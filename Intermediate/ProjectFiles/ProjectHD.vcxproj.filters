@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="..\..\ProjectHD.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F31BBDD1-B3E8-3BCC-9652-680E16935819}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\ProjectHD.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\ProjectHDEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\.ignore" />
+    <None Include="..\..\.vsconfig" />
+    <None Include="..\..\ProjectHD.code-workspace" />
+    <Filter Include="Config">
+      <UniqueIdentifier>{FA535FFB-25E1-3D20-B416-52F9BE21E06E}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultInput.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\ProjectHD">
+      <UniqueIdentifier>{0E6276D8-3262-3CF9-A520-A1D8A9366689}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\ProjectHD\CameraShake_Fire.cpp">
+      <Filter>Source\ProjectHD</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\ProjectHD\CameraShake_Fire.h">
+      <Filter>Source\ProjectHD</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\ProjectHD\EnemyBase.cpp">
+      <Filter>Source\ProjectHD</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\ProjectHD\EnemyBase.h">
+      <Filter>Source\ProjectHD</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\ProjectHD\FPSCharacter.cpp">
+      <Filter>Source\ProjectHD</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\ProjectHD\FPSCharacter.h">
+      <Filter>Source\ProjectHD</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\ProjectHD\HDBombProjectile.cpp">
+      <Filter>Source\ProjectHD</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\ProjectHD\HDBombProjectile.h">
+      <Filter>Source\ProjectHD</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\ProjectHD\HDProjectile.cpp">
+      <Filter>Source\ProjectHD</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\ProjectHD\HDProjectile.h">
+      <Filter>Source\ProjectHD</Filter>
+    </ClInclude>
+    <None Include="..\..\Source\ProjectHD\ProjectHD.Build.cs">
+      <Filter>Source\ProjectHD</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\ProjectHD\ProjectHD.cpp">
+      <Filter>Source\ProjectHD</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\ProjectHD\ProjectHD.h">
+      <Filter>Source\ProjectHD</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\ProjectHD\StratagemBeacon.cpp">
+      <Filter>Source\ProjectHD</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\ProjectHD\StratagemBeacon.h">
+      <Filter>Source\ProjectHD</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
