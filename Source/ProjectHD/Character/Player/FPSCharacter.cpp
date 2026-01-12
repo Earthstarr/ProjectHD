@@ -167,6 +167,22 @@ void AFPSCharacter::BeginPlay()
     ClusterBomb.bIsOnCooldown = false;
     ClusterBomb.Type = EStratagemType::EagleCluster;
     
+    // 궤도 레이저
+    FStratagemData OrbitalLaser;
+    OrbitalLaser.Name = TEXT("Orbital Laser");
+    OrbitalLaser.Command = { 
+        EStratagemDirection::Right, 
+        EStratagemDirection::Down, 
+        EStratagemDirection::Up, 
+        EStratagemDirection::Right, 
+        EStratagemDirection::Down 
+    };
+    OrbitalLaser.BeaconColor = FLinearColor(0.5f, 0.0f, 1.0f);
+    OrbitalLaser.MaxCooldown = 300.0f;
+    OrbitalLaser.CurrentCooldown = 0.0f;
+    OrbitalLaser.bIsOnCooldown = false;
+    OrbitalLaser.Type = EStratagemType::OrbitalLaser;
+    
     // 센트리
     FStratagemData Sentry;  
     Sentry.Name = TEXT("Sentry");

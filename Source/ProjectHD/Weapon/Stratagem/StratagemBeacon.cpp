@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Eagle.h"
 #include "HDSentry.h"
+#include "OrbitalLaser.h"
 #include "ProjectHD/HDSupplyPod.h"
 #include "Math/Quat.h"
 
@@ -246,6 +247,35 @@ void AStratagemBeacon::TriggerStrike()
             }
         }
     }
+    // 궤도 레이저
+    else if (MyStratagemType == EStratagemType::OrbitalLaser)
+    {
+        // 소환 파라미터 설정
+        FActorSpawnParameters SpawnParams;
+        SpawnParams.Owner = this;
+        SpawnParams.Instigator = GetInstigator(); // 플레이어 컨트롤러 정보를 레이저에 전달
+        SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+        // 레이저 액터 소환
+        if (OrbitalLaserClass)
+        {
+            FVector SpawnLocation = GetActorLocation();
+            FRotator SpawnRotation = FRotator::ZeroRotator;
+
+            AOrbitalLaser* LaserActor = GetWorld()->SpawnActor<AOrbitalLaser>(
+                OrbitalLaserClass, 
+                SpawnLocation, 
+                SpawnRotation, 
+                SpawnParams
+            );
+
+            if (LaserActor)
+            {
+                 // LaserActor->InitLaser(Duration, MoveSpeed);
+            }
+        }
+    }
+    
     MeshComp->SetVisibility(false);
     if (SpawnedBeam) SpawnedBeam->Deactivate();
     CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
