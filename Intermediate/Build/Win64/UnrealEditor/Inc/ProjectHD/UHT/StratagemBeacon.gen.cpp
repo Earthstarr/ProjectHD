@@ -244,6 +244,16 @@ struct Z_Construct_UClass_AStratagemBeacon_Statics
 		{ "ToolTip", "\xeb\xb9\xa8\xea\xb0\x84 \xeb\xb9\x9b\xea\xb8\xb0\xeb\x91\xa5 \xec\x9d\xb4\xed\x8e\x99\xed\x8a\xb8" },
 #endif
 	};
+	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_FallingSound_MetaData[] = {
+		{ "Category", "Effects" },
+#if !UE_BUILD_SHIPPING
+		{ "Comment", "// \xeb\xb3\xb4\xea\xb8\x89\xed\x92\x88, \xec\x84\xbc\xed\x8a\xb8\xeb\xa6\xac \xeb\x96\xa8\xec\x96\xb4\xec\xa7\x80\xeb\x8a\x94 \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c\n" },
+#endif
+		{ "ModuleRelativePath", "Weapon/Stratagem/StratagemBeacon.h" },
+#if !UE_BUILD_SHIPPING
+		{ "ToolTip", "\xeb\xb3\xb4\xea\xb8\x89\xed\x92\x88, \xec\x84\xbc\xed\x8a\xb8\xeb\xa6\xac \xeb\x96\xa8\xec\x96\xb4\xec\xa7\x80\xeb\x8a\x94 \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c" },
+#endif
+	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_SpawnedBeam_MetaData[] = {
 #if !UE_BUILD_SHIPPING
 		{ "Comment", "// \xec\x83\x9d\xec\x84\xb1\xeb\x90\x9c \xec\x9d\xb4\xed\x8e\x99\xed\x8a\xb8\xeb\xa5\xbc \xea\xb4\x80\xeb\xa6\xac\xed\x95\xa0 \xec\xbb\xb4\xed\x8f\xac\xeb\x84\x8c\xed\x8a\xb8\n" },
@@ -306,6 +316,7 @@ struct Z_Construct_UClass_AStratagemBeacon_Statics
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_BeaconActivateSound;
 	static const UECodeGen_Private::FFloatPropertyParams NewProp_DelayToStrike;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_BeamEffect;
+	static const UECodeGen_Private::FObjectPropertyParams NewProp_FallingSound;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_SpawnedBeam;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_ClusterExplosionFX;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_ClusterExplosionSound;
@@ -333,6 +344,7 @@ const UECodeGen_Private::FClassPropertyParams Z_Construct_UClass_AStratagemBeaco
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_BeaconActivateSound = { "BeaconActivateSound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, BeaconActivateSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_BeaconActivateSound_MetaData), NewProp_BeaconActivateSound_MetaData) };
 const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_DelayToStrike = { "DelayToStrike", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, DelayToStrike), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_DelayToStrike_MetaData), NewProp_DelayToStrike_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_BeamEffect = { "BeamEffect", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, BeamEffect), Z_Construct_UClass_UNiagaraSystem_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_BeamEffect_MetaData), NewProp_BeamEffect_MetaData) };
+const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_FallingSound = { "FallingSound", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, FallingSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_FallingSound_MetaData), NewProp_FallingSound_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_SpawnedBeam = { "SpawnedBeam", nullptr, (EPropertyFlags)0x0020080000080008, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, SpawnedBeam), Z_Construct_UClass_UNiagaraComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_SpawnedBeam_MetaData), NewProp_SpawnedBeam_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_ClusterExplosionFX = { "ClusterExplosionFX", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, ClusterExplosionFX), Z_Construct_UClass_UNiagaraSystem_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ClusterExplosionFX_MetaData), NewProp_ClusterExplosionFX_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_ClusterExplosionSound = { "ClusterExplosionSound", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, ClusterExplosionSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ClusterExplosionSound_MetaData), NewProp_ClusterExplosionSound_MetaData) };
@@ -350,6 +362,7 @@ const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AStratage
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_BeaconActivateSound,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_DelayToStrike,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_BeamEffect,
+	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_FallingSound,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_SpawnedBeam,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_ClusterExplosionFX,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_ClusterExplosionSound,
@@ -394,14 +407,14 @@ AStratagemBeacon::~AStratagemBeacon() {}
 // End Class AStratagemBeacon
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics
+struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_AStratagemBeacon, AStratagemBeacon::StaticClass, TEXT("AStratagemBeacon"), &Z_Registration_Info_UClass_AStratagemBeacon, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AStratagemBeacon), 1661686238U) },
+		{ Z_Construct_UClass_AStratagemBeacon, AStratagemBeacon::StaticClass, TEXT("AStratagemBeacon"), &Z_Registration_Info_UClass_AStratagemBeacon, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AStratagemBeacon), 4222527823U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_3793604001(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_1028835644(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

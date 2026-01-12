@@ -345,6 +345,26 @@ struct Z_Construct_UClass_AHDSupplyPod_Statics
 		{ "ToolTip", "\xeb\x95\x85 \xec\xb6\xa9\xeb\x8f\x8c \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c" },
 #endif
 	};
+	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_DeploySound_MetaData[] = {
+		{ "Category", "Sound" },
+#if !UE_BUILD_SHIPPING
+		{ "Comment", "// Deploy \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c - \xeb\xb8\x94\xed\x94\x84 Timeline\xec\x97\x90\xec\x84\x9c \xec\x9e\xac\xec\x83\x9d\n" },
+#endif
+		{ "ModuleRelativePath", "HDSupplyPod.h" },
+#if !UE_BUILD_SHIPPING
+		{ "ToolTip", "Deploy \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c - \xeb\xb8\x94\xed\x94\x84 Timeline\xec\x97\x90\xec\x84\x9c \xec\x9e\xac\xec\x83\x9d" },
+#endif
+	};
+	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_UnDeploySound_MetaData[] = {
+		{ "Category", "Sound" },
+#if !UE_BUILD_SHIPPING
+		{ "Comment", "// UnDeploy \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c - \xeb\xb8\x94\xed\x94\x84 Timeline\xec\x97\x90\xec\x84\x9c \xec\x9e\xac\xec\x83\x9d\n" },
+#endif
+		{ "ModuleRelativePath", "HDSupplyPod.h" },
+#if !UE_BUILD_SHIPPING
+		{ "ToolTip", "UnDeploy \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c - \xeb\xb8\x94\xed\x94\x84 Timeline\xec\x97\x90\xec\x84\x9c \xec\x9e\xac\xec\x83\x9d" },
+#endif
+	};
 #endif // WITH_METADATA
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_BodyMesh;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_PillarMesh;
@@ -354,6 +374,8 @@ struct Z_Construct_UClass_AHDSupplyPod_Statics
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_InteractionWidget;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_SupplyPickupSound;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_ImpactSound;
+	static const UECodeGen_Private::FObjectPropertyParams NewProp_DeploySound;
+	static const UECodeGen_Private::FObjectPropertyParams NewProp_UnDeploySound;
 	static const UECodeGen_Private::FPropertyParamsBase* const PropPointers[];
 	static UObject* (*const DependentSingletons[])();
 	static constexpr FClassFunctionLinkInfo FuncInfo[] = {
@@ -377,6 +399,8 @@ const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AHDSupplyPod_S
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_InteractionWidget = { "InteractionWidget", nullptr, (EPropertyFlags)0x00200800000a001d, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AHDSupplyPod, InteractionWidget), Z_Construct_UClass_UWidgetComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_InteractionWidget_MetaData), NewProp_InteractionWidget_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_SupplyPickupSound = { "SupplyPickupSound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AHDSupplyPod, SupplyPickupSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_SupplyPickupSound_MetaData), NewProp_SupplyPickupSound_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_ImpactSound = { "ImpactSound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AHDSupplyPod, ImpactSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ImpactSound_MetaData), NewProp_ImpactSound_MetaData) };
+const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_DeploySound = { "DeploySound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AHDSupplyPod, DeploySound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_DeploySound_MetaData), NewProp_DeploySound_MetaData) };
+const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_UnDeploySound = { "UnDeploySound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AHDSupplyPod, UnDeploySound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_UnDeploySound_MetaData), NewProp_UnDeploySound_MetaData) };
 const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AHDSupplyPod_Statics::PropPointers[] = {
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_BodyMesh,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_PillarMesh,
@@ -386,6 +410,8 @@ const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AHDSupply
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_InteractionWidget,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_SupplyPickupSound,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_ImpactSound,
+	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_DeploySound,
+	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AHDSupplyPod_Statics::NewProp_UnDeploySound,
 };
 static_assert(UE_ARRAY_COUNT(Z_Construct_UClass_AHDSupplyPod_Statics::PropPointers) < 2048);
 UObject* (*const Z_Construct_UClass_AHDSupplyPod_Statics::DependentSingletons[])() = {
@@ -428,14 +454,14 @@ AHDSupplyPod::~AHDSupplyPod() {}
 // End Class AHDSupplyPod
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_Statics
+struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_AHDSupplyPod, AHDSupplyPod::StaticClass, TEXT("AHDSupplyPod"), &Z_Registration_Info_UClass_AHDSupplyPod, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AHDSupplyPod), 2322019709U) },
+		{ Z_Construct_UClass_AHDSupplyPod, AHDSupplyPod::StaticClass, TEXT("AHDSupplyPod"), &Z_Registration_Info_UClass_AHDSupplyPod, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AHDSupplyPod), 2777104382U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_3783977666(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_219174517(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

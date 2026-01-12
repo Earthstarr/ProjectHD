@@ -87,6 +87,11 @@ void AHDSupplyPod::Tick(float DeltaTime)
 
 			bIsDeployed = true;
 			StartDeploySequence(); // 블루프린트 애니메이션 호출
+			
+			if (DeploySound) 
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, DeploySound, GetActorLocation());
+			}	
 
 			if (ImpactSound) 
 			{
@@ -224,6 +229,11 @@ void AHDSupplyPod::Interact(AFPSCharacter* Interactor)
 	{
 		InteractionWidget->SetVisibility(false);
 		EndDeploySequence();
+		
+		if (UnDeploySound)
+		{		
+			UGameplayStatics::PlaySoundAtLocation(this, UnDeploySound, GetActorLocation());
+		}
 	}
 
 	// UI 갱신 델리게이트 호출
