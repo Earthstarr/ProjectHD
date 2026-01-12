@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" addBOMForNewFiles="with BOM under Windows, with no BOM otherwise">
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Character/Player/FPSCharacter.cpp" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Character/Player/FPSCharacter.cpp" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Effect/CameraShake_Fire.cpp" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Effect/CameraShake_Fire.cpp" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/Projectile/HDRocketProjectile.cpp" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/Projectile/HDRocketProjectile.cpp" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/Projectile/HDRocketProjectile.h" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/Projectile/HDRocketProjectile.h" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/Stratagem/Eagle.cpp" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/Stratagem/Eagle.cpp" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/Stratagem/Eagle.h" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/Stratagem/Eagle.h" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/WeaponDataAsset.h" charset="EUC-KR" />
+    <file url="file://$PROJECT_DIR$/Source/ProjectHD/Weapon/WeaponDataAsset.h" charset="EUC-KR" />
+  </component>
+</project>

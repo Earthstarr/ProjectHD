@@ -1,0 +1,52 @@
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "OrbitalLaser.generated.h"
+
+UCLASS()
+class PROJECTHD_API AOrbitalLaser : public AActor
+{
+	GENERATED_BODY()
+    
+public:    
+	AOrbitalLaser();
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+
+	// --- 컴포넌트 ---
+	UPROPERTY(VisibleAnywhere, Category = "Laser")
+	class UNiagaraComponent* LaserFX; // 하늘에서 내려오는 레이저 본체
+
+	// --- 설정 ---
+	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
+	float SearchRadius = 2500.f;      // 적 탐지 범위
+
+	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
+	float MoveSpeed = 600.f;          // 레이저 이동 속도
+
+	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
+	float DamagePerSecond = 150.f;    // 초당 데미지
+
+	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
+	float Duration = 15.0f;           // 레이저 지속 시간
+
+	UPROPERTY(EditAnywhere, Category = "Laser|Visual")
+	class UMaterialInterface* BurnDecal; // 지면이 타는 데칼 머티리얼
+
+	UPROPERTY(EditAnywhere, Category = "Laser|Sound")
+	class USoundBase* LaserLoopSound; // 레이저 작동 지속음
+
+private:
+	UPROPERTY()
+	AActor* CurrentTarget;            // 현재 추격 중인 적
+
+	FVector CurrentImpactPoint;       // 레이저가 지면에 닿는 현재 좌표
+	class UAudioComponent* AudioComp;
+
+	void FindNewTarget();             // 가장 가까운 적 찾기
+	void UpdateLaserVisuals();        // 나이아가라 파티클 위치 갱신
+	void ApplyLaserDamage(float DeltaTime); // 범위 데미지 적용
+};
