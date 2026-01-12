@@ -76,6 +76,10 @@ protected:
     UPROPERTY(EditAnywhere, Category = "Effects")
     UNiagaraSystem* BeamEffect;
     
+    // 보급품, 센트리 떨어지는 사운드
+    UPROPERTY(EditAnywhere, Category = "Effects")
+    class USoundBase* FallingSound;
+    
     // 생성된 이펙트를 관리할 컴포넌트
     UPROPERTY()
     UNiagaraComponent* SpawnedBeam;
@@ -87,7 +91,7 @@ protected:
     // 집속탄 폭발 사운드
     UPROPERTY(EditAnywhere, Category = "Effects")
     class USoundBase* ClusterExplosionSound;
-
+    
     // 집속탄 범위 설정
     float ClusterWidth = 3000.f;  // 가로
     float ClusterDepth = 1500.f;   // 세로

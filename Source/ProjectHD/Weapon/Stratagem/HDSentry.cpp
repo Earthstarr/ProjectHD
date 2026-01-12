@@ -42,9 +42,9 @@ void AHDSentry::Tick(float DeltaTime)
     {
         BodyMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
                 
-        FVector Start = GetActorLocation() + (FVector::UpVector * 80.f);
+        FVector Start = GetActorLocation() + (FVector::UpVector * 50.f);
         FVector Velocity = BodyMesh->GetPhysicsLinearVelocity();
-        float TraceLength = (Velocity.Size() * DeltaTime) + 100.f;
+        float TraceLength = (Velocity.Size() * DeltaTime) + 150.f;
         FVector End = Start + (FVector::UpVector * -TraceLength);
         
         FHitResult GroundHit;
@@ -54,12 +54,15 @@ void AHDSentry::Tick(float DeltaTime)
         if (GetWorld()->LineTraceSingleByChannel(GroundHit, Start, End, ECC_Visibility, Params))
         {
             BodyMesh->SetSimulatePhysics(false);
-            BodyMesh->SetCollisionProfileName(TEXT("BlockAll"));
-            PillarMesh->SetCollisionProfileName(TEXT("BlockAll"));
-            TurretMesh->SetCollisionProfileName(TEXT("BlockAll"));
-            
+            BodyMesh->PutRigidBodyToSleep();
+            BodyMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                        
             // 땅에 고정
             SetActorLocation(GroundHit.ImpactPoint + FVector(0.f, 0.f, -100.f));
+            
+            BodyMesh->SetCollisionProfileName(TEXT("BlockAll"));
+            PillarMesh->SetCollisionProfileName(TEXT("BlockAll"));
+            //TurretMesh->SetCollisionProfileName(TEXT("BlockAll"));
 
             if (ImpactSound) UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 
