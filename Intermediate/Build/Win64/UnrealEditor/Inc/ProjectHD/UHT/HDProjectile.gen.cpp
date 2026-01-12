@@ -5,7 +5,7 @@
 ===========================================================================*/
 
 #include "UObject/GeneratedCppIncludes.h"
-#include "ProjectHD/HDProjectile.h"
+#include "ProjectHD/Weapon/Projectile/HDProjectile.h"
 #include "Runtime/Engine/Classes/Engine/HitResult.h"
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void EmptyLinkFunctionForGeneratedCodeHDProjectile() {}
@@ -41,11 +41,11 @@ struct Z_Construct_UFunction_AHDProjectile_OnHit_Statics
 #if WITH_METADATA
 	static constexpr UECodeGen_Private::FMetaDataPairParam Function_MetaDataParams[] = {
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xef\xbf\xbd\xe6\xb5\xb9 \xef\xbf\xbd\xef\xbf\xbd \xc8\xa3\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xd4\xbc\xef\xbf\xbd\n" },
+		{ "Comment", "// \xec\xb6\xa9\xeb\x8f\x8c \xec\x8b\x9c \xed\x98\xb8\xec\xb6\x9c\xeb\x90\xa0 \xed\x95\xa8\xec\x88\x98\n" },
 #endif
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xef\xbf\xbd\xe6\xb5\xb9 \xef\xbf\xbd\xef\xbf\xbd \xc8\xa3\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xd4\xbc\xef\xbf\xbd" },
+		{ "ToolTip", "\xec\xb6\xa9\xeb\x8f\x8c \xec\x8b\x9c \xed\x98\xb8\xec\xb6\x9c\xeb\x90\xa0 \xed\x95\xa8\xec\x88\x98" },
 #endif
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_HitComp_MetaData[] = {
@@ -122,74 +122,74 @@ struct Z_Construct_UClass_AHDProjectile_Statics
 {
 #if WITH_METADATA
 	static constexpr UECodeGen_Private::FMetaDataPairParam Class_MetaDataParams[] = {
-		{ "IncludePath", "HDProjectile.h" },
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "IncludePath", "Weapon/Projectile/HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_CollisionComp_MetaData[] = {
 		{ "Category", "Projectile" },
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xef\xbf\xbd\xe6\xb5\xb9\xc3\xbc\n" },
+		{ "Comment", "// \xec\xb6\xa9\xeb\x8f\x8c\xec\xb2\xb4\n" },
 #endif
 		{ "EditInline", "true" },
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xef\xbf\xbd\xe6\xb5\xb9\xc3\xbc" },
+		{ "ToolTip", "\xec\xb6\xa9\xeb\x8f\x8c\xec\xb2\xb4" },
 #endif
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ProjectileMovement_MetaData[] = {
 		{ "Category", "Movement" },
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xef\xbf\xbd\xdf\xbb\xef\xbf\xbd\xc3\xbc \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xc6\xae\n" },
+		{ "Comment", "// \xeb\xb0\x9c\xec\x82\xac\xec\xb2\xb4 \xec\x9b\x80\xec\xa7\x81\xec\x9e\x84 \xec\xbb\xb4\xed\x8f\xac\xeb\x84\x8c\xed\x8a\xb8\n" },
 #endif
 		{ "EditInline", "true" },
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xef\xbf\xbd\xdf\xbb\xef\xbf\xbd\xc3\xbc \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xc6\xae" },
+		{ "ToolTip", "\xeb\xb0\x9c\xec\x82\xac\xec\xb2\xb4 \xec\x9b\x80\xec\xa7\x81\xec\x9e\x84 \xec\xbb\xb4\xed\x8f\xac\xeb\x84\x8c\xed\x8a\xb8" },
 #endif
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ProjectileMesh_MetaData[] = {
 		{ "Category", "Mesh" },
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xef\xbf\xbd\xd1\xbe\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\n" },
+		{ "Comment", "// \xec\xb4\x9d\xec\x95\x8c \xec\x99\xb8\xed\x98\x95\n" },
 #endif
 		{ "EditInline", "true" },
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xef\xbf\xbd\xd1\xbe\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd" },
+		{ "ToolTip", "\xec\xb4\x9d\xec\x95\x8c \xec\x99\xb8\xed\x98\x95" },
 #endif
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_DamageAmount_MetaData[] = {
 		{ "Category", "Combat" },
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ImpactEffect_MetaData[] = {
 		{ "Category", "Effects" },
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xef\xbf\xbd\xce\xb5\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xc6\xae \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\n" },
+		{ "Comment", "// \xeb\xb6\x80\xeb\x94\xaa\xed\x98\x94\xec\x9d\x84 \xeb\x95\x8c \xed\x84\xb0\xec\xa7\x88 \xec\x9d\xb4\xed\x8e\x99\xed\x8a\xb8 \xec\x97\x90\xec\x85\x8b\n" },
 #endif
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xef\xbf\xbd\xce\xb5\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xc6\xae \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd" },
+		{ "ToolTip", "\xeb\xb6\x80\xeb\x94\xaa\xed\x98\x94\xec\x9d\x84 \xeb\x95\x8c \xed\x84\xb0\xec\xa7\x88 \xec\x9d\xb4\xed\x8e\x99\xed\x8a\xb8 \xec\x97\x90\xec\x85\x8b" },
 #endif
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ImpactSound_MetaData[] = {
 		{ "Category", "Effects" },
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\n" },
+		{ "Comment", "// \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c\n" },
 #endif
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd" },
+		{ "ToolTip", "\xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c" },
 #endif
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_HitAttenuation_MetaData[] = {
 		{ "Category", "Effects" },
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\n" },
+		{ "Comment", "// \xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c \xea\xb0\x90\xec\x87\xa0\n" },
 #endif
-		{ "ModuleRelativePath", "HDProjectile.h" },
+		{ "ModuleRelativePath", "Weapon/Projectile/HDProjectile.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd" },
+		{ "ToolTip", "\xec\x82\xac\xec\x9a\xb4\xeb\x93\x9c \xea\xb0\x90\xec\x87\xa0" },
 #endif
 	};
 #endif // WITH_METADATA
@@ -203,7 +203,7 @@ struct Z_Construct_UClass_AHDProjectile_Statics
 	static const UECodeGen_Private::FPropertyParamsBase* const PropPointers[];
 	static UObject* (*const DependentSingletons[])();
 	static constexpr FClassFunctionLinkInfo FuncInfo[] = {
-		{ &Z_Construct_UFunction_AHDProjectile_OnHit, "OnHit" }, // 327273146
+		{ &Z_Construct_UFunction_AHDProjectile_OnHit, "OnHit" }, // 1134536559
 	};
 	static_assert(UE_ARRAY_COUNT(FuncInfo) < 2048);
 	static constexpr FCppClassTypeInfoStatic StaticCppClassTypeInfo = {
@@ -265,14 +265,14 @@ AHDProjectile::~AHDProjectile() {}
 // End Class AHDProjectile
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDProjectile_h_Statics
+struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDProjectile_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_AHDProjectile, AHDProjectile::StaticClass, TEXT("AHDProjectile"), &Z_Registration_Info_UClass_AHDProjectile, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AHDProjectile), 255343290U) },
+		{ Z_Construct_UClass_AHDProjectile, AHDProjectile::StaticClass, TEXT("AHDProjectile"), &Z_Registration_Info_UClass_AHDProjectile, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AHDProjectile), 1580675890U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDProjectile_h_2279450985(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDProjectile_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDProjectile_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDProjectile_h_3209812743(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDProjectile_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDProjectile_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

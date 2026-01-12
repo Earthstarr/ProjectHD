@@ -5,12 +5,12 @@
 ===========================================================================*/
 
 #include "UObject/GeneratedCppIncludes.h"
-#include "ProjectHD/CameraShake_Fire.h"
+#include "ProjectHD/Effect/CameraShake_Fire.h"
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void EmptyLinkFunctionForGeneratedCodeCameraShake_Fire() {}
 
 // Begin Cross Module References
-GAMEPLAYCAMERAS_API UClass* Z_Construct_UClass_ULegacyCameraShake();
+ENGINECAMERAS_API UClass* Z_Construct_UClass_ULegacyCameraShake();
 PROJECTHD_API UClass* Z_Construct_UClass_UCameraShake_Fire();
 PROJECTHD_API UClass* Z_Construct_UClass_UCameraShake_Fire_NoRegister();
 UPackage* Z_Construct_UPackage__Script_ProjectHD();
@@ -33,64 +33,40 @@ struct Z_Construct_UClass_UCameraShake_Fire_Statics
 		{ "Comment", "/**\n * \n */" },
 #endif
 		{ "HideCategories", "CameraShakePattern" },
-		{ "IncludePath", "CameraShake_Fire.h" },
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
+		{ "IncludePath", "Effect/CameraShake_Fire.h" },
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ShakeDuration_MetaData[] = {
 		{ "Category", "Shake" },
-#if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xc4\xab\xef\xbf\xbd\xde\xb6\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xc5\xa9 \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xc3\xb0\xef\xbf\xbd (\xef\xbf\xbd\xef\xbf\xbd)\n" },
-#endif
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
-#if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xc4\xab\xef\xbf\xbd\xde\xb6\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xc5\xa9 \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xc3\xb0\xef\xbf\xbd (\xef\xbf\xbd\xef\xbf\xbd)" },
-#endif
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ShakeFrequency_MetaData[] = {
 		{ "Category", "Shake" },
-#if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xc4\xab\xef\xbf\xbd\xde\xb6\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xc5\xa9 \xef\xbf\xbd\xef\xbf\xbd (Hz)\n" },
-#endif
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
-#if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xc4\xab\xef\xbf\xbd\xde\xb6\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xc5\xa9 \xef\xbf\xbd\xef\xbf\xbd (Hz)" },
-#endif
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_LocShakeIntensityX_MetaData[] = {
 		{ "Category", "Shake" },
-#if !UE_BUILD_SHIPPING
-		{ "Comment", "// X, Y, Z\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xcc\xb5\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\n" },
-#endif
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
-#if !UE_BUILD_SHIPPING
-		{ "ToolTip", "X, Y, Z\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xcc\xb5\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd" },
-#endif
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_LocShakeIntensityY_MetaData[] = {
 		{ "Category", "Shake" },
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_LocShakeIntensityZ_MetaData[] = {
 		{ "Category", "Shake" },
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_RotShakeIntensityPitch_MetaData[] = {
 		{ "Category", "Shake" },
-#if !UE_BUILD_SHIPPING
-		{ "Comment", "// Pitch, Yaw, Roll \xc8\xb8\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\n" },
-#endif
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
-#if !UE_BUILD_SHIPPING
-		{ "ToolTip", "Pitch, Yaw, Roll \xc8\xb8\xef\xbf\xbd\xef\xbf\xbd \xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd\xef\xbf\xbd" },
-#endif
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_RotShakeIntensityYaw_MetaData[] = {
 		{ "Category", "Shake" },
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_RotShakeIntensityRoll_MetaData[] = {
 		{ "Category", "Shake" },
-		{ "ModuleRelativePath", "CameraShake_Fire.h" },
+		{ "ModuleRelativePath", "Effect/CameraShake_Fire.h" },
 	};
 #endif // WITH_METADATA
 	static const UECodeGen_Private::FFloatPropertyParams NewProp_ShakeDuration;
@@ -164,14 +140,14 @@ UCameraShake_Fire::~UCameraShake_Fire() {}
 // End Class UCameraShake_Fire
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_CameraShake_Fire_h_Statics
+struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_UCameraShake_Fire, UCameraShake_Fire::StaticClass, TEXT("UCameraShake_Fire"), &Z_Registration_Info_UClass_UCameraShake_Fire, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCameraShake_Fire), 508598887U) },
+		{ Z_Construct_UClass_UCameraShake_Fire, UCameraShake_Fire::StaticClass, TEXT("UCameraShake_Fire"), &Z_Registration_Info_UClass_UCameraShake_Fire, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCameraShake_Fire), 639382061U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_CameraShake_Fire_h_1210295627(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_CameraShake_Fire_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_CameraShake_Fire_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_97173983(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

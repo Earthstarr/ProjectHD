@@ -16,9 +16,12 @@ public class ProjectHD : ModuleRules
             "Slate",
             "SlateCore",
             "Niagara",
-            "GameplayCameras"
+            "GameplayCameras",
+            "GameplayAbilities",
+            "GameplayTags",
+            "GameplayTasks",            
         });
 
-        PrivateDependencyModuleNames.AddRange(new string[] { });
+        PrivateDependencyModuleNames.AddRange(new string[] { "EngineCameras", "EngineCameras" });
     }
 }
