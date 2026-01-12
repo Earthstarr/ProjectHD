@@ -30,7 +30,7 @@ protected:
 
     // --- 설정 ---
     UPROPERTY(EditAnywhere, Category = "Sentry|Settings")
-    float DetectionRadius = 3500.f;
+    float DetectionRadius = 4500.f;
 
     UPROPERTY(EditAnywhere, Category = "Sentry|Settings")
     float RotationSpeed = 5.0f;
@@ -39,7 +39,7 @@ protected:
     float FireRate = 0.1f;
     
     UPROPERTY(EditAnywhere, Category = "Sentry|Settings")
-    int32 MaxAmmo = 120; // 최대 탄약 수
+    int32 MaxAmmo = 400; // 최대 탄약 수
 
     int32 CurrentAmmo;
 

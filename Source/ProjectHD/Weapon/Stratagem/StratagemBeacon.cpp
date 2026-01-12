@@ -280,15 +280,7 @@ void AStratagemBeacon::TriggerStrike()
     if (SpawnedBeam) SpawnedBeam->Deactivate();
     CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     
-    // 타입에 따른 파괴 처리
-    if (MyStratagemType == EStratagemType::EagleCluster)
-    {        
-        SetLifeSpan(5.0f);
-    }
-    else
-    {        
-        Destroy();
-    }
+    SetLifeSpan(5.0f);    
 }
 
 void AStratagemBeacon::ActivateBeacon()
@@ -338,6 +330,10 @@ void AStratagemBeacon::ActivateBeacon()
             }
 
             UGameplayStatics::PlaySoundAtLocation(this, FighterSound, GetActorLocation());
+        }
+        else if ((MyStratagemType == EStratagemType::Sentry || MyStratagemType == EStratagemType::Supply) && FallingSound)
+        {
+            UGameplayStatics::PlaySoundAtLocation(this, FallingSound, GetActorLocation());
         }
     }
 }

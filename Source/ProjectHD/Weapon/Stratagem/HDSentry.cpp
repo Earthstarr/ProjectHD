@@ -42,9 +42,9 @@ void AHDSentry::Tick(float DeltaTime)
     {
         BodyMesh->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
                 
-        FVector Start = GetActorLocation() + (FVector::UpVector * 80.f);
+        FVector Start = GetActorLocation() + (FVector::UpVector * 50.f);
         FVector Velocity = BodyMesh->GetPhysicsLinearVelocity();
-        float TraceLength = (Velocity.Size() * DeltaTime) + 100.f;
+        float TraceLength = (Velocity.Size() * DeltaTime) + 150.f;
         FVector End = Start + (FVector::UpVector * -TraceLength);
         
         FHitResult GroundHit;
@@ -54,12 +54,15 @@ void AHDSentry::Tick(float DeltaTime)
         if (GetWorld()->LineTraceSingleByChannel(GroundHit, Start, End, ECC_Visibility, Params))
         {
             BodyMesh->SetSimulatePhysics(false);
-            BodyMesh->SetCollisionProfileName(TEXT("BlockAll"));
-            PillarMesh->SetCollisionProfileName(TEXT("BlockAll"));
-            TurretMesh->SetCollisionProfileName(TEXT("BlockAll"));
-            
+            BodyMesh->PutRigidBodyToSleep();
+            BodyMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+                        
             // 땅에 고정
             SetActorLocation(GroundHit.ImpactPoint + FVector(0.f, 0.f, -100.f));
+            
+            BodyMesh->SetCollisionProfileName(TEXT("BlockAll"));
+            PillarMesh->SetCollisionProfileName(TEXT("BlockAll"));
+            //TurretMesh->SetCollisionProfileName(TEXT("BlockAll"));
 
             if (ImpactSound) UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 
@@ -87,10 +90,12 @@ void AHDSentry::Tick(float DeltaTime)
     }
 }
 
+// 시야에서 보이면서 가장 가까운 적 찾기
 void AHDSentry::FindNearestEnemy()
 {
     TArray<FHitResult> OutHits;
     FVector MyLoc = GetActorLocation();
+    FVector MuzzleLoc = TurretMesh->GetSocketLocation(TEXT("Muzzle")); // 시야 체크 시작점
     FCollisionShape DetectionSphere = FCollisionShape::MakeSphere(DetectionRadius);
     
     // Pawn 채널에서 주변 모든 적 탐색
@@ -104,13 +109,26 @@ void AHDSentry::FindNearestEnemy()
         for (auto& Hit : OutHits)
         {
             AActor* FoundActor = Hit.GetActor();
-            if (FoundActor && FoundActor->ActorHasTag(TEXT("Enemy"))) // "Enemy" 태그 필수
+            if (FoundActor && FoundActor->ActorHasTag(TEXT("Enemy")))
             {
-                float Dist = FVector::Dist(MyLoc, FoundActor->GetActorLocation());
-                if (Dist < MinDist)
+                // 시야 체크
+                FVector TargetLoc = FoundActor->GetActorLocation();
+                FHitResult SightHit;
+                FCollisionQueryParams Params;
+                Params.AddIgnoredActor(this);
+                Params.AddIgnoredActor(FoundActor);
+
+                // 시야를 가리는 장애물이 있는지 확인
+                bool bIsBlocked = GetWorld()->LineTraceSingleByChannel(SightHit, MuzzleLoc, TargetLoc, ECC_Visibility, Params);
+
+                if (!bIsBlocked) // 장애물에 걸리지 않은 경우에만 타겟 후보로 등록
                 {
-                    MinDist = Dist;
-                    BestTarget = FoundActor;
+                    float Dist = FVector::Dist(MyLoc, FoundActor->GetActorLocation());
+                    if (Dist < MinDist)
+                    {
+                        MinDist = Dist;
+                        BestTarget = FoundActor;
+                    }
                 }
             }
         }
@@ -134,13 +152,14 @@ void AHDSentry::RotateToTarget(float DeltaTime)
     // 센트리는 Roll(기울기)은 회전하면 안되므로 0으로 고정
     NewRot.Roll = 0.f;
     TurretMesh->SetWorldRotation(NewRot);
-
-    // 조준 정렬 확인 (정면 기준 약 10도 이내일 때 사격)
+    
+    // 조준 정렬 확인
     FVector Forward = TurretMesh->GetForwardVector();
     FVector ToTarget = (TargetLoc - MuzzleLoc).GetSafeNormal();
     float Dot = FVector::DotProduct(Forward, ToTarget);
 
-    if (Dot > 0.985f) // 거의 정면일 때
+    // 0.7로 낮춰서 무자비한 사격느낌으로
+    if (Dot > 0.7f)
     {
         if (!GetWorldTimerManager().IsTimerActive(FireTimerHandle))
         {
@@ -167,6 +186,10 @@ void AHDSentry::Fire()
     // 총구 위치 소켓 이름: "Muzzle"
     FVector MuzzleLoc = TurretMesh->GetSocketLocation(TEXT("Muzzle"));
     FRotator MuzzleRot = TurretMesh->GetSocketRotation(TEXT("Muzzle"));
+    
+    // 랜덤 퍼짐 추가 (상하좌우 약 1도)
+    MuzzleRot.Pitch += FMath::FRandRange(-1.0f, 1.0f);
+    MuzzleRot.Yaw += FMath::FRandRange(-1.0f, 1.0f);
 
     FActorSpawnParameters Params;
     Params.Owner = this;
