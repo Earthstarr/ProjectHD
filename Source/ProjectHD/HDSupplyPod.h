@@ -62,6 +62,14 @@ protected:
 	// 땅 충돌 사운드
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	class USoundBase* ImpactSound;
+	
+	// Deploy 사운드 - 블프 Timeline에서 재생
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	class USoundBase* DeploySound;
+	
+	// UnDeploy 사운드 - 블프 Timeline에서 재생
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	class USoundBase* UnDeploySound;
 
 	// 인터페이스 함수 오버라이드
 	virtual void Interact(AFPSCharacter* Interactor) override;
