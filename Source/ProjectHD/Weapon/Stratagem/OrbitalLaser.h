@@ -19,19 +19,22 @@ protected:
 	// --- 컴포넌트 ---
 	UPROPERTY(VisibleAnywhere, Category = "Laser")
 	class UNiagaraComponent* LaserFX; // 하늘에서 내려오는 레이저 본체
+	
+	UPROPERTY(VisibleAnywhere, Category = "Laser")
+	class UNiagaraComponent* ImpactFX; // 지면 이펙트
 
 	// --- 설정 ---
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
 	float SearchRadius = 2500.f;      // 적 탐지 범위
 
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
-	float MoveSpeed = 600.f;          // 레이저 이동 속도
+	float MoveSpeed = 500.f;          // 레이저 이동 속도
 
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
-	float DamagePerSecond = 150.f;    // 초당 데미지
+	float DamagePerSecond = 120.f;    // 초당 데미지
 
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
-	float Duration = 15.0f;           // 레이저 지속 시간
+	float Duration = 31.8f;           // 레이저 지속 시간
 
 	UPROPERTY(EditAnywhere, Category = "Laser|Visual")
 	class UMaterialInterface* BurnDecal; // 지면이 타는 데칼 머티리얼
@@ -49,4 +52,9 @@ private:
 	void FindNewTarget();             // 가장 가까운 적 찾기
 	void UpdateLaserVisuals();        // 나이아가라 파티클 위치 갱신
 	void ApplyLaserDamage(float DeltaTime); // 범위 데미지 적용
+	
+	bool bIsLaserActive = false; // 레이저 활성화 여부
+	void ActivateLaser();        // 1초 뒤 호출될 함수
+	
+	float delaytime = 1.2f;
 };

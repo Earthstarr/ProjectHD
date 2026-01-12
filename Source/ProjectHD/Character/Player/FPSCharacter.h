@@ -26,6 +26,7 @@ enum class EStratagemType : uint8
     Bomb500kg,
     Supply,
     EagleCluster,
+    OrbitalLaser,
     Sentry,
 };
 
