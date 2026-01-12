@@ -49,9 +49,13 @@ protected:
     UPROPERTY(EditAnywhere, Category = "Stratagem")
     TSubclassOf<class AHDSupplyPod> SupplyClass;
     
-    // 보급품
+    // 센트리
     UPROPERTY(EditAnywhere, Category = "Stratagem")
     TSubclassOf<class AHDSentry> SentryClass;
+    
+    // 궤도 레이저
+    UPROPERTY(EditAnywhere, Category = "Stratagem")
+    TSubclassOf<class AOrbitalLaser> OrbitalLaserClass;
 
     // 바닥에 부딪혔을 때 호출될 함수
     UFUNCTION()

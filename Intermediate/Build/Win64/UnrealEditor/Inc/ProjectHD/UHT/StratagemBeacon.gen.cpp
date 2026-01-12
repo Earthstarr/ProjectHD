@@ -27,6 +27,7 @@ PROJECTHD_API UClass* Z_Construct_UClass_AEagle_NoRegister();
 PROJECTHD_API UClass* Z_Construct_UClass_AHDProjectile_NoRegister();
 PROJECTHD_API UClass* Z_Construct_UClass_AHDSentry_NoRegister();
 PROJECTHD_API UClass* Z_Construct_UClass_AHDSupplyPod_NoRegister();
+PROJECTHD_API UClass* Z_Construct_UClass_AOrbitalLaser_NoRegister();
 PROJECTHD_API UClass* Z_Construct_UClass_AStratagemBeacon();
 PROJECTHD_API UClass* Z_Construct_UClass_AStratagemBeacon_NoRegister();
 UPackage* Z_Construct_UPackage__Script_ProjectHD();
@@ -196,11 +197,21 @@ struct Z_Construct_UClass_AStratagemBeacon_Statics
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_SentryClass_MetaData[] = {
 		{ "Category", "Stratagem" },
 #if !UE_BUILD_SHIPPING
-		{ "Comment", "// \xeb\xb3\xb4\xea\xb8\x89\xed\x92\x88\n" },
+		{ "Comment", "// \xec\x84\xbc\xed\x8a\xb8\xeb\xa6\xac\n" },
 #endif
 		{ "ModuleRelativePath", "Weapon/Stratagem/StratagemBeacon.h" },
 #if !UE_BUILD_SHIPPING
-		{ "ToolTip", "\xeb\xb3\xb4\xea\xb8\x89\xed\x92\x88" },
+		{ "ToolTip", "\xec\x84\xbc\xed\x8a\xb8\xeb\xa6\xac" },
+#endif
+	};
+	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_OrbitalLaserClass_MetaData[] = {
+		{ "Category", "Stratagem" },
+#if !UE_BUILD_SHIPPING
+		{ "Comment", "// \xea\xb6\xa4\xeb\x8f\x84 \xeb\xa0\x88\xec\x9d\xb4\xec\xa0\x80\n" },
+#endif
+		{ "ModuleRelativePath", "Weapon/Stratagem/StratagemBeacon.h" },
+#if !UE_BUILD_SHIPPING
+		{ "ToolTip", "\xea\xb6\xa4\xeb\x8f\x84 \xeb\xa0\x88\xec\x9d\xb4\xec\xa0\x80" },
 #endif
 	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_BeaconActivateSound_MetaData[] = {
@@ -291,6 +302,7 @@ struct Z_Construct_UClass_AStratagemBeacon_Statics
 	static const UECodeGen_Private::FClassPropertyParams NewProp_EagleClusterProjectileClass;
 	static const UECodeGen_Private::FClassPropertyParams NewProp_SupplyClass;
 	static const UECodeGen_Private::FClassPropertyParams NewProp_SentryClass;
+	static const UECodeGen_Private::FClassPropertyParams NewProp_OrbitalLaserClass;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_BeaconActivateSound;
 	static const UECodeGen_Private::FFloatPropertyParams NewProp_DelayToStrike;
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_BeamEffect;
@@ -317,6 +329,7 @@ const UECodeGen_Private::FClassPropertyParams Z_Construct_UClass_AStratagemBeaco
 const UECodeGen_Private::FClassPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_EagleClusterProjectileClass = { "EagleClusterProjectileClass", nullptr, (EPropertyFlags)0x0024080000000001, UECodeGen_Private::EPropertyGenFlags::Class, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, EagleClusterProjectileClass), Z_Construct_UClass_UClass, Z_Construct_UClass_AHDProjectile_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_EagleClusterProjectileClass_MetaData), NewProp_EagleClusterProjectileClass_MetaData) };
 const UECodeGen_Private::FClassPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_SupplyClass = { "SupplyClass", nullptr, (EPropertyFlags)0x0024080000000001, UECodeGen_Private::EPropertyGenFlags::Class, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, SupplyClass), Z_Construct_UClass_UClass, Z_Construct_UClass_AHDSupplyPod_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_SupplyClass_MetaData), NewProp_SupplyClass_MetaData) };
 const UECodeGen_Private::FClassPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_SentryClass = { "SentryClass", nullptr, (EPropertyFlags)0x0024080000000001, UECodeGen_Private::EPropertyGenFlags::Class, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, SentryClass), Z_Construct_UClass_UClass, Z_Construct_UClass_AHDSentry_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_SentryClass_MetaData), NewProp_SentryClass_MetaData) };
+const UECodeGen_Private::FClassPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_OrbitalLaserClass = { "OrbitalLaserClass", nullptr, (EPropertyFlags)0x0024080000000001, UECodeGen_Private::EPropertyGenFlags::Class, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, OrbitalLaserClass), Z_Construct_UClass_UClass, Z_Construct_UClass_AOrbitalLaser_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_OrbitalLaserClass_MetaData), NewProp_OrbitalLaserClass_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_BeaconActivateSound = { "BeaconActivateSound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, BeaconActivateSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_BeaconActivateSound_MetaData), NewProp_BeaconActivateSound_MetaData) };
 const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_DelayToStrike = { "DelayToStrike", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, DelayToStrike), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_DelayToStrike_MetaData), NewProp_DelayToStrike_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_BeamEffect = { "BeamEffect", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AStratagemBeacon, BeamEffect), Z_Construct_UClass_UNiagaraSystem_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_BeamEffect_MetaData), NewProp_BeamEffect_MetaData) };
@@ -333,6 +346,7 @@ const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AStratage
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_EagleClusterProjectileClass,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_SupplyClass,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_SentryClass,
+	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_OrbitalLaserClass,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_BeaconActivateSound,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_DelayToStrike,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AStratagemBeacon_Statics::NewProp_BeamEffect,
@@ -380,14 +394,14 @@ AStratagemBeacon::~AStratagemBeacon() {}
 // End Class AStratagemBeacon
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics
+struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_AStratagemBeacon, AStratagemBeacon::StaticClass, TEXT("AStratagemBeacon"), &Z_Registration_Info_UClass_AStratagemBeacon, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AStratagemBeacon), 2831864710U) },
+		{ Z_Construct_UClass_AStratagemBeacon, AStratagemBeacon::StaticClass, TEXT("AStratagemBeacon"), &Z_Registration_Info_UClass_AStratagemBeacon, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AStratagemBeacon), 1661686238U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_1767521034(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_3793604001(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_StratagemBeacon_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

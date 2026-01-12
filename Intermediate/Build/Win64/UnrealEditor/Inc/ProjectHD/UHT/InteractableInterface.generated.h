@@ -14,7 +14,7 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define PROJECTHD_InteractableInterface_generated_h
 
-#define FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_ENHANCED_CONSTRUCTORS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_ENHANCED_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	PROJECTHD_API UInteractableInterface(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get()); \
 private: \
@@ -28,7 +28,7 @@ public: \
 	PROJECTHD_API virtual ~UInteractableInterface();
 
 
-#define FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_GENERATED_UINTERFACE_BODY() \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_GENERATED_UINTERFACE_BODY() \
 private: \
 	static void StaticRegisterNativesUInteractableInterface(); \
 	friend struct Z_Construct_UClass_UInteractableInterface_Statics; \
@@ -37,15 +37,15 @@ public: \
 	DECLARE_SERIALIZER(UInteractableInterface)
 
 
-#define FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_GENERATED_BODY \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_GENERATED_BODY \
 	PRAGMA_DISABLE_DEPRECATION_WARNINGS \
-	FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_GENERATED_UINTERFACE_BODY() \
-	FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_ENHANCED_CONSTRUCTORS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_GENERATED_UINTERFACE_BODY() \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_ENHANCED_CONSTRUCTORS \
 private: \
 	PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
-#define FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_INCLASS_IINTERFACE_NO_PURE_DECLS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_INCLASS_IINTERFACE_NO_PURE_DECLS \
 protected: \
 	virtual ~IInteractableInterface() {} \
 public: \
@@ -54,11 +54,11 @@ public: \
 	virtual UObject* _getUObject() const { return nullptr; }
 
 
-#define FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_11_PROLOG
-#define FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_19_GENERATED_BODY \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_11_PROLOG
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_19_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_INCLASS_IINTERFACE_NO_PURE_DECLS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h_14_INCLASS_IINTERFACE_NO_PURE_DECLS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -66,7 +66,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> PROJECTHD_API UClass* StaticClass<class UInteractableInterface>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_ProjectHD_Source_ProjectHD_InteractableInterface_h
+#define CURRENT_FILE_ID FID_JW_Unreal_ProjectHD_Source_ProjectHD_InteractableInterface_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

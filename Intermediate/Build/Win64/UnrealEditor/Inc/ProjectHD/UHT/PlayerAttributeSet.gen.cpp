@@ -122,14 +122,14 @@ UPlayerAttributeSet::~UPlayerAttributeSet() {}
 // End Class UPlayerAttributeSet
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_Statics
+struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
 		{ Z_Construct_UClass_UPlayerAttributeSet, UPlayerAttributeSet::StaticClass, TEXT("UPlayerAttributeSet"), &Z_Registration_Info_UClass_UPlayerAttributeSet, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UPlayerAttributeSet), 1731241077U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_1969922995(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_1969922995(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

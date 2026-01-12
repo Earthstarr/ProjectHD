@@ -398,14 +398,14 @@ AHDSentry::~AHDSentry() {}
 // End Class AHDSentry
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_HDSentry_h_Statics
+struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_HDSentry_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
 		{ Z_Construct_UClass_AHDSentry, AHDSentry::StaticClass, TEXT("AHDSentry"), &Z_Registration_Info_UClass_AHDSentry, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AHDSentry), 3079618558U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_HDSentry_h_72095128(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_HDSentry_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_HDSentry_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_HDSentry_h_72095128(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_HDSentry_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_HDSentry_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration
