@@ -47,6 +47,17 @@ struct Z_Construct_UClass_AOrbitalLaser_Statics
 		{ "ToolTip", "--- \xec\xbb\xb4\xed\x8f\xac\xeb\x84\x8c\xed\x8a\xb8 ---" },
 #endif
 	};
+	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_ImpactFX_MetaData[] = {
+		{ "Category", "Laser" },
+#if !UE_BUILD_SHIPPING
+		{ "Comment", "// \xed\x95\x98\xeb\x8a\x98\xec\x97\x90\xec\x84\x9c \xeb\x82\xb4\xeb\xa0\xa4\xec\x98\xa4\xeb\x8a\x94 \xeb\xa0\x88\xec\x9d\xb4\xec\xa0\x80 \xeb\xb3\xb8\xec\xb2\xb4\n" },
+#endif
+		{ "EditInline", "true" },
+		{ "ModuleRelativePath", "Weapon/Stratagem/OrbitalLaser.h" },
+#if !UE_BUILD_SHIPPING
+		{ "ToolTip", "\xed\x95\x98\xeb\x8a\x98\xec\x97\x90\xec\x84\x9c \xeb\x82\xb4\xeb\xa0\xa4\xec\x98\xa4\xeb\x8a\x94 \xeb\xa0\x88\xec\x9d\xb4\xec\xa0\x80 \xeb\xb3\xb8\xec\xb2\xb4" },
+#endif
+	};
 	static constexpr UECodeGen_Private::FMetaDataPairParam NewProp_SearchRadius_MetaData[] = {
 		{ "Category", "Laser|Settings" },
 #if !UE_BUILD_SHIPPING
@@ -112,6 +123,7 @@ struct Z_Construct_UClass_AOrbitalLaser_Statics
 	};
 #endif // WITH_METADATA
 	static const UECodeGen_Private::FObjectPropertyParams NewProp_LaserFX;
+	static const UECodeGen_Private::FObjectPropertyParams NewProp_ImpactFX;
 	static const UECodeGen_Private::FFloatPropertyParams NewProp_SearchRadius;
 	static const UECodeGen_Private::FFloatPropertyParams NewProp_MoveSpeed;
 	static const UECodeGen_Private::FFloatPropertyParams NewProp_DamagePerSecond;
@@ -127,6 +139,7 @@ struct Z_Construct_UClass_AOrbitalLaser_Statics
 	static const UECodeGen_Private::FClassParams ClassParams;
 };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_LaserFX = { "LaserFX", nullptr, (EPropertyFlags)0x00200800000a0009, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AOrbitalLaser, LaserFX), Z_Construct_UClass_UNiagaraComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_LaserFX_MetaData), NewProp_LaserFX_MetaData) };
+const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_ImpactFX = { "ImpactFX", nullptr, (EPropertyFlags)0x00200800000a0009, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AOrbitalLaser, ImpactFX), Z_Construct_UClass_UNiagaraComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ImpactFX_MetaData), NewProp_ImpactFX_MetaData) };
 const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_SearchRadius = { "SearchRadius", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AOrbitalLaser, SearchRadius), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_SearchRadius_MetaData), NewProp_SearchRadius_MetaData) };
 const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_MoveSpeed = { "MoveSpeed", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AOrbitalLaser, MoveSpeed), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_MoveSpeed_MetaData), NewProp_MoveSpeed_MetaData) };
 const UECodeGen_Private::FFloatPropertyParams Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_DamagePerSecond = { "DamagePerSecond", nullptr, (EPropertyFlags)0x0020080000000001, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AOrbitalLaser, DamagePerSecond), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_DamagePerSecond_MetaData), NewProp_DamagePerSecond_MetaData) };
@@ -136,6 +149,7 @@ const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AOrbitalLaser_
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_CurrentTarget = { "CurrentTarget", nullptr, (EPropertyFlags)0x0040000000000000, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AOrbitalLaser, CurrentTarget), Z_Construct_UClass_AActor_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_CurrentTarget_MetaData), NewProp_CurrentTarget_MetaData) };
 const UECodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_AOrbitalLaser_Statics::PropPointers[] = {
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_LaserFX,
+	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_ImpactFX,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_SearchRadius,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_MoveSpeed,
 	(const UECodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_AOrbitalLaser_Statics::NewProp_DamagePerSecond,
@@ -182,14 +196,14 @@ AOrbitalLaser::~AOrbitalLaser() {}
 // End Class AOrbitalLaser
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_OrbitalLaser_h_Statics
+struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_OrbitalLaser_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_AOrbitalLaser, AOrbitalLaser::StaticClass, TEXT("AOrbitalLaser"), &Z_Registration_Info_UClass_AOrbitalLaser, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AOrbitalLaser), 2908277691U) },
+		{ Z_Construct_UClass_AOrbitalLaser, AOrbitalLaser::StaticClass, TEXT("AOrbitalLaser"), &Z_Registration_Info_UClass_AOrbitalLaser, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AOrbitalLaser), 1148070689U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_OrbitalLaser_h_956159812(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_OrbitalLaser_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Stratagem_OrbitalLaser_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_OrbitalLaser_h_3917382330(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_OrbitalLaser_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Stratagem_OrbitalLaser_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration

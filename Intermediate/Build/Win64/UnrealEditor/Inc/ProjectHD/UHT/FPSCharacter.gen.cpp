@@ -140,6 +140,7 @@ struct Z_Construct_UEnum_ProjectHD_EStratagemType_Statics
 #endif
 		{ "EagleCluster.Name", "EStratagemType::EagleCluster" },
 		{ "ModuleRelativePath", "Character/Player/FPSCharacter.h" },
+		{ "OrbitalLaser.Name", "EStratagemType::OrbitalLaser" },
 		{ "Sentry.Name", "EStratagemType::Sentry" },
 		{ "Supply.Name", "EStratagemType::Supply" },
 #if !UE_BUILD_SHIPPING
@@ -151,6 +152,7 @@ struct Z_Construct_UEnum_ProjectHD_EStratagemType_Statics
 		{ "EStratagemType::Bomb500kg", (int64)EStratagemType::Bomb500kg },
 		{ "EStratagemType::Supply", (int64)EStratagemType::Supply },
 		{ "EStratagemType::EagleCluster", (int64)EStratagemType::EagleCluster },
+		{ "EStratagemType::OrbitalLaser", (int64)EStratagemType::OrbitalLaser },
 		{ "EStratagemType::Sentry", (int64)EStratagemType::Sentry },
 	};
 	static const UECodeGen_Private::FEnumParams EnumParams;
@@ -287,7 +289,7 @@ const UECodeGen_Private::FEnumPropertyParams Z_Construct_UScriptStruct_FStratage
 const UECodeGen_Private::FArrayPropertyParams Z_Construct_UScriptStruct_FStratagemData_Statics::NewProp_Command = { "Command", nullptr, (EPropertyFlags)0x0010000000000005, UECodeGen_Private::EPropertyGenFlags::Array, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(FStratagemData, Command), EArrayPropertyFlags::None, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Command_MetaData), NewProp_Command_MetaData) }; // 2109644036
 const UECodeGen_Private::FStructPropertyParams Z_Construct_UScriptStruct_FStratagemData_Statics::NewProp_BeaconColor = { "BeaconColor", nullptr, (EPropertyFlags)0x0010000000000005, UECodeGen_Private::EPropertyGenFlags::Struct, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(FStratagemData, BeaconColor), Z_Construct_UScriptStruct_FLinearColor, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_BeaconColor_MetaData), NewProp_BeaconColor_MetaData) };
 const UECodeGen_Private::FBytePropertyParams Z_Construct_UScriptStruct_FStratagemData_Statics::NewProp_Type_Underlying = { "UnderlyingType", nullptr, (EPropertyFlags)0x0000000000000000, UECodeGen_Private::EPropertyGenFlags::Byte, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, 0, nullptr, METADATA_PARAMS(0, nullptr) };
-const UECodeGen_Private::FEnumPropertyParams Z_Construct_UScriptStruct_FStratagemData_Statics::NewProp_Type = { "Type", nullptr, (EPropertyFlags)0x0010000000000005, UECodeGen_Private::EPropertyGenFlags::Enum, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(FStratagemData, Type), Z_Construct_UEnum_ProjectHD_EStratagemType, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Type_MetaData), NewProp_Type_MetaData) }; // 1496983112
+const UECodeGen_Private::FEnumPropertyParams Z_Construct_UScriptStruct_FStratagemData_Statics::NewProp_Type = { "Type", nullptr, (EPropertyFlags)0x0010000000000005, UECodeGen_Private::EPropertyGenFlags::Enum, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(FStratagemData, Type), Z_Construct_UEnum_ProjectHD_EStratagemType, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_Type_MetaData), NewProp_Type_MetaData) }; // 78175332
 const UECodeGen_Private::FFloatPropertyParams Z_Construct_UScriptStruct_FStratagemData_Statics::NewProp_MaxCooldown = { "MaxCooldown", nullptr, (EPropertyFlags)0x0010000000000005, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(FStratagemData, MaxCooldown), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_MaxCooldown_MetaData), NewProp_MaxCooldown_MetaData) };
 const UECodeGen_Private::FFloatPropertyParams Z_Construct_UScriptStruct_FStratagemData_Statics::NewProp_CurrentCooldown = { "CurrentCooldown", nullptr, (EPropertyFlags)0x0010000000000004, UECodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(FStratagemData, CurrentCooldown), METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_CurrentCooldown_MetaData), NewProp_CurrentCooldown_MetaData) };
 void Z_Construct_UScriptStruct_FStratagemData_Statics::NewProp_bIsOnCooldown_SetBit(void* Obj)
@@ -1903,8 +1905,8 @@ const UECodeGen_Private::FBoolPropertyParams Z_Construct_UClass_AFPSCharacter_St
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_StratagemInputSound = { "StratagemInputSound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AFPSCharacter, StratagemInputSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_StratagemInputSound_MetaData), NewProp_StratagemInputSound_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_StratagemErrorSound = { "StratagemErrorSound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AFPSCharacter, StratagemErrorSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_StratagemErrorSound_MetaData), NewProp_StratagemErrorSound_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_StratagemCompleteSound = { "StratagemCompleteSound", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AFPSCharacter, StratagemCompleteSound), Z_Construct_UClass_USoundBase_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_StratagemCompleteSound_MetaData), NewProp_StratagemCompleteSound_MetaData) };
-const UECodeGen_Private::FStructPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_StratagemList_Inner = { "StratagemList", nullptr, (EPropertyFlags)0x0000000000000000, UECodeGen_Private::EPropertyGenFlags::Struct, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, 0, Z_Construct_UScriptStruct_FStratagemData, METADATA_PARAMS(0, nullptr) }; // 2228000118
-const UECodeGen_Private::FArrayPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_StratagemList = { "StratagemList", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Array, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AFPSCharacter, StratagemList), EArrayPropertyFlags::None, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_StratagemList_MetaData), NewProp_StratagemList_MetaData) }; // 2228000118
+const UECodeGen_Private::FStructPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_StratagemList_Inner = { "StratagemList", nullptr, (EPropertyFlags)0x0000000000000000, UECodeGen_Private::EPropertyGenFlags::Struct, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, 0, Z_Construct_UScriptStruct_FStratagemData, METADATA_PARAMS(0, nullptr) }; // 2937883882
+const UECodeGen_Private::FArrayPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_StratagemList = { "StratagemList", nullptr, (EPropertyFlags)0x0020080000000005, UECodeGen_Private::EPropertyGenFlags::Array, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AFPSCharacter, StratagemList), EArrayPropertyFlags::None, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_StratagemList_MetaData), NewProp_StratagemList_MetaData) }; // 2937883882
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_CameraBoom = { "CameraBoom", nullptr, (EPropertyFlags)0x00100000000a001d, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AFPSCharacter, CameraBoom), Z_Construct_UClass_USpringArmComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_CameraBoom_MetaData), NewProp_CameraBoom_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_ThirdPersonCamera = { "ThirdPersonCamera", nullptr, (EPropertyFlags)0x00100000000a001d, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AFPSCharacter, ThirdPersonCamera), Z_Construct_UClass_UCameraComponent_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_ThirdPersonCamera_MetaData), NewProp_ThirdPersonCamera_MetaData) };
 const UECodeGen_Private::FObjectPropertyParams Z_Construct_UClass_AFPSCharacter_Statics::NewProp_DefaultMappingContext = { "DefaultMappingContext", nullptr, (EPropertyFlags)0x0010000000000015, UECodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, nullptr, nullptr, 1, STRUCT_OFFSET(AFPSCharacter, DefaultMappingContext), Z_Construct_UClass_UInputMappingContext_NoRegister, METADATA_PARAMS(UE_ARRAY_COUNT(NewProp_DefaultMappingContext_MetaData), NewProp_DefaultMappingContext_MetaData) };
@@ -2057,24 +2059,24 @@ AFPSCharacter::~AFPSCharacter() {}
 // End Class AFPSCharacter
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics
+struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics
 {
 	static constexpr FEnumRegisterCompiledInInfo EnumInfo[] = {
 		{ EStratagemDirection_StaticEnum, TEXT("EStratagemDirection"), &Z_Registration_Info_UEnum_EStratagemDirection, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 2109644036U) },
-		{ EStratagemType_StaticEnum, TEXT("EStratagemType"), &Z_Registration_Info_UEnum_EStratagemType, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 1496983112U) },
+		{ EStratagemType_StaticEnum, TEXT("EStratagemType"), &Z_Registration_Info_UEnum_EStratagemType, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 78175332U) },
 		{ EAbilityInputID_StaticEnum, TEXT("EAbilityInputID"), &Z_Registration_Info_UEnum_EAbilityInputID, CONSTRUCT_RELOAD_VERSION_INFO(FEnumReloadVersionInfo, 3725710570U) },
 	};
 	static constexpr FStructRegisterCompiledInInfo ScriptStructInfo[] = {
-		{ FStratagemData::StaticStruct, Z_Construct_UScriptStruct_FStratagemData_Statics::NewStructOps, TEXT("StratagemData"), &Z_Registration_Info_UScriptStruct_StratagemData, CONSTRUCT_RELOAD_VERSION_INFO(FStructReloadVersionInfo, sizeof(FStratagemData), 2228000118U) },
+		{ FStratagemData::StaticStruct, Z_Construct_UScriptStruct_FStratagemData_Statics::NewStructOps, TEXT("StratagemData"), &Z_Registration_Info_UScriptStruct_StratagemData, CONSTRUCT_RELOAD_VERSION_INFO(FStructReloadVersionInfo, sizeof(FStratagemData), 2937883882U) },
 		{ FWeaponInstance::StaticStruct, Z_Construct_UScriptStruct_FWeaponInstance_Statics::NewStructOps, TEXT("WeaponInstance"), &Z_Registration_Info_UScriptStruct_WeaponInstance, CONSTRUCT_RELOAD_VERSION_INFO(FStructReloadVersionInfo, sizeof(FWeaponInstance), 2855800932U) },
 	};
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
-		{ Z_Construct_UClass_AFPSCharacter, AFPSCharacter::StaticClass, TEXT("AFPSCharacter"), &Z_Registration_Info_UClass_AFPSCharacter, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AFPSCharacter), 952153187U) },
+		{ Z_Construct_UClass_AFPSCharacter, AFPSCharacter::StaticClass, TEXT("AFPSCharacter"), &Z_Registration_Info_UClass_AFPSCharacter, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AFPSCharacter), 3920139469U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_4014071350(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::ClassInfo),
-	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::ScriptStructInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::ScriptStructInfo),
-	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::EnumInfo));
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_2403126142(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::ClassInfo),
+	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::ScriptStructInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::ScriptStructInfo),
+	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::EnumInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_Statics::EnumInfo));
 // End Registration
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

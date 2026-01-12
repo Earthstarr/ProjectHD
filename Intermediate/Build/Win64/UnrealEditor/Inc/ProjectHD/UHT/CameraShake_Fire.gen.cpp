@@ -140,14 +140,14 @@ UCameraShake_Fire::~UCameraShake_Fire() {}
 // End Class UCameraShake_Fire
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics
+struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
 		{ Z_Construct_UClass_UCameraShake_Fire, UCameraShake_Fire::StaticClass, TEXT("UCameraShake_Fire"), &Z_Registration_Info_UClass_UCameraShake_Fire, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(UCameraShake_Fire), 639382061U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_97173983(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_97173983(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration
