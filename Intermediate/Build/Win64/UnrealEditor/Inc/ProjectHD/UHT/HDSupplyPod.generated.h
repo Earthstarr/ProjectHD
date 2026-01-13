@@ -17,13 +17,13 @@ struct FHitResult;
 #endif
 #define PROJECTHD_HDSupplyPod_generated_h
 
-#define FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_RPC_WRAPPERS_NO_PURE_DECLS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_RPC_WRAPPERS_NO_PURE_DECLS \
 	DECLARE_FUNCTION(execHandleSphereEndOverlap); \
 	DECLARE_FUNCTION(execHandleSphereBeginOverlap);
 
 
-#define FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_CALLBACK_WRAPPERS
-#define FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_INCLASS_NO_PURE_DECLS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_CALLBACK_WRAPPERS
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesAHDSupplyPod(); \
 	friend struct Z_Construct_UClass_AHDSupplyPod_Statics; \
@@ -33,7 +33,7 @@ public: \
 	virtual UObject* _getUObject() const override { return const_cast<AHDSupplyPod*>(this); }
 
 
-#define FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_ENHANCED_CONSTRUCTORS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	AHDSupplyPod(AHDSupplyPod&&); \
@@ -45,14 +45,14 @@ public: \
 	NO_API virtual ~AHDSupplyPod();
 
 
-#define FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_8_PROLOG
-#define FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_GENERATED_BODY \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_8_PROLOG
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_RPC_WRAPPERS_NO_PURE_DECLS \
-	FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_CALLBACK_WRAPPERS \
-	FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_INCLASS_NO_PURE_DECLS \
-	FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_ENHANCED_CONSTRUCTORS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_CALLBACK_WRAPPERS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_INCLASS_NO_PURE_DECLS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h_11_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -60,7 +60,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> PROJECTHD_API UClass* StaticClass<class AHDSupplyPod>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_ProjectHD_Source_ProjectHD_HDSupplyPod_h
+#define CURRENT_FILE_ID FID_JW_Unreal_ProjectHD_Source_ProjectHD_HDSupplyPod_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
