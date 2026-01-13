@@ -16,53 +16,53 @@ enum class EStratagemDirection : uint8;
 #endif
 #define PROJECTHD_FPSCharacter_generated_h
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_37_GENERATED_BODY \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_37_GENERATED_BODY \
 	friend struct Z_Construct_UScriptStruct_FStratagemData_Statics; \
 	PROJECTHD_API static class UScriptStruct* StaticStruct();
 
 
 template<> PROJECTHD_API UScriptStruct* StaticStruct<struct FStratagemData>();
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_72_GENERATED_BODY \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_72_GENERATED_BODY \
 	friend struct Z_Construct_UScriptStruct_FWeaponInstance_Statics; \
 	PROJECTHD_API static class UScriptStruct* StaticStruct();
 
 
 template<> PROJECTHD_API UScriptStruct* StaticStruct<struct FWeaponInstance>();
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_108_DELEGATE \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_108_DELEGATE \
 PROJECTHD_API void FOnAmmoChangedSignature_DelegateWrapper(const FMulticastScriptDelegate& OnAmmoChangedSignature, int32 NewAmmo, int32 NewMag, int32 MaxMag);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_109_DELEGATE \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_109_DELEGATE \
 PROJECTHD_API void FOnHitEnemySignature_DelegateWrapper(const FMulticastScriptDelegate& OnHitEnemySignature, bool bIsHeadshot);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_110_DELEGATE \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_110_DELEGATE \
 PROJECTHD_API void FOnStratagemStepUpdated_DelegateWrapper(const FMulticastScriptDelegate& OnStratagemStepUpdated, int32 NewStep);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_111_DELEGATE \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_111_DELEGATE \
 PROJECTHD_API void FOnStratagemUpdate_DelegateWrapper(const FMulticastScriptDelegate& OnStratagemUpdate, int32 StratagemIndex, int32 CurrentStep);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_112_DELEGATE \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_112_DELEGATE \
 PROJECTHD_API void FOnStratagemStackUpdated_DelegateWrapper(const FMulticastScriptDelegate& OnStratagemStackUpdated, TArray<EStratagemDirection> const& InputStack);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_113_DELEGATE \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_113_DELEGATE \
 PROJECTHD_API void FOnAttributeChanged_DelegateWrapper(const FMulticastScriptDelegate& OnAttributeChanged, float CurrentValue, float MaxValue);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_114_DELEGATE \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_114_DELEGATE \
 PROJECTHD_API void FOnGrenadeChanged_DelegateWrapper(const FMulticastScriptDelegate& OnGrenadeChanged, int32 Current, int32 Max);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_115_DELEGATE \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_115_DELEGATE \
 PROJECTHD_API void FOnStimChanged_DelegateWrapper(const FMulticastScriptDelegate& OnStimChanged, int32 CurrentCount, int32 MaxCount);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_RPC_WRAPPERS_NO_PURE_DECLS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_RPC_WRAPPERS_NO_PURE_DECLS \
 	DECLARE_FUNCTION(execSwitchWeapon); \
 	DECLARE_FUNCTION(execFireWeapon); \
 	DECLARE_FUNCTION(execOnAimCompleted); \
@@ -74,8 +74,8 @@ PROJECTHD_API void FOnStimChanged_DelegateWrapper(const FMulticastScriptDelegate
 	DECLARE_FUNCTION(execOnStimCompleted);
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_CALLBACK_WRAPPERS
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_INCLASS_NO_PURE_DECLS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_CALLBACK_WRAPPERS
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesAFPSCharacter(); \
 	friend struct Z_Construct_UClass_AFPSCharacter_Statics; \
@@ -85,7 +85,7 @@ public: \
 	virtual UObject* _getUObject() const override { return const_cast<AFPSCharacter*>(this); }
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_ENHANCED_CONSTRUCTORS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	AFPSCharacter(AFPSCharacter&&); \
@@ -97,14 +97,14 @@ public: \
 	NO_API virtual ~AFPSCharacter();
 
 
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_117_PROLOG
-#define FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_GENERATED_BODY \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_117_PROLOG
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_RPC_WRAPPERS_NO_PURE_DECLS \
-	FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_CALLBACK_WRAPPERS \
-	FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_INCLASS_NO_PURE_DECLS \
-	FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_ENHANCED_CONSTRUCTORS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_RPC_WRAPPERS_NO_PURE_DECLS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_CALLBACK_WRAPPERS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_INCLASS_NO_PURE_DECLS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h_120_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -112,7 +112,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> PROJECTHD_API UClass* StaticClass<class AFPSCharacter>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h
+#define CURRENT_FILE_ID FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_FPSCharacter_h
 
 
 #define FOREACH_ENUM_ESTRATAGEMDIRECTION(op) \

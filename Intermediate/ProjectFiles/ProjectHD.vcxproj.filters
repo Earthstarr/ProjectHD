@@ -70,6 +70,12 @@
     <ClCompile Include="..\..\Source\ProjectHD\Character\Enemy\EnemyBase.h">
       <Filter>Source\ProjectHD\Character\Enemy</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Source\ProjectHD\Character\Enemy\Enemy_Crawler.cpp">
+      <Filter>Source\ProjectHD\Character\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\ProjectHD\Character\Enemy\Enemy_Crawler.h">
+      <Filter>Source\ProjectHD\Character\Enemy</Filter>
+    </ClCompile>
     <Filter Include="Source\ProjectHD\Character\Player">
       <UniqueIdentifier>{CA9B498E-8561-3333-AE96-1531538ED937}</UniqueIdentifier>
     </Filter>

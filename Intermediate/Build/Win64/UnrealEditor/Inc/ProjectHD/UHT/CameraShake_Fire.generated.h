@@ -14,7 +14,7 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define PROJECTHD_CameraShake_Fire_generated_h
 
-#define FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_INCLASS_NO_PURE_DECLS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesUCameraShake_Fire(); \
 	friend struct Z_Construct_UClass_UCameraShake_Fire_Statics; \
@@ -23,7 +23,7 @@ public: \
 	DECLARE_SERIALIZER(UCameraShake_Fire)
 
 
-#define FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_ENHANCED_CONSTRUCTORS \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	UCameraShake_Fire(UCameraShake_Fire&&); \
@@ -35,12 +35,12 @@ public: \
 	NO_API virtual ~UCameraShake_Fire();
 
 
-#define FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_13_PROLOG
-#define FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_GENERATED_BODY \
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_13_PROLOG
+#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_INCLASS_NO_PURE_DECLS \
-	FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_ENHANCED_CONSTRUCTORS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_INCLASS_NO_PURE_DECLS \
+	FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h_16_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -48,7 +48,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> PROJECTHD_API UClass* StaticClass<class UCameraShake_Fire>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h
+#define CURRENT_FILE_ID FID_JW_Unreal_ProjectHD_Source_ProjectHD_Effect_CameraShake_Fire_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
