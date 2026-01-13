@@ -415,12 +415,6 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
     // 기존 무기 어빌리티 제거
     ClearCurrentWeaponAbilities();
 
-    if (WeaponInventory.IsValidIndex(CurrentWeaponIndex))
-    {
-        WeaponInventory[CurrentWeaponIndex].CurrentAmmoCount = CurrentAmmo;
-        WeaponInventory[CurrentWeaponIndex].CurrentMagCount = CurrentMagCount;
-    }
-
     CurrentWeaponData = NewWeaponData;
     WeaponMesh->SetSkeletalMesh(CurrentWeaponData->WeaponMesh);
     
@@ -844,11 +838,10 @@ void AFPSCharacter::FireWeapon()
 
     if (APlayerController* PC = Cast<APlayerController>(GetController()))
     {
-        // 1. 위로 튀는 반동 (Pitch는 음수 값이 위로 올라감)
+        // 위로 튀는 반동 (Pitch는 음수 값이 위로 올라감)
         AddControllerPitchInput(-RecoilPitch);
 
-        // 2. 좌우로 무작위하게 흔들리는 반동 (선택 사항)
-        // -RecoilYaw ~ RecoilYaw 사이의 랜덤한 값을 더해 좌우 반동 구현
+        // 좌우로 무작위하게 흔들리는 반동
         float RandomYaw = FMath::FRandRange(-RecoilYaw, RecoilYaw);
         AddControllerYawInput(RandomYaw);
     }
@@ -858,7 +851,7 @@ void AFPSCharacter::FireWeapon()
         FVector MuzzleLocation = WeaponMesh->GetSocketLocation(TEXT("MuzzleSocket"));
         FRotator MuzzleRotation = WeaponMesh->GetSocketRotation(TEXT("MuzzleSocket"));
 
-        // 1. 화면 정중앙(에임)이 가리키는 실제 월드 좌표를 찾기 위해 라인 트레이스 사용
+        // 화면 정중앙(에임)이 가리키는 실제 월드 좌표를 찾기 위해 라인 트레이스 사용
         FVector LookAtLocation;
         FVector CameraLocation = ThirdPersonCamera->GetComponentLocation();
         FVector CameraForward = ThirdPersonCamera->GetForwardVector();
@@ -878,7 +871,7 @@ void AFPSCharacter::FireWeapon()
             LookAtLocation = TraceEnd; // 허공일 경우 아주 먼 곳
         }
 
-        // 2. 총구에서 '에임이 가리키는 지점'을 바라보는 회전값 계산
+        // 총구에서 '에임이 가리키는 지점'을 바라보는 회전값 계산
         FRotator TargetRotation = (LookAtLocation - MuzzleLocation).Rotation();
 
         FActorSpawnParameters ActorSpawnParams;
@@ -905,7 +898,7 @@ void AFPSCharacter::FireWeapon()
         APlayerController* PC = Cast<APlayerController>(GetController());
         if (PC && FireCameraShakeClass)
         {
-            // 클라이언트의 카메라를 흔듭니다.
+            //카메라 흔들기
             PC->ClientStartCameraShake(FireCameraShakeClass);
         }
 

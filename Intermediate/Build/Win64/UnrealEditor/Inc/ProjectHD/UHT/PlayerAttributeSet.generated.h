@@ -14,7 +14,7 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #endif
 #define PROJECTHD_PlayerAttributeSet_generated_h
 
-#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_INCLASS_NO_PURE_DECLS \
+#define FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesUPlayerAttributeSet(); \
 	friend struct Z_Construct_UClass_UPlayerAttributeSet_Statics; \
@@ -23,7 +23,7 @@ public: \
 	DECLARE_SERIALIZER(UPlayerAttributeSet)
 
 
-#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_ENHANCED_CONSTRUCTORS \
+#define FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	UPlayerAttributeSet(UPlayerAttributeSet&&); \
@@ -35,12 +35,12 @@ public: \
 	NO_API virtual ~UPlayerAttributeSet();
 
 
-#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_20_PROLOG
-#define FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_GENERATED_BODY \
+#define FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_20_PROLOG
+#define FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_INCLASS_NO_PURE_DECLS \
-	FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_ENHANCED_CONSTRUCTORS \
+	FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_INCLASS_NO_PURE_DECLS \
+	FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h_23_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -48,7 +48,7 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 template<> PROJECTHD_API UClass* StaticClass<class UPlayerAttributeSet>();
 
 #undef CURRENT_FILE_ID
-#define CURRENT_FILE_ID FID_JW_Unreal_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h
+#define CURRENT_FILE_ID FID_ProjectHD_Source_ProjectHD_Character_Player_PlayerAttributeSet_h
 
 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
