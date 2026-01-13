@@ -361,3 +361,19 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# --- Unreal Engine Custom Ignore ---
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+FileOpenOrder/
+obj/
+Build/
+.vscode/
+.vs/
+*.sln
+*.sdf
+*.suo
+*.opensdf
+*.VC.db
