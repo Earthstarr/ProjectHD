@@ -139,7 +139,7 @@ void AOrbitalLaser::UpdateLaserVisuals()
     {
         // 나이아가라 시스템 내부의 파라미터 이름과 일치 (User.BeamEnd)
         LaserFX->SetNiagaraVariableVec3(FString("User_BeamStart"), CurrentImpactPoint + FVector(0, -10, -20));
-        LaserFX->SetNiagaraVariableVec3(FString("User_BeamEnd"), CurrentImpactPoint + FVector(0, -10000, 20000)); // 대각선 하늘 위
+        LaserFX->SetNiagaraVariableVec3(FString("User_BeamEnd"), CurrentImpactPoint + FVector(0, -20000, 50000)); // 대각선 하늘 위
     }
     
     if (ImpactFX)
@@ -195,6 +195,8 @@ void AOrbitalLaser::ApplyLaserDamage(float DeltaTime)
 void AOrbitalLaser::ActivateLaser()
 {
     bIsLaserActive = true;
+    
+    UpdateLaserVisuals();
     
     if (LaserFX) LaserFX->Activate();
     if (ImpactFX) ImpactFX->Activate();
