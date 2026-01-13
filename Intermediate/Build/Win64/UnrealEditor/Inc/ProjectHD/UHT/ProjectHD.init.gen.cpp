@@ -35,7 +35,7 @@ void EmptyLinkFunctionForGeneratedCodeProjectHD_init() {}
 				SingletonFuncArray,
 				UE_ARRAY_COUNT(SingletonFuncArray),
 				PKG_CompiledIn | 0x00000000,
-				0x752520A1,
+				0x40674F05,
 				0xCEC2FADE,
 				METADATA_PARAMS(0, nullptr)
 			};
@@ -43,5 +43,5 @@ void EmptyLinkFunctionForGeneratedCodeProjectHD_init() {}
 		}
 		return Z_Registration_Info_UPackage__Script_ProjectHD.OuterSingleton;
 	}
-	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_ProjectHD(Z_Construct_UPackage__Script_ProjectHD, TEXT("/Script/ProjectHD"), Z_Registration_Info_UPackage__Script_ProjectHD, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0x752520A1, 0xCEC2FADE));
+	static FRegisterCompiledInInfo Z_CompiledInDeferPackage_UPackage__Script_ProjectHD(Z_Construct_UPackage__Script_ProjectHD, TEXT("/Script/ProjectHD"), Z_Registration_Info_UPackage__Script_ProjectHD, CONSTRUCT_RELOAD_VERSION_INFO(FPackageReloadVersionInfo, 0x40674F05, 0xCEC2FADE));
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

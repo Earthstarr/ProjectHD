@@ -174,12 +174,17 @@ void AHDSupplyPod::Interact(AFPSCharacter* Interactor)
 		if (Weapon.WeaponData)
 		{
 			int32 SupplyAmount = Weapon.WeaponData->AmmoSuppliedPerBox;
-			Weapon.CurrentMagCount = FMath::Min(Weapon.CurrentMagCount + SupplyAmount, Weapon.WeaponData->MaxMag);
-
-			// 만약 이 무기가 현재 들고 있는 무기라면 캐릭터 변수도 업데이트
+			// 현재 들고 있는 무기일 경우
 			if (i == CurrentIdx)
 			{
-				Interactor->CurrentMagCount = Weapon.CurrentMagCount;
+				// 캐릭터 본체의 변수만 올리고, 그 값을 인벤토리에 복사만 함
+				Interactor->CurrentMagCount = FMath::Min(Interactor->CurrentMagCount + SupplyAmount, Weapon.WeaponData->MaxMag);
+				Weapon.CurrentMagCount = Interactor->CurrentMagCount;
+			}
+			else
+			{
+				// 들고 있지 않은 무기는 인벤토리 데이터만 올림
+				Weapon.CurrentMagCount = FMath::Min(Weapon.CurrentMagCount + SupplyAmount, Weapon.WeaponData->MaxMag);
 			}
 		}
 	}

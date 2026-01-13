@@ -179,14 +179,14 @@ AHDBombProjectile::~AHDBombProjectile() {}
 // End Class AHDBombProjectile
 
 // Begin Registration
-struct Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDBombProjectile_h_Statics
+struct Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDBombProjectile_h_Statics
 {
 	static constexpr FClassRegisterCompiledInInfo ClassInfo[] = {
 		{ Z_Construct_UClass_AHDBombProjectile, AHDBombProjectile::StaticClass, TEXT("AHDBombProjectile"), &Z_Registration_Info_UClass_AHDBombProjectile, CONSTRUCT_RELOAD_VERSION_INFO(FClassReloadVersionInfo, sizeof(AHDBombProjectile), 3752214901U) },
 	};
 };
-static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDBombProjectile_h_1990126616(TEXT("/Script/ProjectHD"),
-	Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDBombProjectile_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_JW_Unreal_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDBombProjectile_h_Statics::ClassInfo),
+static FRegisterCompiledInInfo Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDBombProjectile_h_1990126616(TEXT("/Script/ProjectHD"),
+	Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDBombProjectile_h_Statics::ClassInfo, UE_ARRAY_COUNT(Z_CompiledInDeferFile_FID_ProjectHD_Source_ProjectHD_Weapon_Projectile_HDBombProjectile_h_Statics::ClassInfo),
 	nullptr, 0,
 	nullptr, 0);
 // End Registration
