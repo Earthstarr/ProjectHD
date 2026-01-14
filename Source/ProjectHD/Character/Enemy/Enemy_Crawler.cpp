@@ -2,9 +2,17 @@
 
 
 #include "Enemy_Crawler.h"
+#include "Components/StateTreeAIComponent.h"
+#include "Components/StateTreeComponent.h"
 
 AEnemy_Crawler::AEnemy_Crawler()
 {
+	StateTreeAIComponent = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
+	StateTreeAIComponent->PrimaryComponentTick.bCanEverTick = true;
+	StateTreeAIComponent->bAutoActivate = true;
+	
+	StateTreeComponent = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
+	
 	MaxHealth = 50.0f;
 	CurrentHealth = MaxHealth;
 }
@@ -12,4 +20,5 @@ AEnemy_Crawler::AEnemy_Crawler()
 void AEnemy_Crawler::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
