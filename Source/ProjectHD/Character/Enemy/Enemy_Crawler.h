@@ -20,6 +20,13 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
+	// 스테이트 트리 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	class UStateTreeAIComponent* StateTreeAIComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	class UStateTreeComponent* StateTreeComponent;
+	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	float pouncingSpeed = 800.0f;
 };
