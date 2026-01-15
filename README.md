@@ -1,6 +1,6 @@
 # ProjectHD
 
-UE5.5 TPS 게임입니다.
+UE5.6 TPS 게임입니다.
 
 ## 개요
 
