@@ -1,6 +1,7 @@
 
 #include "EnemyBase.h"
 #include "Components/CapsuleComponent.h"
+#include "Perception/AISense_Damage.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -13,8 +14,7 @@ float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 
     float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-    CurrentHealth -= ActualDamage;
-    UE_LOG(LogTemp, Warning, TEXT("Enemy Health: %f"), CurrentHealth);
+    CurrentHealth -= ActualDamage;       
 
     if (CurrentHealth <= 0.0f)
     {

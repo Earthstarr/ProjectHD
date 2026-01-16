@@ -73,6 +73,23 @@ UAbilitySystemComponent* AFPSCharacter::GetAbilitySystemComponent() const
     return AbilitySystemComponent;
 }
 
+float AFPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+    class AController* EventInstigator, AActor* DamageCauser)
+{
+    UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
+    
+    float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    if (AttributeSet && ActualDamage > 0.0f)
+    {
+        float NewHealth = AttributeSet->GetHealth() - ActualDamage;        
+        AttributeSet->SetHealth(FMath::Max(NewHealth, 0.0f));
+        UE_LOG(LogTemp, Warning, TEXT("Health: %f"), AttributeSet->GetHealth());
+    }
+
+    return ActualDamage;
+}
+
 void AFPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
