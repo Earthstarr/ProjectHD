@@ -31,7 +31,7 @@ protected:
 	float ExplosionRadius = 800.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float TimeToExplode = 2.0f;
+	float TimeToExplode = 1.5f;
 	
 	// 이펙트
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")

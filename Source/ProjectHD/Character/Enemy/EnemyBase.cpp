@@ -1,6 +1,8 @@
 
 #include "EnemyBase.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Perception/AISense_Damage.h"
 
 AEnemyBase::AEnemyBase()
@@ -14,7 +16,36 @@ float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
 
     float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-    CurrentHealth -= ActualDamage;       
+    CurrentHealth -= ActualDamage;
+    
+    // 데미지를 입을 시 주변의 적에게 0.01의 데미지를 줘서 AI 활성화
+    if (DamageAmount > 0.01f)
+    {
+        TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+        TArray<AActor*> OutActors;
+        TArray<AActor*> ActorsToIgnore;
+        ActorsToIgnore.Add(this);
+        
+        bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
+            GetWorld(), GetActorLocation(), AlarmRadius, ObjectTypes,
+            ACharacter::StaticClass(), ActorsToIgnore, OutActors
+        );
+
+        if (bHasOverlap)
+        {
+            for (AActor* OverlappedActor : OutActors)
+            {            
+                if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
+                {
+                    UGameplayStatics::ApplyDamage(
+                        OverlappedActor, 0.01f, EventInstigator, this, UDamageType::StaticClass()
+                    );
+                }
+            }
+        }
+    }
 
     if (CurrentHealth <= 0.0f)
     {
