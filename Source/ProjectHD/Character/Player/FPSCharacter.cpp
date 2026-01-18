@@ -73,6 +73,23 @@ UAbilitySystemComponent* AFPSCharacter::GetAbilitySystemComponent() const
     return AbilitySystemComponent;
 }
 
+float AFPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+    class AController* EventInstigator, AActor* DamageCauser)
+{
+    UE_LOG(LogTemp, Warning, TEXT("TakeDamage"));
+    
+    float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+    if (AttributeSet && ActualDamage > 0.0f)
+    {
+        float NewHealth = AttributeSet->GetHealth() - ActualDamage;        
+        AttributeSet->SetHealth(FMath::Max(NewHealth, 0.0f));
+        UE_LOG(LogTemp, Warning, TEXT("Health: %f"), AttributeSet->GetHealth());
+    }
+
+    return ActualDamage;
+}
+
 void AFPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
@@ -900,6 +917,46 @@ void AFPSCharacter::FireWeapon()
         {
             //카메라 흔들기
             PC->ClientStartCameraShake(FireCameraShakeClass);
+        }
+        
+        // 현재 장착중인 무기에서 소음 반경 가져오기
+        float CurrentSoundRadius = CurrentWeaponData->SoundRadius;
+        //DrawDebugSphere(GetWorld(), GetActorLocation(), CurrentWeaponData->SoundRadius, 32, FColor::Yellow, false, 3.0f);
+        
+        // 사격 소음 전파
+        TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+        TArray<AActor*> OutActors;
+        TArray<AActor*> ActorsToIgnore;
+        ActorsToIgnore.Add(this);
+
+        bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
+            GetWorld(), 
+            GetActorLocation(), 
+            CurrentSoundRadius, 
+            ObjectTypes, 
+            ACharacter::StaticClass(), 
+            ActorsToIgnore, 
+            OutActors
+        );
+
+        if (bHasOverlap)
+        {
+            for (AActor* OverlappedActor : OutActors)
+            {            
+                // Enemy 태그를 가진 적들에게 소음 전달
+                if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
+                {
+                    UGameplayStatics::ApplyDamage(
+                        OverlappedActor, 
+                        0.01f,
+                        GetController(),
+                        this, 
+                        UDamageType::StaticClass()
+                    );
+                }
+            }
         }
 
         // 최종 발사

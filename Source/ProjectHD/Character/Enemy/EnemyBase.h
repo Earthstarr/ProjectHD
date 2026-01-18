@@ -18,6 +18,9 @@ protected:
     // 체력 시스템
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float MaxHealth = 50.0f;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    float AlarmRadius = 2000.0f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
     float CurrentHealth;

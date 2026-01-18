@@ -132,6 +132,8 @@ public:
     FOnAttributeChanged OnStaminaChanged;
     
     TArray<FWeaponInstance>& GetWeaponInventory() { return WeaponInventory; }
+    
+    virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
     virtual void BeginPlay() override;
@@ -139,7 +141,7 @@ protected:
     
     // 플레이어 AttributeSet
     UPROPERTY()
-    const class UPlayerAttributeSet* AttributeSet;
+    class UPlayerAttributeSet* AttributeSet;
         
     // Health 속성이 변경될 때 ASC에 의해 호출될 콜백 함수
     void HandleHealthChanged(const FOnAttributeChangeData& Data);
@@ -339,7 +341,7 @@ public:
     // 주사기 사운드
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
     class USoundBase* StimSound;
-
+    
     // 무기 교체 시스템
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
     TArray<FWeaponInstance> WeaponInventory;

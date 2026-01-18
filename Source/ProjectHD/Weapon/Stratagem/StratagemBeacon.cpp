@@ -159,13 +159,15 @@ void AStratagemBeacon::TriggerStrike()
         FVector BoxHalfSize = FVector(ClusterDepth, ClusterWidth, 1000.f); // 높이를 10m로 확장
         FCollisionShape BoxShape = FCollisionShape::MakeBox(BoxHalfSize);
         FQuat Rotation = GetActorRotation().Quaternion();
-            
+        
+        /*
         // 범위에 전체 데미지
         GetWorld()->SweepMultiByChannel(BaseHits, TargetLocation, TargetLocation, Rotation, ECC_Pawn, BoxShape);
         for (auto& Hit : BaseHits)
         {
             UGameplayStatics::ApplyDamage(Hit.GetActor(), 30.f, GetInstigatorController(), this, UDamageType::StaticClass());
         }
+        */
     
         // 지형 높이 감지
         for (int32 i = 0; i < ClusterCount; ++i)
