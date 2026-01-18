@@ -25,10 +25,10 @@ protected:
 
 	// --- 설정 ---
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
-	float SearchRadius = 2500.f;      // 적 탐지 범위
+	float SearchRadius = 4500.f;      // 적 탐지 범위
 
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
-	float MoveSpeed = 500.f;          // 레이저 이동 속도
+	float MoveSpeed = 1000.f;          // 레이저 이동 속도
 
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
 	float DamagePerSecond = 120.f;    // 초당 데미지

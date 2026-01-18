@@ -2,6 +2,7 @@
 #include "Grenade.h"
 
 #include "NiagaraFunctionLibrary.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
@@ -32,7 +33,7 @@ void AGrenade::BeginPlay()
 	Super::BeginPlay();
     
 	// 3초 뒤 폭발 타이머
-	GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &AGrenade::Explode, 3.0f, false);
+	GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &AGrenade::Explode, TimeToExplode, false);
 }
 
 void AGrenade::Explode()
@@ -42,6 +43,43 @@ void AGrenade::Explode()
 		this, Damage, (GetActorLocation() + FVector(0.f, 0.f, 50.f)) , ExplosionRadius, 
 		UDamageType::StaticClass(), TArray<AActor*>(), this, GetInstigatorController()
 	);
+	
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+	// 터질 때 주변 적에게 알람
+	TArray<AActor*> OutActors;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	
+	//DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionSoundRadius, 32, FColor::Blue, false, 3.0f);
+	
+	bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
+		GetWorld(), 
+		GetActorLocation(), 
+		ExplosionSoundRadius, 
+		ObjectTypes, 
+		ACharacter::StaticClass(), 
+		ActorsToIgnore, 
+		OutActors
+	);
+
+	if (bHasOverlap)
+	{
+		for (AActor* OverlappedActor : OutActors)
+		{            
+			if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
+			{
+				UGameplayStatics::ApplyDamage(
+					OverlappedActor, 
+					0.01f, 
+					GetInstigatorController(),
+					this, 
+					UDamageType::StaticClass()
+				);
+			}
+		}
+	}	
 
 	// 폭발 이펙트 및 사운드
 	if (ExplosionEffect)

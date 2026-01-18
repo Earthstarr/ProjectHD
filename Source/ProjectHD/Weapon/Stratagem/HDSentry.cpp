@@ -6,6 +6,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "ProjectHD/Weapon/Projectile/HDProjectile.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 AHDSentry::AHDSentry()
@@ -195,6 +196,41 @@ void AHDSentry::Fire()
     Params.Owner = this;
     
     GetWorld()->SpawnActor<AHDProjectile>(ProjectileClass, MuzzleLoc, MuzzleRot, Params);
+    
+    // 사격 소음 알람
+    TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+    ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+    TArray<AActor*> OutActors;
+    TArray<AActor*> ActorsToIgnore;
+    ActorsToIgnore.Add(this);
+    
+    bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
+        GetWorld(), 
+        GetActorLocation(), 
+        SentrySoundRadius, 
+        ObjectTypes, 
+        ACharacter::StaticClass(), 
+        ActorsToIgnore, 
+        OutActors
+    );
+
+    if (bHasOverlap)
+    {
+        for (AActor* OverlappedActor : OutActors)
+        {
+            if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
+            {
+                UGameplayStatics::ApplyDamage(
+                    OverlappedActor, 
+                    0.01f, 
+                    nullptr,
+                    this,
+                    UDamageType::StaticClass()
+                );
+            }
+        }
+    }
     
     if (MuzzleFlashFX)
     {
