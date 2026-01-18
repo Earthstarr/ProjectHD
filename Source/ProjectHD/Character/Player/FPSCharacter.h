@@ -192,6 +192,7 @@ protected:
     void Reload();
     void OnGrenadeStart();
     void OnStimStart();
+    void HandleStimMontageEnded(UAnimMontage* Montage, bool bInterrupted);
     void OnInteract();
     
     UFUNCTION(BlueprintCallable)
@@ -335,7 +336,8 @@ public:
     // 회복용 Gameplay Effect 클래스
     UPROPERTY(EditAnywhere, Category = "GAS")
     TSubclassOf<class UGameplayEffect> StimEffectClass;
-
+    
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
     bool bIsUsingStim = false;
     
     // 주사기 사운드
