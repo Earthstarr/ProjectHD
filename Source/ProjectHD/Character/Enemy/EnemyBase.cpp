@@ -28,6 +28,8 @@ float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
         TArray<AActor*> ActorsToIgnore;
         ActorsToIgnore.Add(this);
         
+        //DrawDebugSphere(GetWorld(), GetActorLocation(), AlarmRadius, 32, FColor::Red, false, 3.0f);
+        
         bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
             GetWorld(), GetActorLocation(), AlarmRadius, ObjectTypes,
             ACharacter::StaticClass(), ActorsToIgnore, OutActors
@@ -40,7 +42,7 @@ float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
                 if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
                 {
                     UGameplayStatics::ApplyDamage(
-                        OverlappedActor, 0.01f, EventInstigator, this, UDamageType::StaticClass()
+                        OverlappedActor, 0.01f, EventInstigator, DamageCauser, UDamageType::StaticClass() // DamageCauser를 그대로 다시 넘겨줌
                     );
                 }
             }

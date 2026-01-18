@@ -28,10 +28,14 @@ protected:
 	float Damage = 100.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float ExplosionRadius = 800.0f;
+	float ExplosionRadius = 1200.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float TimeToExplode = 1.5f;
+	float TimeToExplode = 2.5f;
+	
+	// 소음 알람 범위
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float ExplosionSoundRadius = 6000.0f;
 	
 	// 이펙트
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")

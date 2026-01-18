@@ -39,7 +39,10 @@ protected:
     float FireRate = 0.1f;
     
     UPROPERTY(EditAnywhere, Category = "Sentry|Settings")
-    int32 MaxAmmo = 400; // 최대 탄약 수
+    int32 MaxAmmo = 200; // 최대 탄약 수
+    
+    UPROPERTY(EditAnywhere, Category = "Sentry|Settings")
+    float SentrySoundRadius = 5000.0f; // 소음 반경
 
     int32 CurrentAmmo;
 

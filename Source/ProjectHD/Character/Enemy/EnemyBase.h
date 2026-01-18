@@ -20,7 +20,7 @@ protected:
     float MaxHealth = 50.0f;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float AlarmRadius = 1500.0f;
+    float AlarmRadius = 2000.0f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
     float CurrentHealth;

@@ -341,7 +341,7 @@ public:
     // 주사기 사운드
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
     class USoundBase* StimSound;
-
+    
     // 무기 교체 시스템
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
     TArray<FWeaponInstance> WeaponInventory;
