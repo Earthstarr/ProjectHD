@@ -619,10 +619,27 @@ void AFPSCharacter::OnStimStart()
     {
         bIsUsingStim = true;
         
-        // 주사기 애니메이션 재생
-        AnimInstance->Montage_Play(StimMontage, 1.0f);
+        // 몽타주를 재생하고 반환된 길이 확인
+        float Duration = AnimInstance->Montage_Play(StimMontage, 1.0f);
         
+        if (Duration > 0.0f)
+        {
+            // 몽타주 종료/취소 시 실행될 함수를 연결
+            FOnMontageEnded EndedDelegate;
+            EndedDelegate.BindUObject(this, &AFPSCharacter::HandleStimMontageEnded);
+            AnimInstance->Montage_SetEndDelegate(EndedDelegate, StimMontage);
+        }
+        else
+        {
+            // 재생 실패시 즉시 변수를 false
+            bIsUsingStim = false;
+        }
     }
+}
+
+void AFPSCharacter::HandleStimMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+    bIsUsingStim = false;
 }
 
 void AFPSCharacter::OnInteract()
