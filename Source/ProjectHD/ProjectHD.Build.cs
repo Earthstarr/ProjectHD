@@ -19,7 +19,8 @@ public class ProjectHD : ModuleRules
             "GameplayCameras",
             "GameplayAbilities",
             "GameplayTags",
-            "GameplayTasks",            
+            "GameplayTasks",
+            "AIModule",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "EngineCameras", "EngineCameras", "GameplayStateTreeModule" });

@@ -55,7 +55,7 @@ void AHDProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 			OtherActor,
 			DamageAmount,
 			GetInstigatorController(),
-			this,
+			GetOwner(),
 			UDamageType::StaticClass()
 		);
 

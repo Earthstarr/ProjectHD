@@ -4,11 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "EnemyBase.h"
+#include "Components/BoxComponent.h"
+
 #include "Enemy_Crawler.generated.h"
 
 /**
  * 
  */
+
 UCLASS()
 class PROJECTHD_API AEnemy_Crawler : public AEnemyBase
 {
@@ -16,17 +19,25 @@ class PROJECTHD_API AEnemy_Crawler : public AEnemyBase
 	
 public:
 	AEnemy_Crawler();
-	
+		
 protected:
 	virtual void BeginPlay() override;
-	
-	// 스테이트 트리 컴포넌트
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-	class UStateTreeAIComponent* StateTreeAIComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
-	class UStateTreeComponent* StateTreeComponent;
-	
+		
+	// 몸체 판정용 박스 2개
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+	UBoxComponent* BodyCollisionFront;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
+	UBoxComponent* BodyCollisionBack;
+
+	// 공격 판정용 입 박스
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+	UBoxComponent* MouthCollision;
+
+	// 플레이어 오버랩 이벤트
+	UFUNCTION()
+	void OnMouthOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	float pouncingSpeed = 800.0f;
+	float AttackDamage = 10.0f;
 };
