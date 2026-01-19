@@ -19,6 +19,7 @@
 #include "ProjectHD/Weapon/WeaponDataAsset.h"
 #include "GameplayEffect.h"
 #include "ProjectHD/InteractableInterface.h"
+#include "Perception/AISense_Hearing.h"
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -911,6 +912,7 @@ void AFPSCharacter::FireWeapon()
         FActorSpawnParameters ActorSpawnParams;
         ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
         ActorSpawnParams.Owner = this;
+        ActorSpawnParams.Instigator = this;
 
         // 총구 화염 스폰
         if (MuzzleFlashFX)
@@ -935,47 +937,20 @@ void AFPSCharacter::FireWeapon()
             //카메라 흔들기
             PC->ClientStartCameraShake(FireCameraShakeClass);
         }
-        
-        // 현재 장착중인 무기에서 소음 반경 가져오기
-        float CurrentSoundRadius = CurrentWeaponData->SoundRadius;
-        //DrawDebugSphere(GetWorld(), GetActorLocation(), CurrentWeaponData->SoundRadius, 32, FColor::Yellow, false, 3.0f);
-        
-        // 사격 소음 전파
-        TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-
-        TArray<AActor*> OutActors;
-        TArray<AActor*> ActorsToIgnore;
-        ActorsToIgnore.Add(this);
-
-        bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
-            GetWorld(), 
-            GetActorLocation(), 
-            CurrentSoundRadius, 
-            ObjectTypes, 
-            ACharacter::StaticClass(), 
-            ActorsToIgnore, 
-            OutActors
-        );
-
-        if (bHasOverlap)
+                
+        // 소음
+        if (CurrentWeaponData)
         {
-            for (AActor* OverlappedActor : OutActors)
-            {            
-                // Enemy 태그를 가진 적들에게 소음 전달
-                if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
-                {
-                    UGameplayStatics::ApplyDamage(
-                        OverlappedActor, 
-                        0.01f,
-                        GetController(),
-                        this, 
-                        UDamageType::StaticClass()
-                    );
-                }
-            }
+            UAISense_Hearing::ReportNoiseEvent(
+                GetWorld(), 
+                GetActorLocation(), 
+                CurrentWeaponData->Loudness,
+                this,
+                0.0f,
+                FName(TEXT("Noise"))
+            );
         }
-
+         
         // 최종 발사
         GetWorld()->SpawnActor<AHDProjectile>(CurrentWeaponData->ProjectileClass, MuzzleLocation, TargetRotation, ActorSpawnParams);
 

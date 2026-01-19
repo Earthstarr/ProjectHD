@@ -33,9 +33,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float TimeToExplode = 2.5f;
 	
-	// 소음 알람 범위
+	// 소음 범위
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float ExplosionSoundRadius = 6000.0f;
+	float NoiseLoud = 1.0f;
 	
 	// 이펙트
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
@@ -46,7 +46,11 @@ protected:
 	
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 	
+	FVector ExplosionLocation;
+	void ReportDelayedNoise();	// 소음 이벤트
+	
 private:
 	FTimerHandle ExplosionTimerHandle;
+	FTimerHandle NoiseTimerHandle;
 	
 };

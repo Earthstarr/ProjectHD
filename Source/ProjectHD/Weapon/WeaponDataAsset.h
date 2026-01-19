@@ -65,6 +65,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
 	float SoundRadius = 1500.0f; // 무기 소음 반경
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
+	float Loudness = 1.0f; // 무기 소음 크기(AI Hearing)
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo")
 	int32 AmmoSuppliedPerBox = 2; // 보급시 보충되는 탄창 수
 	
