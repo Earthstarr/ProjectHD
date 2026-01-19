@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Perception/AISense_Damage.h"
+#include "Perception/AISense_Hearing.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -17,38 +18,38 @@ float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
     float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
     CurrentHealth -= ActualDamage;
-    
-    // 데미지를 입을 시 주변의 적에게 0.01의 데미지를 줘서 AI 활성화
-    if (DamageAmount > 0.01f)
+        
+    // 데미지를 입으면 주변 적에게 소음 알림
+    if (ActualDamage > 0.0f && DamageCauser)
     {
-        TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-        ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-
-        TArray<AActor*> OutActors;
-        TArray<AActor*> ActorsToIgnore;
-        ActorsToIgnore.Add(this);
         
-        //DrawDebugSphere(GetWorld(), GetActorLocation(), AlarmRadius, 32, FColor::Red, false, 3.0f);
-        
-        bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
-            GetWorld(), GetActorLocation(), AlarmRadius, ObjectTypes,
-            ACharacter::StaticClass(), ActorsToIgnore, OutActors
-        );
-
-        if (bHasOverlap)
+        AActor* RealAttacker = DamageCauser;  // 기본값은 DamageCauser
+    
+        // 1순위: Instigator (플레이어 같은 Pawn)
+        if (APawn* InstigatorPawn = DamageCauser->GetInstigator())
         {
-            for (AActor* OverlappedActor : OutActors)
-            {            
-                if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
-                {
-                    UGameplayStatics::ApplyDamage(
-                        OverlappedActor, 0.01f, EventInstigator, DamageCauser, UDamageType::StaticClass() // DamageCauser를 그대로 다시 넘겨줌
-                    );
-                }
-            }
+            RealAttacker = InstigatorPawn;
         }
-    }
-
+        // 2순위: Owner (센트리 같은 AActor)
+        else if (AActor* OwnerActor = DamageCauser->GetOwner())
+        {
+            RealAttacker = OwnerActor;
+        }
+    
+        LastAttackerLocation = RealAttacker->GetActorLocation();    
+        
+        //DrawDebugSphere(GetWorld(), GetActorLocation(), 500.0f, 32, FColor::Red, false, 5.0f);
+    
+        UAISense_Hearing::ReportNoiseEvent(
+            GetWorld(),
+            GetActorLocation(),
+            NoiseLoud,
+            this,
+            0.0f,
+            FName(TEXT("HelpNoise")) // 태그
+        );
+    }   
+    
     if (CurrentHealth <= 0.0f)
     {
         Die();

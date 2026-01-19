@@ -20,7 +20,7 @@ protected:
     float MaxHealth = 50.0f;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float AlarmRadius = 2000.0f;
+    float NoiseLoud = 0.8f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
     float CurrentHealth;
@@ -33,4 +33,7 @@ protected:
 
     UPROPERTY(BlueprintReadOnly, Category = "Stat")
     bool bIsDead = false;
+    
+    UPROPERTY(BlueprintReadOnly, Category = "AISense")
+    FVector LastAttackerLocation;
 };

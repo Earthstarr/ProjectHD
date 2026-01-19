@@ -8,6 +8,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Perception/AISense_Hearing.h"
 
 AHDSentry::AHDSentry()
 {
@@ -197,40 +198,15 @@ void AHDSentry::Fire()
     
     GetWorld()->SpawnActor<AHDProjectile>(ProjectileClass, MuzzleLoc, MuzzleRot, Params);
     
-    // 사격 소음 알람
-    TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-    ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-
-    TArray<AActor*> OutActors;
-    TArray<AActor*> ActorsToIgnore;
-    ActorsToIgnore.Add(this);
-    
-    bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
-        GetWorld(), 
-        GetActorLocation(), 
-        SentrySoundRadius, 
-        ObjectTypes, 
-        ACharacter::StaticClass(), 
-        ActorsToIgnore, 
-        OutActors
-    );
-
-    if (bHasOverlap)
-    {
-        for (AActor* OverlappedActor : OutActors)
-        {
-            if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
-            {
-                UGameplayStatics::ApplyDamage(
-                    OverlappedActor, 
-                    0.01f, 
-                    nullptr,
-                    this,
-                    UDamageType::StaticClass()
-                );
-            }
-        }
-    }
+    // 소음
+    UAISense_Hearing::ReportNoiseEvent(
+            GetWorld(), 
+            GetActorLocation(), 
+            NoiseLoud,
+            this,
+            0.0f,
+            FName(TEXT("Noise"))
+            );
     
     if (MuzzleFlashFX)
     {
