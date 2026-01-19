@@ -5,6 +5,7 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Perception/AISense_Hearing.h"
 
 AGrenade::AGrenade()
 {
@@ -32,54 +33,30 @@ void AGrenade::BeginPlay()
 {
 	Super::BeginPlay();
     
-	// 3초 뒤 폭발 타이머
+	// 폭발 타이머
 	GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &AGrenade::Explode, TimeToExplode, false);
 }
 
 void AGrenade::Explode()
 {
-	// 범위 데미지
+	// 터지면서 사라져 GetActorLocation 오류가 발생하므로 위치 정보 미리 저장
+	ExplosionLocation = GetActorLocation() + FVector(0.f, 0.f, 50.f);
+		
+	// 범위 데미지	
 	UGameplayStatics::ApplyRadialDamage(
-		this, Damage, (GetActorLocation() + FVector(0.f, 0.f, 50.f)) , ExplosionRadius, 
+		this, Damage, ExplosionLocation , ExplosionRadius, 
 		UDamageType::StaticClass(), TArray<AActor*>(), this, GetInstigatorController()
+	);	
+	
+	// 타이머 안쓰면 EnemyBase의 TakeDamage의 Help 신호와 겹쳐서 오류남
+	// 폭발 소음은 0.1초 뒤에 발생
+	GetWorldTimerManager().SetTimer(
+		NoiseTimerHandle,
+		this,
+		&AGrenade::ReportDelayedNoise,
+		0.1f, 
+		false
 	);
-	
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-
-	// 터질 때 주변 적에게 알람
-	TArray<AActor*> OutActors;
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-	
-	//DrawDebugSphere(GetWorld(), GetActorLocation(), ExplosionSoundRadius, 32, FColor::Blue, false, 3.0f);
-	
-	bool bHasOverlap = UKismetSystemLibrary::SphereOverlapActors(
-		GetWorld(), 
-		GetActorLocation(), 
-		ExplosionSoundRadius, 
-		ObjectTypes, 
-		ACharacter::StaticClass(), 
-		ActorsToIgnore, 
-		OutActors
-	);
-
-	if (bHasOverlap)
-	{
-		for (AActor* OverlappedActor : OutActors)
-		{            
-			if (OverlappedActor && OverlappedActor->ActorHasTag(TEXT("Enemy")))
-			{
-				UGameplayStatics::ApplyDamage(
-					OverlappedActor, 
-					0.01f, 
-					GetInstigatorController(),
-					this, 
-					UDamageType::StaticClass()
-				);
-			}
-		}
-	}	
 
 	// 폭발 이펙트 및 사운드
 	if (ExplosionEffect)
@@ -91,8 +68,23 @@ void AGrenade::Explode()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
 	}
+	
+	// 타이머를 돌리기 위해 Destroy 지연
+	ProjectileMesh->SetHiddenInGame(true);
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(1.0f);
+}
 
-	Destroy();
+void AGrenade::ReportDelayedNoise()
+{
+	UAISense_Hearing::ReportNoiseEvent(
+		GetWorld(), 
+		ExplosionLocation,
+		NoiseLoud,
+		this,
+		0.0f,
+		FName(TEXT("Noise"))
+	);
 }
 
 void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

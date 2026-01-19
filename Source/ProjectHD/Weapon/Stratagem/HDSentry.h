@@ -42,7 +42,7 @@ protected:
     int32 MaxAmmo = 200; // 최대 탄약 수
     
     UPROPERTY(EditAnywhere, Category = "Sentry|Settings")
-    float SentrySoundRadius = 5000.0f; // 소음 반경
+    float NoiseLoud = 0.8f; // 소음 크기
 
     int32 CurrentAmmo;
 
