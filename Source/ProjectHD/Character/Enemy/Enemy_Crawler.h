@@ -33,7 +33,7 @@ protected:
 	// 공격 판정용 입 박스
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
 	UBoxComponent* MouthCollision;
-
+	
 	// 플레이어 오버랩 이벤트
 	UFUNCTION()
 	void OnMouthOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

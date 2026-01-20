@@ -20,20 +20,46 @@ protected:
     float MaxHealth = 50.0f;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
-    float NoiseLoud = 0.8f;
+    float NoiseLoud = 0.5f;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
     float CurrentHealth;
+    
+    // 애니메이션
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
+    class UAnimMontage* DeathMontage;
 
-    // 대미지 처리 (언리얼 표준 함수 오버라이드)
+    // 대미지 처리
     virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
     // 사망 처리
     virtual void Die();
-
-    UPROPERTY(BlueprintReadOnly, Category = "Stat")
-    bool bIsDead = false;
+    
+    // 틱 끄기
+    void DisableMeshTick();
+    
+    void CheckIfLanded();
+    void ActivateRagdoll();
+    
+    FTimerHandle DisableTickTimerHandle;
+    FTimerHandle LandedCheckTimerHandle;
     
     UPROPERTY(BlueprintReadOnly, Category = "AISense")
     FVector LastAttackerLocation;
+    
+    // 오브젝트 풀링
+    UPROPERTY()
+    class AEnemyPoolManager* PoolManager;
+    
+    FTimerHandle PoolReturnTimerHandle;
+    void ReturnToPool();
+    
+public:
+    UPROPERTY(BlueprintReadOnly, Category = "Stat")
+    bool bIsDead = false;
+    
+    // 오브젝트 풀링
+    virtual void InitEnemy();
+    
+    void SetPoolManager(class AEnemyPoolManager* InManager) { PoolManager = InManager; }
 };
