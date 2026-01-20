@@ -9,6 +9,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Perception/AISense_Hearing.h"
+#include "ProjectHD/Character/Enemy/EnemyBase.h"
 
 AHDSentry::AHDSentry()
 {
@@ -109,9 +110,9 @@ void AHDSentry::FindNearestEnemy()
     if (bHit)
     {
         for (auto& Hit : OutHits)
-        {
-            AActor* FoundActor = Hit.GetActor();
-            if (FoundActor && FoundActor->ActorHasTag(TEXT("Enemy")))
+        {            
+            AEnemyBase* FoundActor = Cast<AEnemyBase>(Hit.GetActor());
+            if (FoundActor && FoundActor->ActorHasTag(TEXT("Enemy")) && !FoundActor->bIsDead)
             {
                 // 시야 체크
                 FVector TargetLoc = FoundActor->GetActorLocation();

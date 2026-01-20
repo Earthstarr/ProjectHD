@@ -11,7 +11,7 @@ AEnemy_Crawler::AEnemy_Crawler()
 {   
 	MaxHealth = 50.0f;
 	CurrentHealth = MaxHealth;
-    	
+	
 	BodyCollisionFront = CreateDefaultSubobject<UBoxComponent>(TEXT("BodyCollisionFront"));
 	BodyCollisionFront->SetupAttachment(GetMesh()); 
 	BodyCollisionFront->SetCollisionProfileName(TEXT("CharacterMesh"));

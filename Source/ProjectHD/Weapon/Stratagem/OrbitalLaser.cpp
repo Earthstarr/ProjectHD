@@ -3,6 +3,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "ProjectHD/Character/Enemy/EnemyBase.h"
 
 AOrbitalLaser::AOrbitalLaser()
 {
@@ -49,7 +50,7 @@ void AOrbitalLaser::Tick(float DeltaTime)
     // DrawDebugSphere(GetWorld(), CurrentImpactPoint, 100.f, 12, FColor::Red, false, -1.f);
     
     // 타겟이 죽었거나 없으면 새 타겟 찾기
-    if (!CurrentTarget || !IsValid(CurrentTarget))
+    if (!CurrentTarget || !IsValid(CurrentTarget)|| Cast<AEnemyBase>(CurrentTarget)->bIsDead)
     {
         FindNewTarget();
     }
@@ -118,8 +119,9 @@ void AOrbitalLaser::FindNewTarget()
     {
         for (auto& Hit : OutHits)
         {
-            AActor* PotentialTarget = Hit.GetActor();
-            if (PotentialTarget && PotentialTarget->ActorHasTag(TEXT("Enemy")))
+            AEnemyBase* PotentialTarget = Cast<AEnemyBase>(Hit.GetActor());
+            
+            if (PotentialTarget && PotentialTarget->ActorHasTag(TEXT("Enemy")) && !PotentialTarget->bIsDead)
             {
                 float Dist = FVector::Dist(CurrentImpactPoint, PotentialTarget->GetActorLocation());
                 if (Dist < MinDist)
@@ -176,12 +178,13 @@ void AOrbitalLaser::ApplyLaserDamage(float DeltaTime)
     {
         for (const FHitResult& Hit : HitResults)
         {
-            AActor* HitActor = Hit.GetActor();
-            if (HitActor && HitActor->ActorHasTag(TEXT("Enemy")))
+            AEnemyBase* HitEnemy = Cast<AEnemyBase>(Hit.GetActor());
+            
+            if (HitEnemy && HitEnemy->ActorHasTag(TEXT("Enemy")) && !HitEnemy->bIsDead)
             {
                 // 지속 데미지이므로 초당 데미지에 DeltaTime을 곱함
                 UGameplayStatics::ApplyDamage(
-                    HitActor, 
+                    HitEnemy, 
                     DamagePerSecond * DeltaTime, 
                     GetInstigatorController(), 
                     this, 
