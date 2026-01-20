@@ -926,9 +926,9 @@ void AFPSCharacter::FireWeapon()
         }
 
         // 사격 사운드
-        if (FireSound)
+        if (CurrentWeaponData->FireSound)
         {
-            UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+            UGameplayStatics::PlaySoundAtLocation(this, CurrentWeaponData->FireSound, GetActorLocation());
         }
 
         APlayerController* PC = Cast<APlayerController>(GetController());
