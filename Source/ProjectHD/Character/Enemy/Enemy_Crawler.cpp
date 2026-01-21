@@ -38,7 +38,7 @@ void AEnemy_Crawler::BeginPlay()
 
 void AEnemy_Crawler::OnMouthOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 									UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{		
+{
 	if (OtherActor && OtherActor != this)
 	{		
 		AFPSCharacter* TargetPlayer = Cast<AFPSCharacter>(OtherActor);

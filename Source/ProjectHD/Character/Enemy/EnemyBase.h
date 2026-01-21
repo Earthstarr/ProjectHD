@@ -36,30 +36,30 @@ protected:
     virtual void Die();
     
     // 틱 끄기
-    void DisableMeshTick();
-    
-    void CheckIfLanded();
-    void ActivateRagdoll();
+    virtual void DisableMeshTick();    
     
     FTimerHandle DisableTickTimerHandle;
     FTimerHandle LandedCheckTimerHandle;
     
     UPROPERTY(BlueprintReadOnly, Category = "AISense")
     FVector LastAttackerLocation;
+            
+public:
+    UPROPERTY(BlueprintReadOnly, Category = "Stat")
+    bool bIsDead = false;
     
     // 오브젝트 풀링
     UPROPERTY()
     class AEnemyPoolManager* PoolManager;
     
     FTimerHandle PoolReturnTimerHandle;
+    
     void ReturnToPool();
-    
-public:
-    UPROPERTY(BlueprintReadOnly, Category = "Stat")
-    bool bIsDead = false;
-    
-    // 오브젝트 풀링
-    virtual void InitEnemy();
-    
+    virtual void InitEnemy();    
     void SetPoolManager(class AEnemyPoolManager* InManager) { PoolManager = InManager; }
+    
+    void CheckIfLanded();
+    
+    FORCEINLINE bool IsDead() const { return bIsDead; }
+    
 };

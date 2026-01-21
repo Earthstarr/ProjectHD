@@ -3,11 +3,14 @@
 
 #include "AIController.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "Perception/AISense_Damage.h"
 #include "Perception/AISense_Hearing.h"
-#include "ProjectHD/EnemyPoolManager.h"
+#include "ProjectHD/Spawn/EnemyPoolManager.h"
+#include "Components/StateTreeAIComponent.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -72,99 +75,103 @@ void AEnemyBase::Die()
 
     for (UPrimitiveComponent* Comp : VisualComponents)
     {
-        // 모든 채널 무시 및 콜리전 비활성화
+        // 총알 통과
         Comp->SetCollisionResponseToAllChannels(ECR_Ignore);
-        Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        
+        // 레그돌을 위해 남겨두기
+        if (Comp != GetMesh())
+        {
+            Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        }
     }
+        
+    GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
+    GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
     
-    // AI 정지 및 캡슐 충돌 제거
-    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    // 땅과는 계속 충돌해야 애니메이션 발 위치 등이 정확할 수 있으므로 WorldStatic만 유지
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); 
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+    
+    // AI 정지
     if (AAIController* AIC = Cast<AAIController>(GetController()))
     {
         AIC->StopMovement();
         AIC->UnPossess();
-    }
-    SetActorTickEnabled(false);
+    }   
 
-    // 사망 애니메이션 재생
-    float DeathAnimDuration = 0.f;
-    
+    // 사망 애니메이션이 있으면 재생, 없으면 바로 레그돌
     if (DeathMontage)
     {
-        DeathAnimDuration = PlayAnimMontage(DeathMontage);
-    }
-
-    if (DeathAnimDuration > 0.f)
-    {
-        // 애니메이션이 끝나는 시점에 지면 체크 및 틱 종료 판단
-        GetWorldTimerManager().SetTimer(DisableTickTimerHandle, this, &AEnemyBase::DisableMeshTick, DeathAnimDuration, false);
+        float DeathAnimDuration = PlayAnimMontage(DeathMontage);
+        
+        if (DeathAnimDuration > 0.f)
+        {
+            // 애니메이션이 끝나면 DisableMeshTick 호출
+            GetWorldTimerManager().SetTimer(DisableTickTimerHandle, this, &AEnemyBase::DisableMeshTick, DeathAnimDuration, false);
+        }
+        else
+        {
+            DisableMeshTick();
+        }
     }
     else
     {
-        // 몽타주가 없으면 즉시 체크
-        DisableMeshTick();
+        DisableMeshTick();    
     }
+    
+    // 오브젝트 풀링 타이머
+    GetWorldTimerManager().SetTimer(PoolReturnTimerHandle, this, &AEnemyBase::ReturnToPool, 20.0f, false);
 }
 
 void AEnemyBase::DisableMeshTick()
 {
-    // 애니메이션이 끝난 시점에서 지면 확인
-    FHitResult GroundHit;
-    FVector Start = GetActorLocation();
-    FVector End = Start + (FVector::UpVector * -100.0f);
-    FCollisionQueryParams Params;
-    Params.AddIgnoredActor(this);
-
-    bool bOnGround = GetWorld()->LineTraceSingleByChannel(GroundHit, Start, End, ECC_Visibility, Params);
-
-    if (bOnGround)
+    // 중력과 낙하 로직을 다시 가동하기 위해 Tick 켜기
+    SetActorTickEnabled(true);
+    
+    // 애니메이션이 끝났으니 중력의 영향을 받도록 설정
+    if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
     {
-        // 틱 끄고 고정
-        GetMesh()->SetComponentTickEnabled(false);
-        GetMesh()->bNoSkeletonUpdate = true;
-        GetMesh()->SetSimulatePhysics(false);
-        GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
+        // 컨트롤러가 없어도 물리 연산을 수행하도록 설정
+        MoveComp->bRunPhysicsWithNoController = true;        
+        MoveComp->GravityScale = 1.0f;
+        MoveComp->SetMovementMode(MOVE_Falling);
+        
+        // 캡슐의 충돌은 꺼져있지만, 무브먼트 컴포넌트가 바닥을 감지할 수 있게 최소한의 설정
+        MoveComp->Velocity = FVector(0.f, 0.f, -10.f);
     }
-    else
-    {
-        // 땅에 닿을 때까지 물리 적용
-        ActivateRagdoll();
-    }
+        
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    GetCapsuleComponent()->SetCollisionObjectType(ECC_Pawn);
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
     
-    // 오브젝트 풀링
-    GetWorldTimerManager().SetTimer(PoolReturnTimerHandle, this, &AEnemyBase::ReturnToPool, 10.0f, false);
-}
-
-void AEnemyBase::ActivateRagdoll()
-{
-    // 레그돌을 위한 물리 켜기
-    GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
-    GetMesh()->SetSimulatePhysics(true);
-    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-    
-    GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);   // 총알 통과
-    GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-    GetMesh()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
-    
-    // 바닥 착지 감지 타이머 시작
-    GetWorldTimerManager().SetTimer(LandedCheckTimerHandle, this, &AEnemyBase::CheckIfLanded, 0.2f, true);
+    // 바닥에 닿았는지 체크 타이머 시작
+    GetWorldTimerManager().SetTimer(LandedCheckTimerHandle, this, &AEnemyBase::CheckIfLanded, 0.1f, true);
 }
 
 void AEnemyBase::CheckIfLanded()
 {
-    // 물리 속도가 충분히 줄어들면 착지로 간주
-    if (GetMesh()->GetPhysicsLinearVelocity().Size() < 10.0f)
+    // 이동 속도가 거의 0이라면
+    if (GetVelocity().Size() < 10.0f)
     {
         GetWorldTimerManager().ClearTimer(LandedCheckTimerHandle);
         
-        // 물리 끄고 현재 포즈로 고정
-        GetMesh()->SetSimulatePhysics(false);
-        GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-        
-        // 최종적으로 최적화 수행
+        // 최종 프리즈
+        SetActorTickEnabled(false);
         GetMesh()->SetComponentTickEnabled(false);
         GetMesh()->bNoSkeletonUpdate = true;
+        
+        if (GetCharacterMovement())
+        {
+            GetCharacterMovement()->DisableMovement();
+            GetCharacterMovement()->StopMovementImmediately();
+        }
+
+        // 캡슐 콜리전도 꺼서 총알/이동 방해를 제거
+        GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        
     }
 }
 
@@ -190,6 +197,18 @@ void AEnemyBase::InitEnemy()
     GetMesh()->SetComponentTickEnabled(true);
     GetMesh()->bNoSkeletonUpdate = false;
     GetMesh()->SetSimulatePhysics(false);
+    
+    if (AAIController* AIC = Cast<AAIController>(GetController()))
+    {
+        // 컨트롤러에 붙어있는 StateTreeComponent를 찾습니다.
+        UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>();
+        if (STComp)
+        {
+            // 이전에 멈춰있던 스테이트 트리를 처음부터 다시 시작합니다.
+            STComp->StopLogic("Restarting from Pool");
+            STComp->StartLogic();
+        }
+    }
 
     // 모든 타이머 초기화
     GetWorldTimerManager().ClearAllTimersForObject(this);
@@ -198,7 +217,7 @@ void AEnemyBase::InitEnemy()
 void AEnemyBase::ReturnToPool()
 {
     if (PoolManager)
-    {
+    {        
         PoolManager->ReleaseEnemy(this);
-    }
+    }    
 }
