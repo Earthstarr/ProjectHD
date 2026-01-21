@@ -19,6 +19,7 @@ public:
 	AEnemy_Chimera();
 	
 protected:	
+	virtual void BeginPlay() override;
 	
 	// 몸체 판정용 박스 2개
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision")
@@ -34,7 +35,9 @@ protected:
 	// 플레이어 오버랩 이벤트
 	UFUNCTION()
 	void OnHitBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	float AttackDamage = 50.0f;
+	float AttackDamage = 50.0f;	
+	
+	
 };
