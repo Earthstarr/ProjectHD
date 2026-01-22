@@ -272,6 +272,27 @@ void AFPSCharacter::ClearCurrentWeaponAbilities()
     CurrentWeaponAbilityHandles.Empty();
 }
 
+void AFPSCharacter::AddKillCombo()
+{
+    // 콤보 숫자 증가
+    KillComboCount++;
+
+    // UI 갱신용 델리게이트 호출
+    OnComboChanged.Broadcast(KillComboCount);
+
+    // 기존 타이머가 작동 중이면 초기화 (Refresh)
+    GetWorldTimerManager().ClearTimer(ComboTimerHandle);
+
+    // 10초 뒤에 ResetKillCombo 함수를 호출하도록 타이머 설정
+    GetWorldTimerManager().SetTimer(ComboTimerHandle, this, &AFPSCharacter::ResetKillCombo, ComboExpireTime, false);
+}
+
+void AFPSCharacter::ResetKillCombo()
+{
+    KillComboCount = 0;
+    OnComboChanged.Broadcast(KillComboCount);
+}
+
 void AFPSCharacter::UpdateAimOffset(float DeltaTime)
 {
     // 컨트롤러의 회전값과 캐릭터의 회전값 차이

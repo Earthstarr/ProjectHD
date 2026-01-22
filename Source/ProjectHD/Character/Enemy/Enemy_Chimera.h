@@ -18,6 +18,8 @@ class PROJECTHD_API AEnemy_Chimera : public AEnemyBase
 public:
 	AEnemy_Chimera();
 	
+	virtual void InitEnemy() override;
+	
 protected:	
 	virtual void BeginPlay() override;
 	
@@ -37,7 +39,7 @@ protected:
 	void OnHitBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
-	float AttackDamage = 50.0f;	
+	float AttackDamage = 45.0f;	
 	
 	
 };

@@ -113,6 +113,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStratagemStackUpdated, const TArr
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttributeChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGrenadeChanged, int32, Current, int32, Max);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStimChanged, int32, CurrentCount, int32, MaxCount);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboChanged, int32, NewCombo);
 
 UCLASS()
 class PROJECTHD_API AFPSCharacter : public ACharacter, public IAbilitySystemInterface
@@ -172,11 +173,11 @@ protected:
     void StartStaminaRegen();
     
     FTimerHandle TimerHandle_StaminaRegen;
+    FTimerHandle ComboTimerHandle;
     
 public:
     void OnSprintStarted();
-    void OnSprintCompleted();
-    
+    void OnSprintCompleted();    
     
 protected:
     
@@ -363,6 +364,12 @@ public:
 
     FTimerHandle TimerHandle_Reload;
     
+    // 콤보 증가 및 타이머 갱신
+    void AddKillCombo();
+
+    // 콤보 리셋
+    void ResetKillCombo();
+    
 protected:
     
     // 애니메이션    
@@ -400,7 +407,8 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stratagem")
     bool bIsSelectingStratagem = false;
 
-    bool bIsStratagemReady = false;
+    bool bIsStratagemReady = false;    
+    float ComboExpireTime = 7.0f;
 
     // --- 스트라타젬 사운드 ---
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stratagem")
@@ -415,6 +423,9 @@ protected:
     // 중복 및 이름 오류 수정: StratagemList는 FStratagemData 타입을 사용합니다.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stratagem")
     TArray<FStratagemData> StratagemList;
+    
+    UPROPERTY(VisibleAnywhere, Category = "Stat")
+    int32 KillComboCount = 0;
 
     int32 ActiveStratagemIndex = 0;
 
@@ -493,12 +504,13 @@ public:
     
     UPROPERTY(BlueprintAssignable, Category = "Events")
     FOnStimChanged OnStimChanged;
+    
+    UPROPERTY(BlueprintAssignable, Category = "HUD")
+    FOnComboChanged OnComboChanged;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
     float MouseSensitivity = 0.3f;
     
-    
-
 protected:
     UPROPERTY(BlueprintReadWrite, Category = "Mesh")
     class USkeletalMeshComponent* WeaponMesh;

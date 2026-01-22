@@ -48,6 +48,13 @@ public:
     UPROPERTY(BlueprintReadOnly, Category = "Stat")
     bool bIsDead = false;
     
+    // 미션지점의 적들은 Idle 상태로 대기하기 위한 bool 값
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    bool bIsIdle = false;
+    
+    // 미션지점 스폰적 구분을 위한 bool 값 (플레이어와 거리가 멀어져도 사라지지 않음)
+    bool bIsMissionSpawned = false;
+    
     // 오브젝트 풀링
     UPROPERTY()
     class AEnemyPoolManager* PoolManager;

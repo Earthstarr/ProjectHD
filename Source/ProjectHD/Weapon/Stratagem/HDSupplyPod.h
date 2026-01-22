@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "InteractableInterface.h"
+#include "ProjectHD/InteractableInterface.h"
 #include "HDSupplyPod.generated.h"
 
 UCLASS()

@@ -23,7 +23,7 @@ class PROJECTHD_API AEnemyPoolManager : public AActor
 public:
 	AEnemyPoolManager();
 	
-	virtual void BeginPlay();
+	virtual void BeginPlay() override;
 	
 	// 풀에서 적을 가져오거나 새로 생성
 	AEnemyBase* AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, FVector Location, FRotator Rotation);

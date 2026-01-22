@@ -191,8 +191,8 @@ void AHDSentry::Fire()
     FRotator MuzzleRot = TurretMesh->GetSocketRotation(TEXT("Muzzle"));
     
     // 랜덤 퍼짐 추가 (상하좌우 약 1도)
-    MuzzleRot.Pitch += FMath::FRandRange(-1.0f, 1.0f);
-    MuzzleRot.Yaw += FMath::FRandRange(-1.0f, 1.0f);
+    //MuzzleRot.Pitch += FMath::FRandRange(-1.0f, 1.0f);
+    //MuzzleRot.Yaw += FMath::FRandRange(-1.0f, 1.0f);
 
     FActorSpawnParameters Params;
     Params.Owner = this;

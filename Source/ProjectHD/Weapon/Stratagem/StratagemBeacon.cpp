@@ -8,7 +8,7 @@
 #include "Eagle.h"
 #include "HDSentry.h"
 #include "OrbitalLaser.h"
-#include "ProjectHD/HDSupplyPod.h"
+#include "ProjectHD/Weapon/Stratagem/HDSupplyPod.h"
 #include "Math/Quat.h"
 
 AStratagemBeacon::AStratagemBeacon()
@@ -215,12 +215,12 @@ void AStratagemBeacon::TriggerStrike()
                 
                 //이펙트 터진곳 데미지
                 TArray<FHitResult> PointHits;
-                FCollisionShape SphereShape = FCollisionShape::MakeSphere(500.f);
+                FCollisionShape SphereShape = FCollisionShape::MakeSphere(250.f);
                 if (GetWorld()->SweepMultiByChannel(PointHits, FinalExplosionPos, FinalExplosionPos, FQuat::Identity, ECC_Pawn, SphereShape))
                 {
                     for (auto& PHit : PointHits)
                     {
-                        UGameplayStatics::ApplyPointDamage(PHit.GetActor(), 100.f, FinalExplosionPos - PHit.ImpactPoint, PHit, GetInstigatorController(), this, UDamageType::StaticClass());
+                        UGameplayStatics::ApplyPointDamage(PHit.GetActor(), 50.f, FinalExplosionPos - PHit.ImpactPoint, PHit, GetInstigatorController(), this, UDamageType::StaticClass());
                     }
                 }
             }, Delay, false);
