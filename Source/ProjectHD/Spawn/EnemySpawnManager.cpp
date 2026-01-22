@@ -35,23 +35,12 @@ void AEnemySpawnManager::BeginPlay()
 
     // 타이머 시작
     GetWorldTimerManager().SetTimer(PatrolSpawnTimer, this, &AEnemySpawnManager::SpawnPatrolSquad, PatrolSpawnInterval, true);
-    GetWorldTimerManager().SetTimer(MaintainTimer, this, &AEnemySpawnManager::MaintainMissionZones, 10.0f, true);
+    GetWorldTimerManager().SetTimer(DespawnCheckTimer, this, &AEnemySpawnManager::CheckEnemyDistances, DespawnCheckInterval, true);
 }
 
 void AEnemySpawnManager::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-}
-
-void AEnemySpawnManager::MaintainMissionZones()
-{
-    for (ASpawnZone* Zone : MissionZones)
-    {
-        if (Zone)
-        {
-            Zone->MaintainEnemyCount(PoolManager);
-        }
-    }
 }
 
 void AEnemySpawnManager::SpawnPatrolSquad()
@@ -65,22 +54,52 @@ void AEnemySpawnManager::SpawnPatrolSquad()
     FVector SpawnCenter = PlayerLoc + RandomDirection * PatrolSpawnDistance;
 
     // 정찰대 스폰
-    for (int32 i = 0; i < PatrolSquadSize; ++i)
+    for (const FPatrolEnemySpawnInfo& SpawnInfo : PatrolEnemyTypes)
     {
-        TSubclassOf<AEnemyBase> RandomClass = PatrolEnemyTypes[FMath::RandRange(0, PatrolEnemyTypes.Num() - 1)];
-        
-        FVector Offset = FVector(FMath::RandRange(-200.f, 200.f), FMath::RandRange(-200.f, 200.f), 0);
-        FVector SpawnLoc = SpawnCenter + Offset;
-        FRotator SpawnRot = FRotator(0, FMath::RandRange(0.f, 360.f), 0);
+        if (!SpawnInfo.EnemyClass) continue;
 
-        PoolManager->AcquireEnemy(RandomClass, SpawnLoc, SpawnRot);
+        for (int32 i = 0; i < SpawnInfo.SpawnCount; ++i)
+        {
+            FVector Offset = FVector(FMath::RandRange(-1000.f, 1000.f), FMath::RandRange(-1000.f, 1000.f), 500.f);
+            FVector SpawnLoc = SpawnCenter + Offset;
+            FRotator SpawnRot = FRotator(0, FMath::RandRange(0.f, 360.f), 0);
+
+            PoolManager->AcquireEnemy(SpawnInfo.EnemyClass, SpawnLoc, SpawnRot);
+        }
     }
-
-    UE_LOG(LogTemp, Warning, TEXT("정찰대 스폰: %s"), *SpawnCenter.ToString());
 }
 
 FVector AEnemySpawnManager::GetPlayerLocation() const
 {
     ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
     return Player ? Player->GetActorLocation() : FVector::ZeroVector;
+}
+
+void AEnemySpawnManager::CheckEnemyDistances()
+{
+    if (!PoolManager) return;
+
+    FVector PlayerLoc = GetPlayerLocation();
+    
+    // 월드에 존재하는 모든 EnemyBase를 찾기
+    TArray<AActor*> ActiveEnemies;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemyBase::StaticClass(), ActiveEnemies);
+
+    for (AActor* Actor : ActiveEnemies)
+    {
+        AEnemyBase* Enemy = Cast<AEnemyBase>(Actor);
+        
+        // 이미 죽었거나 비활성화된 적은 무시
+        if (!Enemy || Enemy->IsHidden() || Enemy->IsDead()) continue;
+        
+        // 미션 지역 적은 무시
+        if (Enemy->bIsMissionSpawned) continue;
+
+        // 거리가 멀면 풀로 반환
+        float DistanceSq = FVector::DistSquared(PlayerLoc, Enemy->GetActorLocation());        
+        if (DistanceSq > FMath::Square(DespawnDistance))
+        {            
+            PoolManager->ReleaseEnemy(Enemy);
+        }
+    }
 }

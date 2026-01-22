@@ -31,7 +31,7 @@ protected:
 	float MoveSpeed = 1000.f;          // 레이저 이동 속도
 
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
-	float DamagePerSecond = 120.f;    // 초당 데미지
+	float DamagePerSecond = 300.f;    // 초당 데미지
 
 	UPROPERTY(EditAnywhere, Category = "Laser|Settings")
 	float Duration = 31.8f;           // 레이저 지속 시간

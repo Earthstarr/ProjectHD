@@ -11,10 +11,13 @@
 #include "Perception/AISense_Hearing.h"
 #include "ProjectHD/Spawn/EnemyPoolManager.h"
 #include "Components/StateTreeAIComponent.h"
+#include "ProjectHD/Character/Player/FPSCharacter.h"
 
 AEnemyBase::AEnemyBase()
 {
     CurrentHealth = MaxHealth;
+    
+    UE_LOG(LogTemp, Warning, TEXT("새로운 EnemyBase 생성"));
 }
 
 float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -120,8 +123,19 @@ void AEnemyBase::Die()
         DisableMeshTick();    
     }
     
+    // 플레이어 킬 콤보 델리게이트 연동
+    APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    if (PlayerPawn)
+    {
+        AFPSCharacter* Player = Cast<AFPSCharacter>(PlayerPawn);
+        if (Player)
+        {
+            Player->AddKillCombo();
+        }
+    }
+    
     // 오브젝트 풀링 타이머
-    GetWorldTimerManager().SetTimer(PoolReturnTimerHandle, this, &AEnemyBase::ReturnToPool, 20.0f, false);
+    GetWorldTimerManager().SetTimer(PoolReturnTimerHandle, this, &AEnemyBase::ReturnToPool, 60.0f, false);
 }
 
 void AEnemyBase::DisableMeshTick()
@@ -175,12 +189,38 @@ void AEnemyBase::CheckIfLanded()
     }
 }
 
-// 초기화
+// 다시 스폰시 초기화
 void AEnemyBase::InitEnemy()
 {
     bIsDead = false;
+    
+    // 미션지역 적 정찰대로 재활용 초기화
+    bIsMissionSpawned = false;
+    bIsIdle = false;
+    
     CurrentHealth = MaxHealth;
     SetActorHiddenInGame(false);
+    
+    if (AAIController* AIC = Cast<AAIController>(GetController()))
+    {
+        SetInstigator(this);
+        
+        // 컨트롤러에 붙어있는 StateTreeComponent 찾기
+        UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>();
+        if (STComp)
+        {
+            // 이전에 멈춰있던 스테이트 트리를 처음부터 다시 시작
+            STComp->StopLogic("Restarting from Pool");
+            STComp->StartLogic();
+        }
+    }
+    
+    // 애니메이션 몽타주 초기화
+    if (UAnimInstance* AnimInst = GetMesh()->GetAnimInstance())
+    {
+        // 현재 재생 중인 모든 몽타주를 0초의 블렌드 타임으로 즉시 중단
+        AnimInst->Montage_Stop(0.0f);
+    }
 
     // 모든 컴포넌트 콜리전 복구
     TArray<UPrimitiveComponent*> VisualComponents;
@@ -188,8 +228,21 @@ void AEnemyBase::InitEnemy()
     
     for (UPrimitiveComponent* Comp : VisualComponents)
     {    
+        // 히트박스는 초기값 NoCollision
+        FString CompName = Comp->GetName();
+        if (CompName.Contains("HitBox") || CompName.Contains("Mouth"))
+        {
+            Comp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+            Comp->SetCollisionResponseToAllChannels(ECR_Overlap);
+            Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            continue;
+        }
+        
+        // 일반 콜리전 복구
         Comp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-        Comp->SetCollisionResponseToAllChannels(ECR_Block); // 기본값 복구
+        Comp->SetCollisionResponseToAllChannels(ECR_Block);
+        
+        Comp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
     }
 
     // 틱 및 스켈레톤 업데이트 복구
@@ -198,17 +251,7 @@ void AEnemyBase::InitEnemy()
     GetMesh()->bNoSkeletonUpdate = false;
     GetMesh()->SetSimulatePhysics(false);
     
-    if (AAIController* AIC = Cast<AAIController>(GetController()))
-    {
-        // 컨트롤러에 붙어있는 StateTreeComponent를 찾습니다.
-        UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>();
-        if (STComp)
-        {
-            // 이전에 멈춰있던 스테이트 트리를 처음부터 다시 시작합니다.
-            STComp->StopLogic("Restarting from Pool");
-            STComp->StartLogic();
-        }
-    }
+    
 
     // 모든 타이머 초기화
     GetWorldTimerManager().ClearAllTimersForObject(this);
