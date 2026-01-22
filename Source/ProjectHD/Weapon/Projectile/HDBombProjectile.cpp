@@ -75,9 +75,10 @@ void AHDBombProjectile::Explode()
 {
     FVector ExplosionOrigin = SavedHit.ImpactPoint + (SavedHit.ImpactNormal * 20.0f);
 
+    // 원형 범위 데미지
     UGameplayStatics::ApplyRadialDamageWithFalloff(
         this, DamageAmount, 10.f, ExplosionOrigin,
-        ExplosionRadius * 0.5f, ExplosionRadius, 1.f,
+        ExplosionRadius, ExplosionRadius * 1.2f, 1.f,
         UDamageType::StaticClass(), TArray<AActor*>(),
         this, GetInstigatorController(), ECC_Visibility
     );

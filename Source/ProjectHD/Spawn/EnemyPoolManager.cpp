@@ -29,6 +29,22 @@ void AEnemyPoolManager::BeginPlay()
 AEnemyBase* AEnemyPoolManager::AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, FVector Location, FRotator Rotation)
 {
 	if (!EnemyClass) return nullptr;
+	
+	// 지형 감지 로직
+	FVector TraceStart = Location + FVector(0.f, 0.f, 2000.f); // 하늘 위 20m 지점
+	FVector TraceEnd = Location + FVector(0.f, 0.f, -1000.f);  // 바닥 아래 10m 지점
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	
+	// 매니저 자신이나 이미 배치된 적들과의 충돌을 피하기 위해 설정
+	Params.AddIgnoredActor(this);
+	
+	// 지형 찾기
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params))
+	{
+		// 지면에 닿은 위치로 Location 수정
+		Location = HitResult.ImpactPoint + FVector(0.f, 0.f, 10.f); 
+	}
 
 	AEnemyBase* EnemyToUse = nullptr;
 	FEnemyPoolArray& Pool = PoolMap.FindOrAdd(EnemyClass);
@@ -41,12 +57,12 @@ AEnemyBase* AEnemyPoolManager::AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, 
 	else
 	{
 		// 풀이 비어있으면 새로 생성
-		FActorSpawnParameters Params;
-		Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		EnemyToUse = GetWorld()->SpawnActor<AEnemyBase>(EnemyClass, Location, Rotation, Params);
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		EnemyToUse = GetWorld()->SpawnActor<AEnemyBase>(EnemyClass, Location, Rotation, SpawnParams);
         
 		// 매니저를 알 수 있게 설정 (반환 시 필요)
-		// EnemyToUse->SetPoolManager(this); 
+		EnemyToUse->SetPoolManager(this); 
 	}
 
 	if (EnemyToUse)
@@ -57,12 +73,12 @@ AEnemyBase* AEnemyPoolManager::AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, 
 		if (EnemyToUse->GetController() == nullptr)
 		{
 			EnemyToUse->SpawnDefaultController();
-		}
-    
-		// 모든 상태 초기화
-		EnemyToUse->InitEnemy();
+		}		
 	}
 
+	// 모든 상태 초기화
+	EnemyToUse->InitEnemy();
+	
 	return EnemyToUse;
 }
 

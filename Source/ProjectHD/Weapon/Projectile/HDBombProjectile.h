@@ -22,7 +22,7 @@ protected:
     virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
     UPROPERTY(EditAnywhere, Category = "Explosion")
-    float ExplosionRadius = 800.f;
+    float ExplosionRadius = 2000.f;
     
     // 땅에 부딪힐때 이펙트와 사운드
     UPROPERTY(EditDefaultsOnly, Category = "Effects")
