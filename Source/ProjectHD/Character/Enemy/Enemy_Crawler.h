@@ -19,6 +19,8 @@ class PROJECTHD_API AEnemy_Crawler : public AEnemyBase
 	
 public:
 	AEnemy_Crawler();
+	
+	virtual void InitEnemy() override;
 		
 protected:
 	virtual void BeginPlay() override;

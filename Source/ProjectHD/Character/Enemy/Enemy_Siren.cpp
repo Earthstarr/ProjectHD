@@ -3,8 +3,11 @@
 
 #include "ProjectHD/Character/Enemy/Enemy_Siren.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
+#include "ProjectHD/Spawn/EnemyPoolManager.h"
 
 
 AEnemy_Siren::AEnemy_Siren()
@@ -15,18 +18,22 @@ AEnemy_Siren::AEnemy_Siren()
 	BodyCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BodyCollision"));
 	BodyCollision->SetupAttachment(GetMesh()); 
 	BodyCollision->SetCollisionProfileName(TEXT("CharacterMesh"));
+	BodyCollision->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	
 	HeadCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("HeadCollision"));
 	HeadCollision->SetupAttachment(GetMesh()); 
 	HeadCollision->SetCollisionProfileName(TEXT("CharacterMesh"));
+	HeadCollision->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
 	HitBoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("HitBoxCollision"));
 	HitBoxCollision->SetupAttachment(GetMesh());
 	HitBoxCollision->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	HitBoxCollision->SetGenerateOverlapEvents(true);
+	HitBoxCollision->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
     
 	BodyCollision->IgnoreActorWhenMoving(this, true);
 	BodyCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BodyCollision->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	
 	HitBoxCollision->IgnoreActorWhenMoving(this, true);
 	HitBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -39,8 +46,32 @@ void AEnemy_Siren::BeginPlay()
 	HitBoxCollision->OnComponentBeginOverlap.AddDynamic(this, &AEnemy_Siren::OnHitBoxOverlap);
 }
 
+void AEnemy_Siren::InitEnemy()
+{
+	Super::InitEnemy();
+    
+	if (BodyCollision)
+	{
+		BodyCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		BodyCollision->SetCollisionResponseToAllChannels(ECR_Block);
+		BodyCollision->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	}
+    
+	if (HeadCollision)
+	{
+		HeadCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		HeadCollision->SetCollisionResponseToAllChannels(ECR_Block);
+		HeadCollision->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	}
+    
+	if (HitBoxCollision)
+	{
+		HitBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
+}
+
 void AEnemy_Siren::OnHitBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                   UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor != this)
 	{     
@@ -51,4 +82,84 @@ void AEnemy_Siren::OnHitBoxOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 			HitBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 	}
+}
+
+void AEnemy_Siren::StartReinforce()
+{
+	if (bIsCoolingDown || bIsDead) return;
+
+	bIsCoolingDown = true;
+	
+	ReinforceLocation = GetActorLocation();
+
+	// 연기 나이아가라
+	if (ReinforceFX)
+	{
+		SpawnedReinforceFX = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ReinforceFX, ReinforceLocation);
+	}
+
+	// 일정 시간 동안 반복 스폰 타이머 시작
+	GetWorldTimerManager().SetTimer(
+		SpawnTimerHandle, 
+		this, 
+		&AEnemy_Siren::SpawnWave, 
+		SpawnInterval,
+		true, 
+		7.0f
+	);
+
+	// 30초 후 증원 종료 타이머
+	GetWorldTimerManager().SetTimer(ReinforceTimerHandle, this, &AEnemy_Siren::StopReinforce, ReinforceDuration, false);
+
+	// 3분 쿨타임 타이머
+	GetWorldTimerManager().SetTimer(
+		CooldownTimerHandle, 
+		this, 
+		&AEnemy_Siren::ResetCooldown, 
+		ReinforceCooldown, 
+		false
+	);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Start Reinforce"));
+}
+
+void AEnemy_Siren::SpawnWave()
+{
+	if (!PoolManager) return;
+
+	// 설정된 모든 적 종류를 순회하며 스폰
+	for (const FReinforcementWave& Wave : WaveConfigs)
+	{
+		if (!Wave.EnemyClass) continue;
+		
+		int32 RandomSpawnCount = FMath::RandRange(Wave.MinSpawnCount, Wave.MaxSpawnCount);
+
+		for (int32 i = 0; i < RandomSpawnCount; ++i)
+		{
+			// 기준 반경 이내 랜덤 스폰
+			FVector RandomOffset = FVector(FMath::RandRange(-800.f, 800.f), FMath::RandRange(-800.f, 800.f), 100.f);
+			FVector SpawnLoc = ReinforceLocation + RandomOffset;
+			FRotator SpawnRot = FRotator(0, FMath::RandRange(0.f, 360.f), 0);
+
+			PoolManager->AcquireEnemy(Wave.EnemyClass, SpawnLoc, SpawnRot);
+		}
+	}
+}
+
+void AEnemy_Siren::StopReinforce()
+{
+	GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
+	
+	if (SpawnedReinforceFX)
+	{
+		// 즉시 삭제하거나(Destroy), 이미 파티클이 자연스럽게 사라지도록 비활성화(Deactivate) 합니다.
+		// 헬다이버즈 느낌을 내려면 Deactivate가 더 자연스럽습니다.
+		SpawnedReinforceFX->Deactivate();
+		SpawnedReinforceFX = nullptr;
+	}
+}
+
+void AEnemy_Siren::ResetCooldown()
+{
+	bIsCoolingDown = false;
 }
