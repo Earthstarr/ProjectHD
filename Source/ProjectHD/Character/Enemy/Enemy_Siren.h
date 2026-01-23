@@ -75,6 +75,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Siren|Reinforcement")
 	float ReinforceCooldown = 180.0f; // 쿨타임
 	
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Siren|Reinforcement")
 	bool bIsCoolingDown = false;

@@ -94,12 +94,12 @@ void AEnemySpawnManager::CheckEnemyDistances()
         
         // 미션 지역 적은 무시
         if (Enemy->bIsMissionSpawned) continue;
-
+        
         // 거리가 멀면 풀로 반환
         float DistanceSq = FVector::DistSquared(PlayerLoc, Enemy->GetActorLocation());        
         if (DistanceSq > FMath::Square(DespawnDistance))
-        {            
-            PoolManager->ReleaseEnemy(Enemy);
+        {
+            Enemy->ForceDespawn();
         }
     }
 }
