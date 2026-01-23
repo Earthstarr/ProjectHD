@@ -6,6 +6,8 @@
 #include "AbilitySystemInterface.h"
 #include "GameplayAbilitySpec.h"
 #include "ProjectHD/Weapon/WeaponDataAsset.h"
+#include "ProjectHD/SubtitleTypes.h" // 자막
+
 #include "FPSCharacter.generated.h"
 
 class AHDProjectile;
@@ -28,6 +30,7 @@ enum class EStratagemType : uint8
     EagleCluster,
     OrbitalLaser,
     Sentry,
+    Rearm,
 };
 
 // 스트라타젬 데이터 구조체
@@ -63,6 +66,19 @@ struct FStratagemData
     // 현재 쿨타임 중인지 여부
     UPROPERTY(BlueprintReadWrite)
     bool bIsOnCooldown = false;
+    
+    // 스택형 스트라타젬 (이글)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stratagem")
+    bool bUseStack = false;          // 스택 시스템 사용 여부
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stratagem")
+    int32 MaxStack = 1;              // 최대 사용 횟수
+
+    UPROPERTY(BlueprintReadWrite, Category = "Stratagem")
+    int32 CurrentStack = 1;          // 현재 남은 횟수
+
+    UPROPERTY(BlueprintReadWrite, Category = "Stratagem")
+    bool bIsRearming = false;        // 재무장(쿨타임) 중인지 여부
 };
 
 // 무기 구조체
@@ -114,6 +130,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttributeChanged, float, Current
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGrenadeChanged, int32, Current, int32, Max);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStimChanged, int32, CurrentCount, int32, MaxCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboChanged, int32, NewCombo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStratagemMenuOpened, bool, bCanRearm);
 
 UCLASS()
 class PROJECTHD_API AFPSCharacter : public ACharacter, public IAbilitySystemInterface
@@ -419,6 +436,9 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stratagem")
     class USoundBase* StratagemCompleteSound; // 입력 완료 (소리 3)
+    
+    UPROPERTY(EditAnywhere, Category = "Stratagem")
+    class USoundBase* EagleRearmSound;
 
     // 중복 및 이름 오류 수정: StratagemList는 FStratagemData 타입을 사용합니다.
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stratagem")
@@ -429,7 +449,7 @@ protected:
 
     int32 ActiveStratagemIndex = 0;
 
-    TArray<EStratagemDirection> CurrentInputStack;
+    TArray<EStratagemDirection> CurrentInputStack;   
 
 public:
     virtual void Tick(float DeltaTime) override;
@@ -507,6 +527,16 @@ public:
     
     UPROPERTY(BlueprintAssignable, Category = "HUD")
     FOnComboChanged OnComboChanged;
+    
+    UPROPERTY(BlueprintAssignable, Category = "Stratagem")
+    FOnStratagemMenuOpened OnStratagemMenuOpened;
+    
+    UPROPERTY(BlueprintAssignable, Category = "Audio")
+    FOnSoundPlayedSignature  OnSoundPlayed;  // 자막
+
+    // 재무장 가능 여부 판단 함수
+    UFUNCTION(BlueprintCallable, Category = "Stratagem")
+    bool CanEagleRearm() const;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
     float MouseSensitivity = 0.3f;
