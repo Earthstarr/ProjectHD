@@ -14,6 +14,7 @@ AEnemy_Siren::AEnemy_Siren()
 {
 	MaxHealth = 30.0f;
 	CurrentHealth = MaxHealth;
+	ReturnToPoolTime = 5.0f;
 	
 	BodyCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BodyCollision"));
 	BodyCollision->SetupAttachment(GetMesh()); 
@@ -154,8 +155,10 @@ void AEnemy_Siren::StopReinforce()
 	{
 		// 즉시 삭제하거나(Destroy), 이미 파티클이 자연스럽게 사라지도록 비활성화(Deactivate) 합니다.
 		// 헬다이버즈 느낌을 내려면 Deactivate가 더 자연스럽습니다.
-		SpawnedReinforceFX->Deactivate();
+		//SpawnedReinforceFX->Deactivate();
+		SpawnedReinforceFX->DestroyComponent();
 		SpawnedReinforceFX = nullptr;
+		
 	}
 }
 

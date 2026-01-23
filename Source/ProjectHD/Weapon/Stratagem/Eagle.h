@@ -2,7 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ProjectHD/SubtitleTypes.h" // 자막
+
 #include "Eagle.generated.h"
+
 
 UCLASS()
 class PROJECTHD_API AEagle : public AActor
@@ -20,6 +23,9 @@ public:
 
     // 비컨에서 호출하여 비행 시작 지점과 끝 지점 설정
     void InitEagle(FVector Start, FVector End, float Duration);
+    
+    UPROPERTY(BlueprintAssignable, Category = "Audio")
+    FOnSoundPlayedSignature OnSoundPlayed;  // 자막
 
 private:
     

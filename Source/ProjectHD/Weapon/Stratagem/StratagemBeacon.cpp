@@ -74,10 +74,10 @@ void AStratagemBeacon::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, U
     if (BeaconActivateSound)
     {
         UGameplayStatics::PlaySound2D(this, BeaconActivateSound);
+        //OnSoundPlayed.Broadcast(FName("Beacon_Activate")); // 자막
     }
 
-    // 바닥에 달라붙기 (Attach)
-    // 부딪힌 대상(OtherActor)이 있고, 움직이는 물체일 수도 있으므로 부착해줍니다.
+    // 액터에 달라붙기 (Attach)
     if (OtherActor)
     {
         FAttachmentTransformRules AttachRules(
@@ -333,9 +333,19 @@ void AStratagemBeacon::ActivateBeacon()
 
             UGameplayStatics::PlaySoundAtLocation(this, FighterSound, GetActorLocation());
         }
-        else if ((MyStratagemType == EStratagemType::Sentry || MyStratagemType == EStratagemType::Supply) && FallingSound)
+        else if (MyStratagemType == EStratagemType::Sentry && FallingSound)
         {
             UGameplayStatics::PlaySoundAtLocation(this, FallingSound, GetActorLocation());
+            OnSoundPlayed.Broadcast(FName("Sentry_Falling")); // 자막
+        }
+        else if (MyStratagemType == EStratagemType::Supply && FallingSound)
+        {
+            UGameplayStatics::PlaySoundAtLocation(this, FallingSound, GetActorLocation());
+            OnSoundPlayed.Broadcast(FName("Supply_Falling")); // 자막
+        }
+        else if (MyStratagemType == EStratagemType::OrbitalLaser)
+        {
+            OnSoundPlayed.Broadcast(FName("OrbitalLaser_Falling")); // 자막
         }
     }
 }
