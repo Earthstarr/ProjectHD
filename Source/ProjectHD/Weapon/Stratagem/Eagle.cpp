@@ -78,6 +78,7 @@ void AEagle::Tick(float DeltaTime)
             if (EagleVoice)
             {
                 UGameplayStatics::PlaySoundAtLocation(this, EagleVoice, GetActorLocation());
+                OnSoundPlayed.Broadcast(FName("Eagle_Bomb")); // ÀÚ¸·
             }
             bVoicePlayed = true;
         }

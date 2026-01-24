@@ -43,6 +43,8 @@ protected:
     
     UPROPERTY(BlueprintReadOnly, Category = "AISense")
     FVector LastAttackerLocation;
+    
+    float ReturnToPoolTime = 60.0f;
             
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Stat")
@@ -66,6 +68,8 @@ public:
     void SetPoolManager(class AEnemyPoolManager* InManager) { PoolManager = InManager; }
     
     void CheckIfLanded();
+    
+    virtual void ForceDespawn();
     
     FORCEINLINE bool IsDead() const { return bIsDead; }
     
