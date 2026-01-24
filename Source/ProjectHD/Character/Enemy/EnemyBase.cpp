@@ -135,7 +135,7 @@ void AEnemyBase::Die()
     }
     
     // 오브젝트 풀링 타이머
-    GetWorldTimerManager().SetTimer(PoolReturnTimerHandle, this, &AEnemyBase::ReturnToPool, 60.0f, false);
+    GetWorldTimerManager().SetTimer(PoolReturnTimerHandle, this, &AEnemyBase::ReturnToPool, ReturnToPoolTime, false);
 }
 
 void AEnemyBase::DisableMeshTick()
@@ -187,6 +187,66 @@ void AEnemyBase::CheckIfLanded()
         GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         
     }
+}
+
+void AEnemyBase::ForceDespawn()
+{
+    if (bIsDead) return; // 중복 실행 방지
+    bIsDead = true;
+    
+    // 액터에 붙은 모든 컴포넌트를 순회하며 콜리전 정리
+    TArray<UPrimitiveComponent*> VisualComponents;
+    GetComponents<UPrimitiveComponent>(VisualComponents);
+
+    for (UPrimitiveComponent* Comp : VisualComponents)
+    {
+        // 총알 통과
+        Comp->SetCollisionResponseToAllChannels(ECR_Ignore);
+        
+        // 레그돌을 위해 남겨두기
+        if (Comp != GetMesh())
+        {
+            Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        }
+    }
+        
+    GetMesh()->SetCollisionResponseToAllChannels(ECR_Ignore);
+    GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+    
+    // 땅과는 계속 충돌해야 애니메이션 발 위치 등이 정확할 수 있으므로 WorldStatic만 유지
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics); 
+    GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+    GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+    
+    // AI 정지
+    if (AAIController* AIC = Cast<AAIController>(GetController()))
+    {
+        AIC->StopMovement();
+        AIC->UnPossess();
+    }   
+    /*
+    // 사망 애니메이션이 있으면 재생, 없으면 바로 레그돌
+    if (DeathMontage)
+    {
+        float DeathAnimDuration = PlayAnimMontage(DeathMontage);
+        
+        if (DeathAnimDuration > 0.f)
+        {
+            // 애니메이션이 끝나면 DisableMeshTick 호출
+            GetWorldTimerManager().SetTimer(DisableTickTimerHandle, this, &AEnemyBase::DisableMeshTick, DeathAnimDuration, false);
+        }
+        else
+        {
+            DisableMeshTick();
+        }
+    }
+    else
+    {
+        DisableMeshTick();    
+    }
+    */
+    // 오브젝트 풀링 타이머 1초로
+    GetWorldTimerManager().SetTimer(PoolReturnTimerHandle, this, &AEnemyBase::ReturnToPool, 1.0f, false);
 }
 
 // 다시 스폰시 초기화
