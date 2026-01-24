@@ -40,6 +40,10 @@ public:
 	virtual void BeginPlay() override;	
 	virtual void InitEnemy() override;
 	
+	// 죽어도 증원은 계속되도록 오버라이드
+	virtual void Die() override;
+	virtual void ForceDespawn() override;
+	
 protected:
 	
 	// 몸체 판정용 박스
@@ -75,6 +79,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Siren|Reinforcement")
 	float ReinforceCooldown = 180.0f; // 쿨타임
 	
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Siren|Reinforcement")
 	bool bIsCoolingDown = false;
@@ -87,11 +92,18 @@ private:
 	FTimerHandle SpawnTimerHandle;
 	FTimerHandle CooldownTimerHandle;
 	
+	// 증원 중인지 플래그
+	bool bIsReinforcing = false;
+	
 	// 증원 신호 위치 저장
 	FVector ReinforceLocation;
 	
+	// 증원 시작 시간 (타이머 복구용)
+	float ReinforceStartTime = 0.0f;
+	
 	void StopReinforce();  // 증원 종료
 	void SpawnWave(); // 적 스폰
+	void CleanupReinforcement();	// 증원 관련 타이머 전부 초기화
 	
 	UFUNCTION()
 	void ResetCooldown(); // 쿨타임 초기화
