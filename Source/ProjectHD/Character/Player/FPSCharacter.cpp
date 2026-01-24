@@ -172,6 +172,9 @@ void AFPSCharacter::BeginPlay()
     Bomb.BeaconColor = FLinearColor::Red;
     Bomb.MaxCooldown = 120.0f;
     Bomb.CurrentCooldown = 0.0f;
+    Bomb.bUseStack = true;  // 스택 사용
+    Bomb.MaxStack = 2;
+    Bomb.CurrentStack = 2;
     Bomb.bIsOnCooldown = false;
     Bomb.Type = EStratagemType::Bomb500kg;  
     
@@ -182,6 +185,9 @@ void AFPSCharacter::BeginPlay()
     ClusterBomb.BeaconColor = FLinearColor(1.0f, 0.5f, 0.0f); // 주황색
     ClusterBomb.MaxCooldown = 90.0f; // 이글은 쿨타임이 짧은 대신 사용 횟수 제한이 있는 경우가 많음
     ClusterBomb.CurrentCooldown = 0.0f;
+    ClusterBomb.bUseStack = true;   // 스택 사용
+    ClusterBomb.MaxStack = 3;
+    ClusterBomb.CurrentStack = 3;
     ClusterBomb.bIsOnCooldown = false;
     ClusterBomb.Type = EStratagemType::EagleCluster;
     
@@ -220,6 +226,19 @@ void AFPSCharacter::BeginPlay()
     Supply.CurrentCooldown = 0.0f;
     Supply.bIsOnCooldown = false;
     Supply.Type = EStratagemType::Supply;
+    
+    // 이글 재무장
+    FStratagemData EagleRearm;
+    EagleRearm.Name = TEXT("Eagle Rearm");
+    EagleRearm.Command = { EStratagemDirection::Up, 
+        EStratagemDirection::Up, 
+        EStratagemDirection::Left, 
+        EStratagemDirection::Up, 
+        EStratagemDirection::Right 
+    };
+    EagleRearm.Type = EStratagemType::Rearm; // 타겟이 될 타입을 지정하거나 별도 Enum 추가
+    EagleRearm.bUseStack = false; // 재무장 명령 자체는 일반 쿨타임 방식
+    EagleRearm.MaxCooldown = 0.0f;
 
     // 위젯 생성 및 화면 추가
     if (MainHUDWidgetClass)
@@ -229,7 +248,16 @@ void AFPSCharacter::BeginPlay()
         {
             MainHUDWidget->AddToViewport();
         }
-    } 
+    }
+    
+    // 시작하고 각 스트라타젬 현재 스택을 다시한번 초기화
+    for (FStratagemData& Data : StratagemList)
+    {
+        if (Data.bUseStack)
+        {
+            Data.CurrentStack = Data.MaxStack;
+        }
+    }
 }
 
 void AFPSCharacter::SwitchWeapon(int32 SlotIndex)
@@ -306,6 +334,19 @@ void AFPSCharacter::UpdateAimOffset(float DeltaTime)
     AimPitch = FMath::FInterpTo(AimPitch, Delta.Pitch, DeltaTime, 15.0f);
 }
 
+bool AFPSCharacter::CanEagleRearm() const
+{
+    for (const FStratagemData& Data : StratagemList)
+    {
+        // 스택을 사용하는 스트라타젬(이글) 중 하나라도 풀스택이 아니면 재무장 가능
+        if (Data.bUseStack && Data.CurrentStack < Data.MaxStack)
+        {
+           return true;
+        }
+    }
+    return false;
+}
+
 void AFPSCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
@@ -322,7 +363,14 @@ void AFPSCharacter::Tick(float DeltaTime)
             {
                 Data.CurrentCooldown = 0.0f;
                 Data.bIsOnCooldown = false;
-            }
+                
+                // 재무장이 끝났다면 스택 복구
+                if (Data.bUseStack && Data.bIsRearming)
+                {
+                    Data.CurrentStack = Data.MaxStack;
+                    Data.bIsRearming = false;
+                }
+            }            
         }
     }
 }
@@ -1003,7 +1051,37 @@ void AFPSCharacter::FireWeapon()
 
 void AFPSCharacter::ThrowBeacon()
 {
-    if (!BeaconClass) return;
+    if (!BeaconClass || !StratagemList.IsValidIndex(ActiveStratagemIndex)) return;
+
+    FStratagemData& ActiveData = StratagemList[ActiveStratagemIndex];
+
+    // 스택형인 경우 체크
+    if (ActiveData.bUseStack)
+    {
+        if (ActiveData.CurrentStack > 0)
+        {
+            ActiveData.CurrentStack--;
+            
+            // 마지막 스택을 다 썼을 때만 자동으로 재무장 시작
+            if (ActiveData.CurrentStack <= 0)
+            {
+                ActiveData.bIsOnCooldown = true;
+                ActiveData.bIsRearming = true;
+                ActiveData.CurrentCooldown = ActiveData.MaxCooldown;
+            }
+            else 
+            {
+                // 스택이 남아있으면 쿨타임을 돌리지 않음
+                ActiveData.bIsOnCooldown = false;
+                ActiveData.CurrentCooldown = 0.0f;
+            }
+        }
+    }
+    else // 일반 스트라타젬
+    {
+        ActiveData.bIsOnCooldown = true;
+        ActiveData.CurrentCooldown = ActiveData.MaxCooldown;
+    }
 
     FVector SpawnLocation = WeaponMesh->GetSocketLocation(TEXT("MuzzleSocket"));
     FRotator ControlRot = GetControlRotation();
@@ -1020,7 +1098,7 @@ void AFPSCharacter::ThrowBeacon()
         SpawnRotation,
         SpawnParams
     );
-
+    /*
     // 성공적으로 스폰되었다면 설정 적용
     if (SpawnedBeacon && StratagemList.IsValidIndex(ActiveStratagemIndex))
     {
@@ -1037,12 +1115,24 @@ void AFPSCharacter::ThrowBeacon()
             ProjectileComp->Velocity = LaunchDirection * ThrowForce;
         }
     }
+    */
+    if (SpawnedBeacon)
+    {
+        SpawnedBeacon->MyStratagemType = ActiveData.Type;
+        SpawnedBeacon->UpdateBeaconVisual(ActiveData.BeaconColor);
 
+        UProjectileMovementComponent* ProjectileComp = SpawnedBeacon->FindComponentByClass<UProjectileMovementComponent>();
+        if (ProjectileComp)
+        {
+            ProjectileComp->Velocity = ControlRot.Vector() * ThrowForce;
+        }
+    }
+    
     // 상태 초기화
     CurrentInputStack.Empty();
     bIsStratagemReady = false;
     bIsSelectingStratagem = false;
-    CurrentCommandStep = 0;
+    //CurrentCommandStep = 0;
 
     // UI 초기화 신호 (빈 스택 전송)
     OnStratagemStackUpdated.Broadcast(CurrentInputStack);
@@ -1058,6 +1148,7 @@ void AFPSCharacter::OnStratagemMenuAction(const FInputActionValue& Value)
     {
         CurrentCommandStep = 0;   
         OnStratagemStepUpdated.Broadcast(CurrentCommandStep);
+        OnStratagemMenuOpened.Broadcast(CanEagleRearm());
     }
     else
     {
@@ -1144,15 +1235,53 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
     // 결과 처리
     if (CompletedIndex != -1) // 최종 완성
     {
-        ActiveStratagemIndex = CompletedIndex;
-        bIsStratagemReady = true;
+        FStratagemData& Selected = StratagemList[CompletedIndex];
 
-        if (StratagemCompleteSound)
+        // 재무장 커맨드인 경우
+        if (Selected.Type == EStratagemType::Rearm)
         {
-            UGameplayStatics::PlaySound2D(this, StratagemCompleteSound);
+            if (CanEagleRearm())
+            {
+                for (FStratagemData& Data : StratagemList)  // 스택형 스트라타잼 스택을 0으로 바꾸고 쿨다운상태로
+                {
+                    if (Data.bUseStack && Data.CurrentStack < Data.MaxStack && Data.CurrentStack != 0)
+                    {
+                        Data.CurrentStack = 0;
+                        Data.bIsOnCooldown = true;
+                        Data.bIsRearming = true;
+                        Data.CurrentCooldown = Data.MaxCooldown;
+                        if (StratagemCompleteSound) UGameplayStatics::PlaySound2D(this, StratagemCompleteSound);
+                        
+                        if (EagleRearmSound)    // 이글 재장전 보이스
+                        {
+                            UGameplayStatics::PlaySoundAtLocation(this, EagleRearmSound, GetActorLocation());
+                            OnSoundPlayed.Broadcast(FName("Eagle_Rearm")); // 자막
+                        }
+                    }
+                }
+                // 재무장 명령은 즉시 성공 처리                
+                CurrentInputStack.Empty();
+                bIsSelectingStratagem = false;
+                bIsSelectingStratagem = false;
+                
+                OnStratagemStackUpdated.Broadcast(CurrentInputStack);
+                return;
+            }
+            else
+            {
+                // 조건이 안 맞으면 오입력 처리하거나 무시
+                CurrentInputStack.Empty();
+                if (StratagemErrorSound) UGameplayStatics::PlaySound2D(this, StratagemErrorSound);
+            }
         }
-
-        //bIsSelectingStratagem = false;
+        else
+        {
+            // 일반 스트라타젬
+            if (StratagemCompleteSound) UGameplayStatics::PlaySound2D(this, StratagemCompleteSound);
+            ActiveStratagemIndex = CompletedIndex;
+            bIsStratagemReady = true;
+            
+        }
     }
     else if (!bAnyMatchFound) // 하나라도 맞는 게 없으면 리셋
     {

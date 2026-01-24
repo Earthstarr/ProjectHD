@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
+#include "ProjectHD/SubtitleTypes.h" // 자막
+
 #include "StratagemBeacon.generated.h"
 
 class UNiagaraSystem;
@@ -21,6 +23,9 @@ public:
 
     // 외부(C++)에서 색상을 설정하고 나이아가라 파라미터를 업데이트하는 함수
     void UpdateBeaconVisual(FLinearColor NewColor);
+    
+    UPROPERTY(BlueprintAssignable, Category = "Audio")
+    FOnSoundPlayedSignature OnSoundPlayed;  // 자막
 
 protected:
     virtual void BeginPlay() override;
