@@ -1,5 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
 #include "ProjectHD/Character/Enemy/Enemy_Siren.h"
 
 #include "NiagaraComponent.h"
@@ -7,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
 #include "ProjectHD/Spawn/EnemyPoolManager.h"
+
 
 AEnemy_Siren::AEnemy_Siren()
 {
@@ -67,10 +69,6 @@ void AEnemy_Siren::InitEnemy()
 	{
 		HitBoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
-
-	// 오브젝트 풀에서 꺼낼 때 증원 상태 초기화
-	CleanupReinforcement();
-	bIsCoolingDown = false;
 }
 
 void AEnemy_Siren::OnHitBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -92,10 +90,8 @@ void AEnemy_Siren::StartReinforce()
 	if (bIsCoolingDown || bIsDead) return;
 
 	bIsCoolingDown = true;
-	bIsReinforcing = true;  // 증원 중 플래그
+	
 	ReinforceLocation = GetActorLocation();
-	ReinforceStartTime = GetWorld()->GetTimeSeconds();
-
 
 	// 연기 나이아가라
 	if (ReinforceFX)
@@ -113,7 +109,7 @@ void AEnemy_Siren::StartReinforce()
 		7.0f
 	);
 
-	// 50초 후 증원 종료 타이머
+	// 30초 후 증원 종료 타이머
 	GetWorldTimerManager().SetTimer(ReinforceTimerHandle, this, &AEnemy_Siren::StopReinforce, ReinforceDuration, false);
 
 	// 3분 쿨타임 타이머
@@ -124,6 +120,8 @@ void AEnemy_Siren::StartReinforce()
 		ReinforceCooldown, 
 		false
 	);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Start Reinforce"));
 }
 
 void AEnemy_Siren::SpawnWave()
@@ -153,150 +151,18 @@ void AEnemy_Siren::StopReinforce()
 {
 	GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
 	
-	// 나이아가라 완전히 제거
 	if (SpawnedReinforceFX)
-	{		
-		SpawnedReinforceFX->DeactivateImmediate();
+	{
+		// 즉시 삭제하거나(Destroy), 이미 파티클이 자연스럽게 사라지도록 비활성화(Deactivate) 합니다.
+		// 헬다이버즈 느낌을 내려면 Deactivate가 더 자연스럽습니다.
+		//SpawnedReinforceFX->Deactivate();
 		SpawnedReinforceFX->DestroyComponent();
 		SpawnedReinforceFX = nullptr;
-	}	
+		
+	}
 }
 
 void AEnemy_Siren::ResetCooldown()
 {
 	bIsCoolingDown = false;
-}
-
-void AEnemy_Siren::CleanupReinforcement()
-{
-	// 모든 증원 관련 타이머 정리
-	GetWorldTimerManager().ClearTimer(SpawnTimerHandle);
-	GetWorldTimerManager().ClearTimer(ReinforceTimerHandle);
-	GetWorldTimerManager().ClearTimer(CooldownTimerHandle);
-	
-	// 나이아가라 이펙트 완전히 제거
-	if (SpawnedReinforceFX)
-	{
-		SpawnedReinforceFX->DeactivateImmediate();
-		SpawnedReinforceFX->DestroyComponent();
-		SpawnedReinforceFX = nullptr;
-	}
-}
-
-void AEnemy_Siren::Die()
-{	
-	// 증원 중이었는지 체크 & 남은 시간 계산
-	if (bIsReinforcing)
-	{
-		float CurrentTime = GetWorld()->GetTimeSeconds();
-		float ElapsedTime = CurrentTime - ReinforceStartTime;
-		float RemainingSpawnTime = ReinforceDuration - ElapsedTime;
-		float RemainingCooldownTime = ReinforceCooldown - ElapsedTime;
-		
-		// 부모 Die 호출 (여기서 ClearAllTimers)
-		Super::Die();
-		
-		// 타이머 재설정 (남은 시간만큼)
-		if (RemainingSpawnTime > 0)
-		{
-			// SpawnWave 타이머 재설정
-			float NextSpawnDelay = SpawnInterval - FMath::Fmod(ElapsedTime - 7.0f, SpawnInterval);
-			if (NextSpawnDelay > 0 && NextSpawnDelay <= SpawnInterval)
-			{
-				GetWorldTimerManager().SetTimer(
-					SpawnTimerHandle,
-					this,
-					&AEnemy_Siren::SpawnWave,
-					SpawnInterval,
-					true,
-					NextSpawnDelay
-				);
-			}
-			
-			// StopReinforce 타이머 재설정
-			GetWorldTimerManager().SetTimer(
-				ReinforceTimerHandle,
-				this,
-				&AEnemy_Siren::StopReinforce,
-				RemainingSpawnTime,
-				false
-			);
-		}
-		
-		// 쿨타임 타이머 재설정
-		if (RemainingCooldownTime > 0)
-		{
-			GetWorldTimerManager().SetTimer(
-				CooldownTimerHandle,
-				this,
-				&AEnemy_Siren::ResetCooldown,
-				RemainingCooldownTime,
-				false
-			);
-		}
-	}
-	else
-	{
-		// 증원 중이 아니면 그냥 부모 Die 호출
-		Super::Die();
-	}
-}
-
-void AEnemy_Siren::ForceDespawn()
-{
-	// 증원 중이었는지 체크 & 남은 시간 계산
-	if (bIsReinforcing)
-	{
-		float CurrentTime = GetWorld()->GetTimeSeconds();
-		float ElapsedTime = CurrentTime - ReinforceStartTime;
-		float RemainingSpawnTime = ReinforceDuration - ElapsedTime;
-		float RemainingCooldownTime = ReinforceCooldown - ElapsedTime;
-		
-		// 부모 ForceDespawn 호출
-		Super::ForceDespawn();
-		
-		// 타이머 재설정 (남은 시간만큼)
-		if (RemainingSpawnTime > 0)
-		{
-			// SpawnWave 타이머 재설정
-			float NextSpawnDelay = SpawnInterval - FMath::Fmod(ElapsedTime - 7.0f, SpawnInterval);
-			if (NextSpawnDelay > 0 && NextSpawnDelay <= SpawnInterval)
-			{
-				GetWorldTimerManager().SetTimer(
-					SpawnTimerHandle,
-					this,
-					&AEnemy_Siren::SpawnWave,
-					SpawnInterval,
-					true,
-					NextSpawnDelay
-				);
-			}
-			
-			// StopReinforce 타이머 재설정
-			GetWorldTimerManager().SetTimer(
-				ReinforceTimerHandle,
-				this,
-				&AEnemy_Siren::StopReinforce,
-				RemainingSpawnTime,
-				false
-			);
-		}
-		
-		// 쿨타임 타이머 재설정
-		if (RemainingCooldownTime > 0)
-		{
-			GetWorldTimerManager().SetTimer(
-				CooldownTimerHandle,
-				this,
-				&AEnemy_Siren::ResetCooldown,
-				RemainingCooldownTime,
-				false
-			);
-		}
-	}
-	else
-	{
-		// 증원 중이 아니면 그냥 부모 ForceDespawn 호출
-		Super::ForceDespawn();
-	}
 }
