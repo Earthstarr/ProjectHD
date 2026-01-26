@@ -31,8 +31,8 @@ AEnemyBase* AEnemyPoolManager::AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, 
 	if (!EnemyClass) return nullptr;
 	
 	// 지형 감지 로직
-	FVector TraceStart = Location + FVector(0.f, 0.f, 2000.f); // 하늘 위 20m 지점
-	FVector TraceEnd = Location + FVector(0.f, 0.f, -1000.f);  // 바닥 아래 10m 지점
+	FVector TraceStart = Location + FVector(0.f, 0.f, 5000.f); // 위 50m
+	FVector TraceEnd = Location + FVector(0.f, 0.f, -5000.f);  // 아래 50m
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	
@@ -68,7 +68,17 @@ AEnemyBase* AEnemyPoolManager::AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, 
 	if (EnemyToUse)
 	{
 		EnemyToUse->SetActorLocationAndRotation(Location, Rotation);
-    
+		
+		FVector SafeLocation = Location;
+		FRotator SafeRotation = Rotation;
+		
+		// 액터의 현재 캡슐 크기를 기준으로 주변의 빈 공간을 탐색
+		if (GetWorld()->FindTeleportSpot(EnemyToUse, SafeLocation, SafeRotation))
+		{
+			// 찾았다면 해당 위치로 텔레포트 (물리 처리 포함)
+			EnemyToUse->SetActorLocationAndRotation(SafeLocation, SafeRotation, false, nullptr, ETeleportType::TeleportPhysics);
+		}
+
 		// AI 컨트롤러가 없다면 새로 생성하고 빙의
 		if (EnemyToUse->GetController() == nullptr)
 		{

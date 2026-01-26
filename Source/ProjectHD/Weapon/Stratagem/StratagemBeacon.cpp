@@ -182,7 +182,7 @@ void AStratagemBeacon::TriggerStrike()
             float Delay = FMath::FRandRange(0.5f, 3.0f);
             
             FTimerHandle TempHandle;
-            GetWorldTimerManager().SetTimer(TempHandle, [this, HorizontalPos]()
+            GetWorldTimerManager().SetTimer(TempHandle, [i, this, HorizontalPos]()
             {
                 // 지형 높이 찾기
                 FVector TraceStart = HorizontalPos + FVector(0.f, 0.f, 2000.f); // 해당 위치 20m 위에서
@@ -201,10 +201,13 @@ void AStratagemBeacon::TriggerStrike()
                 }
                 // -----------------------------
     
-                // 시각 효과 및 지점 데미지
-                if (ClusterExplosionFX)
+                // 시각 효과 및 지점 데미지                
+                if (i % 3 == 0)
                 {
-                    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ClusterExplosionFX, FinalExplosionPos);
+                    if (ClusterExplosionFX)
+                    {
+                        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ClusterExplosionFX, FinalExplosionPos);
+                    }
                 }
                 
                 if (ClusterExplosionSound)
