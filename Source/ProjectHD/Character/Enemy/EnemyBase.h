@@ -69,7 +69,7 @@ public:
     
     void CheckIfLanded();
     
-    void ForceDespawn();
+    virtual void ForceDespawn();
     
     FORCEINLINE bool IsDead() const { return bIsDead; }
     
