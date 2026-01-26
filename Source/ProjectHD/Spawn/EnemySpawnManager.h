@@ -38,6 +38,12 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Patrol")
 	TArray<FPatrolEnemySpawnInfo> PatrolEnemyTypes;
 
+	// 적이 플레이어 주변 어디로 모일지 결정하는 반경 (최소/최대 거리)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Settings")
+	float MinPatrolRadius = 1500.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spawn Settings")
+	float MaxPatrolRadius = 3000.f;
 
 protected:
 	virtual void BeginPlay() override;

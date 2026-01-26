@@ -2,6 +2,7 @@
 
 #include "ProjectHD/Character/Enemy/Enemy_Siren.h"
 
+#include "NavigationSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -128,25 +129,62 @@ void AEnemy_Siren::StartReinforce()
 
 void AEnemy_Siren::SpawnWave()
 {
-	if (!PoolManager) return;
+    if (!PoolManager) return;
 
-	// 설정된 모든 적 종류를 순회하며 스폰
-	for (const FReinforcementWave& Wave : WaveConfigs)
-	{
-		if (!Wave.EnemyClass) continue;
-		
-		int32 RandomSpawnCount = FMath::RandRange(Wave.MinSpawnCount, Wave.MaxSpawnCount);
+    // 플레이어 위치 가져오기
+    APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    if (!PlayerPawn) return;
+    
+    FVector PlayerLoc = PlayerPawn->GetActorLocation();
+    UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 
-		for (int32 i = 0; i < RandomSpawnCount; ++i)
-		{
-			// 기준 반경 이내 랜덤 스폰
-			FVector RandomOffset = FVector(FMath::RandRange(-800.f, 800.f), FMath::RandRange(-800.f, 800.f), 100.f);
-			FVector SpawnLoc = ReinforceLocation + RandomOffset;
-			FRotator SpawnRot = FRotator(0, FMath::RandRange(0.f, 360.f), 0);
+    for (const FReinforcementWave& Wave : WaveConfigs)
+    {
+       if (!Wave.EnemyClass) continue;
+       
+       int32 RandomSpawnCount = FMath::RandRange(Wave.MinSpawnCount, Wave.MaxSpawnCount);
 
-			PoolManager->AcquireEnemy(Wave.EnemyClass, SpawnLoc, SpawnRot);
-		}
-	}
+       for (int32 i = 0; i < RandomSpawnCount; ++i)
+       {
+          // 기준 반경 이내 랜덤 스폰 위치
+          FVector RandomOffset = FVector(FMath::RandRange(-800.f, 800.f), FMath::RandRange(-800.f, 800.f), 100.f);
+          FVector SpawnLoc = ReinforceLocation + RandomOffset;
+          FRotator SpawnRot = FRotator(0, FMath::RandRange(0.f, 360.f), 0);
+
+          // 적 스폰
+          AEnemyBase* SpawnedEnemy = PoolManager->AcquireEnemy(Wave.EnemyClass, SpawnLoc, SpawnRot);
+          
+          if (SpawnedEnemy)
+          {
+             // 캡슐 끼임 방지 (FindTeleportSpot)
+             FVector SafeLocation = SpawnedEnemy->GetActorLocation();
+             FRotator SafeRotation = SpawnedEnemy->GetActorRotation();
+
+             if (GetWorld()->FindTeleportSpot(SpawnedEnemy, SafeLocation, SafeRotation))
+             {
+                SpawnedEnemy->SetActorLocation(SafeLocation, false, nullptr, ETeleportType::TeleportPhysics);
+             }
+
+             // 목적지 설정
+             FVector ToPlayerDir = FVector(FMath::RandRange(-1.f, 1.f), FMath::RandRange(-1.f, 1.f), 0).GetSafeNormal();
+             
+             // 사이렌 증원군은 좀 더 플레이어에게 가깝게 붙도록 설정
+             float RandomDist = FMath::FRandRange(500.f, 1500.f); 
+             FVector RawTarget = PlayerLoc + (ToPlayerDir * RandomDist);
+             
+             FNavLocation ProjectedLocation;
+             if (NavSys && NavSys->ProjectPointToNavigation(RawTarget, ProjectedLocation, FVector(500.f, 500.f, 500.f)))
+             {
+                SpawnedEnemy->TargetPatrolLocation = ProjectedLocation.Location;
+             }
+             else
+             {
+                // 네비메시 실패 시 플레이어 발밑으로 설정
+                SpawnedEnemy->TargetPatrolLocation = PlayerLoc;
+             }
+          }
+       }
+    }
 }
 
 void AEnemy_Siren::StopReinforce()

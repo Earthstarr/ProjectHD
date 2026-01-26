@@ -1,4 +1,6 @@
 #include "EnemySpawnManager.h"
+
+#include "NavigationSystem.h"
 #include "ProjectHD/Spawn/EnemyPoolManager.h"
 #include "SpawnZone.h"
 #include "Kismet/GameplayStatics.h"
@@ -48,6 +50,7 @@ void AEnemySpawnManager::SpawnPatrolSquad()
     if (!PoolManager || PatrolEnemyTypes.Num() == 0) return;
 
     FVector PlayerLoc = GetPlayerLocation();
+    UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
     
     // 플레이어 주변 랜덤 위치
     FVector RandomDirection = FVector(FMath::RandRange(-1.f, 1.f), FMath::RandRange(-1.f, 1.f), 0).GetSafeNormal();
@@ -64,7 +67,40 @@ void AEnemySpawnManager::SpawnPatrolSquad()
             FVector SpawnLoc = SpawnCenter + Offset;
             FRotator SpawnRot = FRotator(0, FMath::RandRange(0.f, 360.f), 0);
 
-            PoolManager->AcquireEnemy(SpawnInfo.EnemyClass, SpawnLoc, SpawnRot);
+            AEnemyBase* SpawnedEnemy = PoolManager->AcquireEnemy(SpawnInfo.EnemyClass, SpawnLoc, SpawnRot);
+            
+            if (SpawnedEnemy)
+            {
+                // 현재 위치에서 겹침을 확인하고 안전한 지점으로 텔레포트
+                FVector SafeLocation = SpawnedEnemy->GetActorLocation();
+                FRotator SafeRotation = SpawnedEnemy->GetActorRotation();
+
+                if (GetWorld()->FindTeleportSpot(SpawnedEnemy, SafeLocation, SafeRotation))
+                {
+                    SpawnedEnemy->SetActorLocation(SafeLocation, false, nullptr, ETeleportType::TeleportPhysics);
+                }
+
+                // 네비메시 보정
+                if (NavSys)
+                {
+                    FVector ToPlayerDir = FVector(FMath::RandRange(-1.f, 1.f), FMath::RandRange(-1.f, 1.f), 0).GetSafeNormal();
+                    float RandomDist = FMath::FRandRange(MinPatrolRadius, MaxPatrolRadius);
+                    
+                    // 플레이어 XY만 사용, Z는 지면 기준으로
+                    FVector RawTarget = FVector(PlayerLoc.X, PlayerLoc.Y, 0.f) + (ToPlayerDir * RandomDist);
+                    FNavLocation ProjectedLocation;
+
+                    // Z축 검색 범위를 넓게 설정
+                    if (NavSys->ProjectPointToNavigation(RawTarget, ProjectedLocation, FVector(1000.f, 1000.f, 10000.f)))
+                    {
+                        SpawnedEnemy->TargetPatrolLocation = ProjectedLocation.Location;
+                    }
+                    else
+                    {
+                        SpawnedEnemy->TargetPatrolLocation = PlayerLoc;
+                    }
+                }
+            }
         }
     }
 }
