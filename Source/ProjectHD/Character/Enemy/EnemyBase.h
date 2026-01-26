@@ -44,7 +44,7 @@ protected:
     UPROPERTY(BlueprintReadOnly, Category = "AISense")
     FVector LastAttackerLocation;
     
-    float ReturnToPoolTime = 60.0f;
+    float ReturnToPoolTime = 15.0f;
             
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Stat")
@@ -53,6 +53,10 @@ public:
     // 미션지점의 적들은 Idle 상태로 대기하기 위한 bool 값
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     bool bIsIdle = false;
+    
+    // 스폰될 때 플레이어 근처로 이동하기 위한 좌표
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
+    FVector TargetPatrolLocation;
     
     // 미션지점 스폰적 구분을 위한 bool 값 (플레이어와 거리가 멀어져도 사라지지 않음)
     bool bIsMissionSpawned = false;
@@ -64,7 +68,7 @@ public:
     FTimerHandle PoolReturnTimerHandle;
     
     void ReturnToPool();
-    virtual void InitEnemy();    
+    virtual void InitEnemy();
     void SetPoolManager(class AEnemyPoolManager* InManager) { PoolManager = InManager; }
     
     void CheckIfLanded();

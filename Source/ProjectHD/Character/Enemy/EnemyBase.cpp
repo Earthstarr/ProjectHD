@@ -101,7 +101,7 @@ void AEnemyBase::Die()
     {
         AIC->StopMovement();
         AIC->UnPossess();
-    }   
+    }
 
     // 사망 애니메이션이 있으면 재생, 없으면 바로 레그돌
     if (DeathMontage)
@@ -242,7 +242,7 @@ void AEnemyBase::ForceDespawn()
     }
     else
     {
-        DisableMeshTick();    
+        DisableMeshTick();
     }
     */
     // 오브젝트 풀링 타이머 1초로
@@ -273,6 +273,10 @@ void AEnemyBase::InitEnemy()
             STComp->StopLogic("Restarting from Pool");
             STComp->StartLogic();
         }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("AIC Not Found"));
     }
     
     // 애니메이션 몽타주 초기화
@@ -311,8 +315,6 @@ void AEnemyBase::InitEnemy()
     GetMesh()->bNoSkeletonUpdate = false;
     GetMesh()->SetSimulatePhysics(false);
     
-    
-
     // 모든 타이머 초기화
     GetWorldTimerManager().ClearAllTimersForObject(this);
 }
