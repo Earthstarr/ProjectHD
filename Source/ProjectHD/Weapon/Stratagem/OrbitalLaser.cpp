@@ -44,21 +44,10 @@ void AOrbitalLaser::BeginPlay()
 void AOrbitalLaser::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
-    
     if (!bIsLaserActive) return;
 
-    // DrawDebugSphere(GetWorld(), CurrentImpactPoint, 100.f, 12, FColor::Red, false, -1.f);
-    
-    // 타겟이 죽었거나 없으면 새 타겟 찾기
-    if (!CurrentTarget || !IsValid(CurrentTarget)|| Cast<AEnemyBase>(CurrentTarget)->bIsDead)
-    {
-        FindNewTarget();
-    }
-
-    // 레이저 이동 목표 지점 설정 (타겟이 없으면 제자리 대기)
+    // 이동
     FVector TargetLocation = CurrentTarget ? CurrentTarget->GetActorLocation() : GetActorLocation();
-    
-    // 방향 계산
     FVector Direction = TargetLocation - CurrentImpactPoint;
     float DistanceToTarget = Direction.Size();
 
@@ -66,40 +55,22 @@ void AOrbitalLaser::Tick(float DeltaTime)
     {
         Direction.Normalize();
         CurrentImpactPoint += Direction * MoveSpeed * DeltaTime;
-
-        // 만약 이번 프레임에 이동할 거리가 남은 거리보다 멀면 목표 지점에 고정
-        if ((MoveSpeed * DeltaTime) > DistanceToTarget)
-        {
-            CurrentImpactPoint = TargetLocation;
-        }
     }
 
-    // 지면 높이 보정
+    // 높이 보정 (LineTrace)
     FHitResult GroundHit;
-    FVector TraceStart = CurrentImpactPoint + FVector(0, 0, 2000);
-    FVector TraceEnd = CurrentImpactPoint + FVector(0, 0, -2000);
-    FCollisionQueryParams Params;
-    Params.AddIgnoredActor(this);
-
-    if (GetWorld()->LineTraceSingleByChannel(GroundHit, TraceStart, TraceEnd, ECC_Visibility, Params))
+    if (GetWorld()->LineTraceSingleByChannel(GroundHit, CurrentImpactPoint + FVector(0,0,2000), CurrentImpactPoint + FVector(0,0,-2000), ECC_Visibility))
     {
         CurrentImpactPoint.Z = GroundHit.ImpactPoint.Z;
     }
 
-    // 나이아가라
-    UpdateLaserVisuals();
-
-    // 데미지 적용
-    ApplyLaserDamage(DeltaTime);
-
-    // 지면 연소 효과 (데칼 생성)
-    if (BurnDecal)
+    // 비주얼 갱신 (캐싱된 FName 사용)
+    if (LaserFX)
     {
-        UGameplayStatics::SpawnDecalAtLocation(GetWorld(), BurnDecal, FVector(100, 100, 100), 
-            CurrentImpactPoint, FRotator(-90, 0, 0), 2.0f);
+        LaserFX->SetVariableVec3(BeamStartName, CurrentImpactPoint + FVector(0, -10, -20));
+        LaserFX->SetVariableVec3(BeamEndName, CurrentImpactPoint + FVector(0, -20000, 100000));
     }
-
-    // 사운드
+    if (ImpactFX) ImpactFX->SetWorldLocation(CurrentImpactPoint + FVector(0, 0, 20.f));
     if (AudioComp) AudioComp->SetWorldLocation(CurrentImpactPoint);
 }
 
@@ -140,8 +111,8 @@ void AOrbitalLaser::UpdateLaserVisuals()
     if (LaserFX)
     {
         // 나이아가라 시스템 내부의 파라미터 이름과 일치 (User.BeamEnd)
-        LaserFX->SetNiagaraVariableVec3(FString("User_BeamStart"), CurrentImpactPoint + FVector(0, -10, -20));
-        LaserFX->SetNiagaraVariableVec3(FString("User_BeamEnd"), CurrentImpactPoint + FVector(0, -20000, 50000)); // 대각선 하늘 위
+        LaserFX->SetVariableVec3(FName("User_BeamStart"), CurrentImpactPoint + FVector(0, -10, -20));
+        LaserFX->SetVariableVec3(FName("User_BeamEnd"), CurrentImpactPoint + FVector(-0, -20000, 100000)); // 대각선 하늘 위
     }
     
     if (ImpactFX)
@@ -203,4 +174,18 @@ void AOrbitalLaser::ActivateLaser()
     
     if (LaserFX) LaserFX->Activate();
     if (ImpactFX) ImpactFX->Activate();
+    
+    // 0.2초마다 데미지 판정 실행
+    GetWorldTimerManager().SetTimer(DamageTimerHandle, this, &AOrbitalLaser::OnDamageTick, 0.2f, true);
+    
+    // 타겟 탐색 0.5초마다
+    GetWorldTimerManager().SetTimer(SearchTimerHandle, this, &AOrbitalLaser::FindNewTarget, 0.5f, true);
+}
+
+void AOrbitalLaser::OnDamageTick()
+{
+    if (!bIsLaserActive) return;
+
+    // 0.2초 분량의 데미지를 한 번에 입힘
+    ApplyLaserDamage(0.2f);
 }

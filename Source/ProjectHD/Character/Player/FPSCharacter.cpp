@@ -20,6 +20,8 @@
 #include "GameplayEffect.h"
 #include "ProjectHD/InteractableInterface.h"
 #include "Perception/AISense_Hearing.h"
+#include "NavigationInvokerComponent.h"
+#include "PodActor.h"
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -67,6 +69,9 @@ AFPSCharacter::AFPSCharacter()
     
     // 체력, 스테미나 관리용 AttributeSet
     AttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("AttributeSet"));
+    
+    // 내비 인보커
+    NavInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));
 }
 
 UAbilitySystemComponent* AFPSCharacter::GetAbilitySystemComponent() const
@@ -82,7 +87,11 @@ float AFPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& D
     if (AttributeSet && ActualDamage > 0.0f)
     {
         float NewHealth = AttributeSet->GetHealth() - ActualDamage;        
+<<<<<<< Updated upstream
         AttributeSet->SetHealth(FMath::Max(NewHealth, 0.0f));
+=======
+        AttributeSet->SetHealth(FMath::Max(NewHealth, 0.0f));        
+>>>>>>> Stashed changes
     }
 
     return ActualDamage;
@@ -91,6 +100,13 @@ float AFPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& D
 void AFPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
+    
+    // 내비 생성 범위 설정
+    if (NavInvoker)
+    {
+        // 첫 번째 인자: GenerationRadius, 두 번째 인자: RemovalRadius
+        NavInvoker->SetGenerationRadii(10000.f, 12000.f);
+    }
 
     if (AbilitySystemComponent)
     {
@@ -465,6 +481,11 @@ void AFPSCharacter::Look(const FInputActionValue& Value)
 void AFPSCharacter::HandleHealthChanged(const FOnAttributeChangeData& Data)
 {
     OnHealthChanged.Broadcast(Data.NewValue, AttributeSet->GetMaxHealth());
+    
+    if (Data.NewValue <= 0.0f)
+    {
+        Die();
+    }
 }
 
 void AFPSCharacter::HandleStaminaChanged(const FOnAttributeChangeData& Data)
@@ -647,6 +668,118 @@ void AFPSCharacter::StartStaminaRegen()
             if (SpecHandle.IsValid())
             {
                 AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+            }
+        }
+    }
+}
+
+void AFPSCharacter::Die()
+{
+    if (bIsDead) return;
+    bIsDead = true;
+    
+    // 레그돌 활성화
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    GetMesh()->SetSimulatePhysics(true);
+    GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+
+    // 5초 뒤 부활 타이머
+    FTimerHandle RespawnHandle;
+    GetWorldTimerManager().SetTimer(RespawnHandle, this, &AFPSCharacter::RespawnWithPod, 5.0f, false);
+}
+
+void AFPSCharacter::RespawnWithPod()
+{
+    // 체력 및 상태 속성 초기화
+    if (AttributeSet)
+    {
+        AttributeSet->SetHealth(AttributeSet->GetMaxHealth());
+        AttributeSet->SetStamina(AttributeSet->GetMaxStamina());
+        OnHealthChanged.Broadcast(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
+        OnStaminaChanged.Broadcast(AttributeSet->GetStamina(), AttributeSet->GetMaxStamina());
+    }
+    
+    // 소모품 충전
+    CurrentGrenadeCount = MaxGrenadeCount;
+    CurrentStimCount = MaxStimCount;
+    OnGrenadeChanged.Broadcast(CurrentGrenadeCount, MaxGrenadeCount);
+    OnStimChanged.Broadcast(CurrentStimCount, MaxStimCount);
+
+    // 모든 인벤토리 무기 탄약 및 탄창 풀 충전
+    for (FWeaponInstance& Weapon : WeaponInventory)
+    {
+        if (Weapon.WeaponData)
+        {
+            Weapon.CurrentAmmoCount = Weapon.WeaponData->MaxAmmoInMag;
+            Weapon.CurrentMagCount = Weapon.WeaponData->MaxMag;
+        }
+    }
+
+    // 현재 들고 있는 무기 변수도 즉시 동기화
+    if (CurrentWeaponData)
+    {
+        CurrentAmmo = CurrentWeaponData->MaxAmmoInMag;
+        CurrentMagCount = CurrentWeaponData->MaxMag;
+        OnAmmoChanged.Broadcast(CurrentAmmo, CurrentMagCount, MaxMagCount);
+    }
+    
+    // ★★★ 레그돌 완전히 종료 ★★★
+    bIsDead = false;
+    GetMesh()->SetSimulatePhysics(false);
+    GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
+    
+    // ★★★ 메시 회전 초기화 (중요!) ★★★
+    GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+    GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
+    
+    // ★★★ 캡슐 초기화 ★★★
+    GetCapsuleComponent()->SetSimulatePhysics(false);
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 포드 안에서는 끔
+    GetCapsuleComponent()->SetEnableGravity(false);
+    
+    // ★★★ 이동 모드 초기화 ★★★
+    GetCharacterMovement()->StopMovementImmediately();
+    GetCharacterMovement()->SetMovementMode(MOVE_None);
+    GetCharacterMovement()->GravityScale = 1.0f;
+
+    // ★★★ 캐릭터 회전 초기화 (수평으로) ★★★
+    SetActorRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
+
+    // 스폰 위치
+    FVector SpawnLoc = GetActorLocation() + FVector(0, 0, 20000.f);
+    
+    if (PodClass)
+    {
+        APodActor* NewPod = GetWorld()->SpawnActor<APodActor>(PodClass, SpawnLoc, FRotator::ZeroRotator);
+        if (NewPod)
+        {
+            // ★★★ 부착 전에 위치/회전 강제 설정 ★★★
+            SetActorLocation(NewPod->GetCharacterAnchor()->GetComponentLocation());
+            SetActorRotation(FRotator(0.f, -90.f, 0.f));
+            
+            // 부착
+            AttachToComponent(
+                NewPod->GetCharacterAnchor(), 
+                FAttachmentTransformRules::SnapToTargetNotIncludingScale
+            );
+            
+            // 부착 후 상대 변환 강제 초기화
+            SetActorRelativeLocation(FVector::ZeroVector);
+            SetActorRelativeRotation(FRotator::ZeroRotator);
+
+            // 포드와의 충돌 무시
+            GetCapsuleComponent()->IgnoreActorWhenMoving(NewPod, true);
+            GetMesh()->IgnoreActorWhenMoving(NewPod, true);
+
+            // 포드 물리 시작
+            UStaticMeshComponent* PodMesh = Cast<UStaticMeshComponent>(NewPod->GetRootComponent());
+            if (PodMesh)
+            {
+                PodMesh->SetSimulatePhysics(true);
+                PodMesh->GetBodyInstance()->bLockXRotation = true;
+                PodMesh->GetBodyInstance()->bLockYRotation = true;
+                PodMesh->SetPhysicsLinearVelocity(FVector(0, 0, -20000.f));
             }
         }
     }

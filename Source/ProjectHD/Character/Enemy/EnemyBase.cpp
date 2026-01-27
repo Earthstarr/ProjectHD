@@ -12,12 +12,15 @@
 #include "ProjectHD/Spawn/EnemyPoolManager.h"
 #include "Components/StateTreeAIComponent.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
+#include "NavigationInvokerComponent.h"
 
 AEnemyBase::AEnemyBase()
 {
     CurrentHealth = MaxHealth;
     
-    UE_LOG(LogTemp, Warning, TEXT("새로운 EnemyBase 생성"));
+    // 내비 인보커
+    //NavInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));    
+    //NavInvoker->SetGenerationRadii(1000.f, 1500.f);
 }
 
 float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -132,6 +135,12 @@ void AEnemyBase::Die()
         {
             Player->AddKillCombo();
         }
+    }
+    
+    // 내비 인보커 끄기
+    if (NavInvoker)
+    {
+        NavInvoker->Deactivate();
     }
     
     // 오브젝트 풀링 타이머
@@ -273,11 +282,15 @@ void AEnemyBase::InitEnemy()
             STComp->StopLogic("Restarting from Pool");
             STComp->StartLogic();
         }
+<<<<<<< Updated upstream
     }
     else
     {
         UE_LOG(LogTemp, Warning, TEXT("AIC Not Found"));
     }
+=======
+    }    
+>>>>>>> Stashed changes
     
     // 애니메이션 몽타주 초기화
     if (UAnimInstance* AnimInst = GetMesh()->GetAnimInstance())
@@ -317,6 +330,13 @@ void AEnemyBase::InitEnemy()
     
     // 모든 타이머 초기화
     GetWorldTimerManager().ClearAllTimersForObject(this);
+    
+    // 내비 인보커
+    if (NavInvoker)
+    {
+        NavInvoker->Activate(true); 
+        NavInvoker->SetGenerationRadii(1000.f, 1500.f);
+    }
 }
 
 void AEnemyBase::ReturnToPool()

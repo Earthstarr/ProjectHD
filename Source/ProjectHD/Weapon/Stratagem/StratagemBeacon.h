@@ -100,7 +100,7 @@ protected:
     // 집속탄 범위 설정
     float ClusterWidth = 3000.f;  // 가로
     float ClusterDepth = 1500.f;   // 세로
-    int32 ClusterCount = 200;      // 폭발 횟수
+    int32 ClusterCount = 100;      // 폭발 횟수
 
     // 비행기 액터
     UPROPERTY(EditAnywhere, Category = "Effects")
