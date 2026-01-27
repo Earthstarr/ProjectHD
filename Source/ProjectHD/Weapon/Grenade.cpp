@@ -20,7 +20,7 @@ AGrenade::AGrenade()
 	
 	// 마찰력 설정
 	ProjectileMovement->bIsHomingProjectile = false;
-	ProjectileMovement->Friction = 0.3f; // 기본값보다 높게 설정 (0.0 ~ 10.0+)
+	ProjectileMovement->Friction = 0.5f; // 기본값보다 높게 설정
     
 	// 튕길 때 속도 감소
 	ProjectileMovement->Bounciness = 0.3f; // 너무 높으면 계속 튀고, 낮으면 바로 멈춤
@@ -32,21 +32,43 @@ AGrenade::AGrenade()
 void AGrenade::BeginPlay()
 {
 	Super::BeginPlay();
-    
-	// 폭발 타이머
-	GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &AGrenade::Explode, TimeToExplode, false);
+	
+	FTimerHandle TempHandle;
+	GetWorldTimerManager().SetTimer(TempHandle, [this]()
+	{
+		// 이미 외부(로켓)에서 타이머를 켰다면 중복 실행 방지
+		if (!GetWorldTimerManager().IsTimerActive(ExplosionTimerHandle))
+		{
+			StartExplosionTimer(TimeToExplode);
+		}
+	}, 0.1f, false);
+}
+
+void AGrenade::StartExplosionTimer(float Delay)
+{
+	float FinalDelay = (Delay > 0.f) ? Delay : TimeToExplode;
+	GetWorldTimerManager().SetTimer(ExplosionTimerHandle, this, &AGrenade::Explode, FinalDelay, false);
 }
 
 void AGrenade::Explode()
 {
 	// 터지면서 사라져 GetActorLocation 오류가 발생하므로 위치 정보 미리 저장
 	ExplosionLocation = GetActorLocation() + FVector(0.f, 0.f, 50.f);
-		
+	
+	/*
 	// 범위 데미지	
 	UGameplayStatics::ApplyRadialDamage(
 		this, Damage, ExplosionLocation , ExplosionRadius, 
 		UDamageType::StaticClass(), TArray<AActor*>(), this, GetInstigatorController()
-	);	
+	);
+	*/
+	
+	UGameplayStatics::ApplyRadialDamageWithFalloff(
+	this, Damage, Damage * 0.5f, ExplosionLocation,
+	ExplosionRadius * 0.8f, ExplosionRadius, 1.f,
+	UDamageType::StaticClass(), TArray<AActor*>(),
+	this, GetInstigatorController(), ECC_WorldDynamic // 채널 변경 시도
+);
 	
 	// 타이머 안쓰면 EnemyBase의 TakeDamage의 Help 신호와 겹쳐서 오류남
 	// 폭발 소음은 0.1초 뒤에 발생

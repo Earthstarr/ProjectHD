@@ -57,4 +57,17 @@ private:
 	void ActivateLaser();        // 1초 뒤 호출될 함수
 	
 	float delaytime = 1.2f;
+	
+	// 데미지 주기용 타이머 핸들
+	FTimerHandle DamageTimerHandle;
+
+	// 타겟 탐색 주기용 타이머 핸들 (탐색 렉 방지)
+	FTimerHandle SearchTimerHandle;
+
+	// 타이머에 의해 호출될 데미지 함수
+	void OnDamageTick();
+
+	// FName 캐싱 (문자열 생성 렉 방지)
+	const FName BeamStartName = FName("User_BeamStart");
+	const FName BeamEndName = FName("User_BeamEnd");
 };

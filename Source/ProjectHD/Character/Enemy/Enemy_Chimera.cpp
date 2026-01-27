@@ -10,7 +10,7 @@
 
 AEnemy_Chimera::AEnemy_Chimera()
 {
-	MaxHealth = 2000.0f;
+	MaxHealth = 1200.0f;
 	CurrentHealth = MaxHealth;
     
 	RightArmCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("RightArmCollision"));
