@@ -24,11 +24,7 @@ protected:
 
 	// 충돌체
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
-	USphereComponent* CollisionComp;
-
-	// 발사체 움직임 컴포넌트
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
-	UProjectileMovementComponent* ProjectileMovement;
+	USphereComponent* CollisionComp;	
 
 	// 총알 외형
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Mesh")
@@ -57,4 +53,8 @@ public:
 	// Getter 함수 (외부에서 속도 조절 등을 할 때 필요)
 	USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+	
+	// 발사체 움직임 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement")
+	UProjectileMovementComponent* ProjectileMovement;
 };

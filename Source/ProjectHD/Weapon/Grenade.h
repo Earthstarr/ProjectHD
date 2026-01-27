@@ -19,19 +19,21 @@ public:
 	
 	virtual void BeginPlay() override;
 	
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	float TimeToExplode = 2.5f;
+	
+	void StartExplosionTimer(float Delay);
 	
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void Explode();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float Damage = 100.0f;
+	float Damage = 300.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float ExplosionRadius = 1200.0f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float TimeToExplode = 2.5f;
+	float ExplosionRadius = 1200.0f;	
 	
 	// 소음 범위
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")

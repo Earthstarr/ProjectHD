@@ -196,6 +196,12 @@ public:
     void OnSprintStarted();
     void OnSprintCompleted();    
     
+    UPROPERTY(EditAnywhere, Category = "Design")
+    TSubclassOf<class APodActor> PodClass;
+
+    void Die();
+    void RespawnWithPod();
+    
 protected:
     
     /* 입력 처리 함수들 */
@@ -279,6 +285,8 @@ protected:
     
     bool bSprintButtonDown = false;
     
+    bool bIsDead = false;
+    
     // 에임
     UFUNCTION(BlueprintNativeEvent, Category = "Combat")
     void OnAimStarted();
@@ -321,6 +329,9 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
     UNiagaraSystem* MuzzleFlashFX;
+    
+    UPROPERTY(VisibleAnywhere, Category = "Navigation")
+    class UNavigationInvokerComponent* NavInvoker;
 
 public:
     // 탄약 시스템

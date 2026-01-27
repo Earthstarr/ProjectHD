@@ -29,15 +29,15 @@ AHDProjectile::AHDProjectile()
 	// 발사체 움직임 설정
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 15000.f;
-	ProjectileMovement->MaxSpeed = 15000.f;
+	ProjectileMovement->InitialSpeed = 30000.f;
+	ProjectileMovement->MaxSpeed = 30000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true; // 날아가는 방향으로 회전
 	ProjectileMovement->bShouldBounce = false;         // 튕기지 않고 바로 충돌 처리
 	ProjectileMovement->ProjectileGravityScale = 0.f;   // 중력 영향 (0이면 직선, 높을수록 낙차 발생)
 
 	CollisionComp->IgnoreActorWhenMoving(GetOwner(), true);
 
-	// 5초 뒤에 자동으로 삭제 (메모리 관리)
+	// 5초 뒤에 자동으로 삭제
 	InitialLifeSpan = 5.0f;
 }
 

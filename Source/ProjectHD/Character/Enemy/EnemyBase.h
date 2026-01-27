@@ -25,6 +25,10 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
     float CurrentHealth;
     
+    // 내비 인보커
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Navigation")
+    class UNavigationInvokerComponent* NavInvoker;
+    
     // 애니메이션
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Animation")
     class UAnimMontage* DeathMontage;
