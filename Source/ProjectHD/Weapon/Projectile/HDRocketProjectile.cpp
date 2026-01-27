@@ -2,39 +2,92 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
+#include "ProjectHD/Weapon/Grenade.h"
+#include "Engine/OverlapResult.h"
 
 AHDRocketProjectile::AHDRocketProjectile()
-{
-    // 1. 느린 비행 속도 설정 (예: 4000)
-    ProjectileMovement->InitialSpeed = 4000.f;
-    ProjectileMovement->MaxSpeed = 4000.f;
+{    
+    PrimaryActorTick.bCanEverTick = true;
 
-    // 2. 직선 비행을 위해 중력 영향 제거 (중력을 넣고 싶으면 0.1 정도로 설정)
-    ProjectileMovement->ProjectileGravityScale = 0.1f;
+    ProjectileMovement->InitialSpeed = 6000.f;
+    ProjectileMovement->MaxSpeed = 6000.f;    
+    ProjectileMovement->ProjectileGravityScale = 0.03f;
+    
+    // 부모 변수 초기화
+    DamageAmount = 50.f;
+    ExplosionRadius = 450.f;
+}
+
+void AHDRocketProjectile::BeginPlay()
+{
+    Super::BeginPlay();
+
+    // 0.1초마다 적 감지
+    GetWorldTimerManager().SetTimer(ProximityCheckTimerHandle, this, &AHDRocketProjectile::CheckProximity, 0.1f, true, 0.3f);
+    
+    // 4초 뒤에 폭발
+    GetWorldTimerManager().SetTimer(
+        ExplosionTimerHandle, 
+        FTimerDelegate::CreateUObject(this, &AHDRocketProjectile::TriggerExplosion, FVector::ZeroVector, FVector::UpVector), 
+        4.0f, 
+        false
+    );
+}
+
+void AHDRocketProjectile::CheckProximity()
+{
+    FVector CurrentLoc = GetActorLocation();
+    TArray<FOverlapResult> OverlapResults;
+    FCollisionQueryParams Params;
+    Params.AddIgnoredActor(this);
+    Params.AddIgnoredActor(GetOwner());
+
+    // 주변 Pawn 채널을 대상으로 범위 검사
+    bool bHit = GetWorld()->OverlapMultiByChannel(
+        OverlapResults,
+        CurrentLoc,
+        FQuat::Identity,
+        ECC_Pawn,
+        FCollisionShape::MakeSphere(ProximityRadius),
+        Params
+    );
+
+    if (bHit)
+    {
+        for (const FOverlapResult& Result : OverlapResults)
+        {
+            AActor* OverlapActor = Result.GetActor();
+            // 적 태그("Enemy") 확인
+            if (OverlapActor && OverlapActor->ActorHasTag(TEXT("Enemy")))
+            {
+                // 적 발견 시 타이머 중지 및 즉시 공중 폭발
+                GetWorldTimerManager().ClearTimer(ProximityCheckTimerHandle);
+                TriggerExplosion(CurrentLoc, FVector::UpVector);
+                return;
+            }
+        }
+    }
 }
 
 void AHDRocketProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    // 부모의 OnHit을 호출하지 않고(단일 데미지 방지), 여기서 바로 폭발 로직 수행
-    /*
-    FVector ExplosionLocation = Hit.ImpactPoint;
+    // 벽이나 지면에 직접 닿았을 때도 폭발
+    GetWorldTimerManager().ClearTimer(ProximityCheckTimerHandle);
+    TriggerExplosion(Hit.ImpactPoint, Hit.ImpactNormal);
+}
 
-    // 1. 범위 대미지 적용 (Radial Damage)
-    UGameplayStatics::ApplyRadialDamage(
-        this,
-        DamageAmount,       // 기본 데미지
-        ExplosionLocation,
-        ExplosionRadius,
-        UDamageType::StaticClass(),
-        TArray<AActor*>(),  // 무시할 액터들
-        this,
-        GetInstigatorController(),
-        true                // 가시성 체크 여부
-    );
-    */
+void AHDRocketProjectile::TriggerExplosion(FVector ExplosionLocation, FVector ImpactNormal)
+{
+    // 타이머 클리어 (중복 방지)
+    GetWorldTimerManager().ClearTimer(ProximityCheckTimerHandle);
+    GetWorldTimerManager().ClearTimer(ExplosionTimerHandle);
+    
+    // 만약 인자로 들어온 위치가 ZeroVector(자폭 타이머 호출)라면 현재 내 위치를 사용
+    FVector FinalLocation = ExplosionLocation.IsZero() ? GetActorLocation() : ExplosionLocation;
+    
+    FVector ExplosionOrigin = FinalLocation + (ImpactNormal * 20.0f);
 
-    FVector ExplosionOrigin = Hit.ImpactPoint + (Hit.ImpactNormal * 20.0f);
-
+    // 메인 로켓 범위 대미지
     UGameplayStatics::ApplyRadialDamageWithFalloff(
         this, DamageAmount, 10.f, ExplosionOrigin,
         ExplosionRadius * 0.5f, ExplosionRadius, 1.f,
@@ -42,23 +95,67 @@ void AHDRocketProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
         this, GetInstigatorController(), ECC_Visibility
     );
 
-    // 2. 카메라 흔들림 효과
+    // 카메라 흔들림
     if (ExplosionShakeClass)
     {
         UGameplayStatics::PlayWorldCameraShake(GetWorld(), ExplosionShakeClass, ExplosionOrigin, 0.f, ExplosionRadius * 2.f);
     }
 
-    // 3. 이펙트 및 사운드 재생 (AHDProjectile에 정의된 변수 재사용)
+    // 이펙트
     if (ImpactEffect)
     {
-        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactEffect, ExplosionOrigin, Hit.ImpactNormal.Rotation());
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ImpactEffect, ExplosionOrigin, ImpactNormal.Rotation());
     }
-
     if (ImpactSound)
     {
         UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, ExplosionOrigin);
     }
+    
+    // 자탄(수류탄) 스폰
+    if (ShrapnelGrenadeClass)
+    {
+        for (int32 i = 0; i < NumShrapnelGrenades; ++i)
+        {
+            FVector RandomDir = FMath::VRand();
+            // 지면으로 바로 박히지 않게 위쪽 방향으로 가중치 부여
+            if (RandomDir.Z < 0.f) RandomDir.Z *= -0.3f; 
 
-    // 4. 즉시 제거
+            FVector ShrapnelSpawnLocation = ExplosionOrigin + (RandomDir * ShrapnelSpawnRadius);
+            
+            FActorSpawnParameters SpawnParams;
+            SpawnParams.Owner = GetOwner();
+            SpawnParams.Instigator = GetInstigator();
+            SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+            AGrenade* Shrapnel = GetWorld()->SpawnActor<AGrenade>(ShrapnelGrenadeClass, ShrapnelSpawnLocation, RandomDir.Rotation(), SpawnParams);
+            
+            if (Shrapnel)
+            {
+                // 자탄 트레일
+                UNiagaraComponent* TrailComp = UNiagaraFunctionLibrary::SpawnSystemAttached(
+                ShrapnelTrailFX, 
+                Shrapnel->GetRootComponent(), 
+                NAME_None, 
+                FVector::ZeroVector, 
+                FRotator::ZeroRotator, 
+                EAttachLocation::SnapToTarget, 
+                true
+                );
+                
+                // 랜덤 폭발 지연
+                float RandomDelay = FMath::FRandRange(ShrapnelExplodeDelay * 0.5f, ShrapnelExplodeDelay * 2.0f);
+                Shrapnel->TimeToExplode = RandomDelay;
+                Shrapnel->StartExplosionTimer(RandomDelay);
+                Shrapnel->ProjectileMovement->ProjectileGravityScale = 5.0f;    // 중력 무겁게
+
+                if (Shrapnel->ProjectileMovement)
+                {
+                    // 관성: 랜덤 비사 방향 속도 + 로켓이 날아가던 방향의 30% 속도 유지
+                    Shrapnel->ProjectileMovement->Velocity = (RandomDir * ShrapnelLaunchSpeed) + (GetVelocity() * 0.3f);
+                }
+            }
+        }
+    }
+    
     Destroy();
 }

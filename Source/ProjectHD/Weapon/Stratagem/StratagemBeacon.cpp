@@ -202,7 +202,11 @@ void AStratagemBeacon::TriggerStrike()
                 // -----------------------------
     
                 // 시각 효과 및 지점 데미지                
+<<<<<<< Updated upstream
                 if (i % 3 == 0)
+=======
+                if (i % 2 == 0)
+>>>>>>> Stashed changes
                 {
                     if (ClusterExplosionFX)
                     {
@@ -218,7 +222,7 @@ void AStratagemBeacon::TriggerStrike()
                 
                 //이펙트 터진곳 데미지
                 TArray<FHitResult> PointHits;
-                FCollisionShape SphereShape = FCollisionShape::MakeSphere(250.f);
+                FCollisionShape SphereShape = FCollisionShape::MakeSphere(500.f);
                 if (GetWorld()->SweepMultiByChannel(PointHits, FinalExplosionPos, FinalExplosionPos, FQuat::Identity, ECC_Pawn, SphereShape))
                 {
                     for (auto& PHit : PointHits)
