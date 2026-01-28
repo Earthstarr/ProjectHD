@@ -5,6 +5,7 @@
 #include "SpawnZone.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
+#include "ProjectHD/Character/Player/FPSCharacter.h"
 
 AEnemySpawnManager::AEnemySpawnManager()
 {
@@ -114,6 +115,14 @@ FVector AEnemySpawnManager::GetPlayerLocation() const
 void AEnemySpawnManager::CheckEnemyDistances()
 {
     if (!PoolManager) return;
+    
+    AFPSCharacter* PlayerChar = Cast<AFPSCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+    
+    // 플레이어가 죽었거나 포드에 타고 있다면 체크 중단
+    if (!PlayerChar || PlayerChar->bIsDead || PlayerChar->bIsOnPod) 
+    {
+        return;
+    }
 
     FVector PlayerLoc = GetPlayerLocation();
     

@@ -202,6 +202,9 @@ public:
     void Die();
     void RespawnWithPod();
     
+    bool bIsDead = false;
+    bool bIsOnPod = false;
+    
 protected:
     
     /* 입력 처리 함수들 */
@@ -285,7 +288,7 @@ protected:
     
     bool bSprintButtonDown = false;
     
-    bool bIsDead = false;
+    
     
     // 에임
     UFUNCTION(BlueprintNativeEvent, Category = "Combat")
@@ -461,6 +464,12 @@ protected:
     int32 ActiveStratagemIndex = 0;
 
     TArray<EStratagemDirection> CurrentInputStack;   
+    
+    UPROPERTY(EditAnywhere, Category = "Audio")
+    USoundBase* DeathVoiceSound;    // 사망시 보이스
+    
+    UPROPERTY(EditAnywhere, Category = "Audio")
+    USoundBase* RespawnVoiceSound;  // 재투입시 보이스
 
 public:
     virtual void Tick(float DeltaTime) override;

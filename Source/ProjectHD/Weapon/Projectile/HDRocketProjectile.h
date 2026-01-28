@@ -47,8 +47,11 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Rocket | Shrapnel")
     class UNiagaraSystem* ShrapnelTrailFX;    // 자탄 트레일
 
-    // 감지 타이머 핸들
+    // 감지 타이머
     FTimerHandle ProximityCheckTimerHandle;
+    
+    // 감지 딜레이 타이머
+    FTimerHandle DelayedExplosionTimerHandle;
     
     // 충돌 없으면 4초 뒤 폭발
     FTimerHandle ExplosionTimerHandle;

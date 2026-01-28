@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/TimelineComponent.h"
+
 #include "PodActor.generated.h"
 
 UCLASS()
@@ -13,13 +14,6 @@ class PROJECTHD_API APodActor : public AActor
 public:
 	APodActor();
 	
-	FORCEINLINE class UStaticMeshComponent* GetInternalElevatorMesh() const { return InternalElevatorMesh; }
-	FORCEINLINE USceneComponent* GetCharacterAnchor() const { return CharacterAnchor; }
-
-protected:
-	virtual void BeginPlay() override;
-	virtual void Tick( float DeltaTime ) override;
-
 	// 포드 몸체 메쉬
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* PodMesh;
@@ -37,6 +31,19 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	class UCurveFloat* RiseCurve;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* FallingSound; // 낙하 사운드
+    
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ImpactSound; // 착지 사운드
+	
+	FORCEINLINE class UStaticMeshComponent* GetInternalElevatorMesh() const { return InternalElevatorMesh; }
+	FORCEINLINE USceneComponent* GetCharacterAnchor() const { return CharacterAnchor; }
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void Tick( float DeltaTime ) override;
 
 	UFUNCTION()
 	void HandleRiseProgress(float Value);
@@ -51,4 +58,7 @@ private:
 	bool bLanded = false;
 	
 	void OnRiseFinished();
+	
+	UPROPERTY()
+	UAudioComponent* FallingSoundComponent;
 };

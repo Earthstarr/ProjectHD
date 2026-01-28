@@ -282,15 +282,7 @@ void AEnemyBase::InitEnemy()
             STComp->StopLogic("Restarting from Pool");
             STComp->StartLogic();
         }
-<<<<<<< Updated upstream
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("AIC Not Found"));
-    }
-=======
     }    
->>>>>>> Stashed changes
     
     // 애니메이션 몽타주 초기화
     if (UAnimInstance* AnimInst = GetMesh()->GetAnimInstance())

@@ -86,12 +86,8 @@ float AFPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& D
 
     if (AttributeSet && ActualDamage > 0.0f)
     {
-        float NewHealth = AttributeSet->GetHealth() - ActualDamage;        
-<<<<<<< Updated upstream
+        float NewHealth = AttributeSet->GetHealth() - ActualDamage;
         AttributeSet->SetHealth(FMath::Max(NewHealth, 0.0f));
-=======
-        AttributeSet->SetHealth(FMath::Max(NewHealth, 0.0f));        
->>>>>>> Stashed changes
     }
 
     return ActualDamage;
@@ -364,6 +360,13 @@ void AFPSCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
     UpdateAimOffset(DeltaTime);
+    
+    // 포드 안에 있을 때 시야를 정 아래로 고정
+    if (bIsOnPod && Controller)
+    {
+        FRotator CurrentRot = GetControlRotation();
+        Controller->SetControlRotation(FRotator(-90.f, CurrentRot.Yaw, CurrentRot.Roll));
+    }
 
     // 스트라타젬 쿨타임 업데이트
     for (FStratagemData& Data : StratagemList)
@@ -453,6 +456,8 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AFPSCharacter::Move(const FInputActionValue& Value)
 {
+    if (bIsDead) return;
+    
     FVector2D MovementVector = Value.Get<FVector2D>();
 
     if (Controller != nullptr)
@@ -678,6 +683,17 @@ void AFPSCharacter::Die()
     if (bIsDead) return;
     bIsDead = true;
     
+    if (DeathVoiceSound)
+    {
+        UGameplayStatics::PlaySound2D(this, DeathVoiceSound);
+        OnSoundPlayed.Broadcast(FName("DeathVoiceSound")); // 자막
+    }
+        
+    // 모든 이동/물리 정지
+    GetCharacterMovement()->StopMovementImmediately();
+    GetCharacterMovement()->DisableMovement();
+    GetCharacterMovement()->SetComponentTickEnabled(false);
+    
     // 레그돌 활성화
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     GetMesh()->SetSimulatePhysics(true);
@@ -689,8 +705,17 @@ void AFPSCharacter::Die()
 }
 
 void AFPSCharacter::RespawnWithPod()
-{
-    // 체력 및 상태 속성 초기화
+{    
+    bIsDead = false;
+    bIsOnPod = true;
+    
+    if (RespawnVoiceSound)
+    {
+        UGameplayStatics::PlaySound2D(this, RespawnVoiceSound);
+        OnSoundPlayed.Broadcast(FName("RespawnVoiceSound")); // 자막
+    }
+    
+    // 체력 및 상태 초기화
     if (AttributeSet)
     {
         AttributeSet->SetHealth(AttributeSet->GetMaxHealth());
@@ -699,13 +724,11 @@ void AFPSCharacter::RespawnWithPod()
         OnStaminaChanged.Broadcast(AttributeSet->GetStamina(), AttributeSet->GetMaxStamina());
     }
     
-    // 소모품 충전
     CurrentGrenadeCount = MaxGrenadeCount;
     CurrentStimCount = MaxStimCount;
     OnGrenadeChanged.Broadcast(CurrentGrenadeCount, MaxGrenadeCount);
     OnStimChanged.Broadcast(CurrentStimCount, MaxStimCount);
 
-    // 모든 인벤토리 무기 탄약 및 탄창 풀 충전
     for (FWeaponInstance& Weapon : WeaponInventory)
     {
         if (Weapon.WeaponData)
@@ -715,7 +738,6 @@ void AFPSCharacter::RespawnWithPod()
         }
     }
 
-    // 현재 들고 있는 무기 변수도 즉시 동기화
     if (CurrentWeaponData)
     {
         CurrentAmmo = CurrentWeaponData->MaxAmmoInMag;
@@ -723,64 +745,76 @@ void AFPSCharacter::RespawnWithPod()
         OnAmmoChanged.Broadcast(CurrentAmmo, CurrentMagCount, MaxMagCount);
     }
     
-    // ★★★ 레그돌 완전히 종료 ★★★
-    bIsDead = false;
+    // 레그돌 종료    
     GetMesh()->SetSimulatePhysics(false);
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-    GetMesh()->SetCollisionResponseToAllChannels(ECR_Block);
-    
-    // ★★★ 메시 회전 초기화 (중요!) ★★★
     GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
     GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
     
-    // ★★★ 캡슐 초기화 ★★★
-    GetCapsuleComponent()->SetSimulatePhysics(false);
-    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 포드 안에서는 끔
-    GetCapsuleComponent()->SetEnableGravity(false);
+    // CharacterMovement 다시 켜기
+    GetCharacterMovement()->SetComponentTickEnabled(true);
     
-    // ★★★ 이동 모드 초기화 ★★★
-    GetCharacterMovement()->StopMovementImmediately();
+    // 캐릭터를 완전히 비활성화
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    GetCapsuleComponent()->SetEnableGravity(false);
     GetCharacterMovement()->SetMovementMode(MOVE_None);
-    GetCharacterMovement()->GravityScale = 1.0f;
+    GetCharacterMovement()->GravityScale = 0.0f;
+    
+    // 시야를 정 아래로 고정 (-90도)
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        FRotator CurrentRot = PC->GetControlRotation();
+        PC->SetControlRotation(FRotator(-90.f, CurrentRot.Yaw, 0.f));
+    }
+    
+    float RandomX = FMath::RandRange(-1500.f, 1500.f);
+    float RandomY = FMath::RandRange(-1500.f, 1500.f);
 
-    // ★★★ 캐릭터 회전 초기화 (수평으로) ★★★
-    SetActorRotation(FRotator(0.f, GetControlRotation().Yaw, 0.f));
-
-    // 스폰 위치
-    FVector SpawnLoc = GetActorLocation() + FVector(0, 0, 20000.f);
+    // 죽은 위치에서 랜덤위치로 스폰
+    FVector SpawnLoc = GetActorLocation() + FVector(RandomX, RandomY, 40000.f);
     
     if (PodClass)
     {
         APodActor* NewPod = GetWorld()->SpawnActor<APodActor>(PodClass, SpawnLoc, FRotator::ZeroRotator);
-        if (NewPod)
+        if (NewPod && NewPod->PodMesh)
         {
-            // ★★★ 부착 전에 위치/회전 강제 설정 ★★★
-            SetActorLocation(NewPod->GetCharacterAnchor()->GetComponentLocation());
-            SetActorRotation(FRotator(0.f, -90.f, 0.f));
+            // Anchor 위치 가져오기
+            FVector AnchorWorldLoc = NewPod->GetCharacterAnchor()->GetComponentLocation();
+                        
+            //캡슐 절반(48) 빼서 발이 Anchor에 닿도록
+            AnchorWorldLoc.Z -= 48.f;
+                        
+            SetActorLocation(AnchorWorldLoc);
+            SetActorRotation(FRotator::ZeroRotator);
+                        
+            // Pod physics
+            UStaticMeshComponent* PodMeshComp = NewPod->PodMesh;
+            PodMeshComp->SetSimulatePhysics(true);
+            PodMeshComp->SetEnableGravity(true);
+            PodMeshComp->WakeRigidBody();
             
-            // 부착
-            AttachToComponent(
-                NewPod->GetCharacterAnchor(), 
-                FAttachmentTransformRules::SnapToTargetNotIncludingScale
-            );
-            
-            // 부착 후 상대 변환 강제 초기화
-            SetActorRelativeLocation(FVector::ZeroVector);
-            SetActorRelativeRotation(FRotator::ZeroRotator);
-
-            // 포드와의 충돌 무시
-            GetCapsuleComponent()->IgnoreActorWhenMoving(NewPod, true);
-            GetMesh()->IgnoreActorWhenMoving(NewPod, true);
-
-            // 포드 물리 시작
-            UStaticMeshComponent* PodMesh = Cast<UStaticMeshComponent>(NewPod->GetRootComponent());
-            if (PodMesh)
+            if (FBodyInstance* BodyInst = PodMeshComp->GetBodyInstance())
             {
-                PodMesh->SetSimulatePhysics(true);
-                PodMesh->GetBodyInstance()->bLockXRotation = true;
-                PodMesh->GetBodyInstance()->bLockYRotation = true;
-                PodMesh->SetPhysicsLinearVelocity(FVector(0, 0, -20000.f));
+                BodyInst->bLockXRotation = true;
+                BodyInst->bLockYRotation = true;
             }
+            
+            PodMeshComp->SetPhysicsLinearVelocity(FVector(0, 0, -9000.f));
+            
+            // 1프레임 뒤에 붙이기
+            GetWorldTimerManager().SetTimerForNextTick([this, NewPod]()
+            {
+                if (NewPod && NewPod->GetCharacterAnchor())
+                {
+                    AttachToComponent(
+                        NewPod->GetCharacterAnchor(), 
+                        FAttachmentTransformRules::KeepWorldTransform
+                    );
+                    
+                    GetCapsuleComponent()->IgnoreActorWhenMoving(NewPod, true);
+                    GetMesh()->IgnoreActorWhenMoving(NewPod, true);
+                }
+            });
         }
     }
 }
@@ -914,6 +948,8 @@ void AFPSCharacter::OnStimCompleted()
 
 void AFPSCharacter::OnFireStarted()
 {
+    if (bIsDead) return;
+    
     bFireButtonDown = true;
     
     if (!bIsAiming) return;
@@ -964,6 +1000,8 @@ void AFPSCharacter::StopFiring()
 
 void AFPSCharacter::Reload()
 {
+    if (bIsDead) return;
+    
     if (CurrentAmmo >= MaxAmmoInMag || CurrentMagCount <= 0 || bIsReloading || bIsThrowingGrenade || bIsUsingStim) return;
     
     if (bSprintButtonDown)
@@ -1021,7 +1059,9 @@ void AFPSCharacter::ResetRotationMode()
 }
 
 void AFPSCharacter::OnAimStarted_Implementation()
-{    
+{   
+    if (bIsDead) return;
+    
     bAimButtonDown = true;
     bIsAiming = true;
 
