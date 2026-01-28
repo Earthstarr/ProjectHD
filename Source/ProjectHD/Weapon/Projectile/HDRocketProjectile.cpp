@@ -60,9 +60,16 @@ void AHDRocketProjectile::CheckProximity()
             // 적 태그("Enemy") 확인
             if (OverlapActor && OverlapActor->ActorHasTag(TEXT("Enemy")))
             {
-                // 적 발견 시 타이머 중지 및 즉시 공중 폭발
+                // 적 발견 시 타이머 중지                
                 GetWorldTimerManager().ClearTimer(ProximityCheckTimerHandle);
-                TriggerExplosion(CurrentLoc, FVector::UpVector);
+                
+                // 0.2초 후에 폭발
+                GetWorldTimerManager().SetTimer(
+                    DelayedExplosionTimerHandle,
+                    FTimerDelegate::CreateUObject(this, &AHDRocketProjectile::TriggerExplosion, CurrentLoc, FVector::UpVector),
+                    0.2f,
+                    false
+                );
                 return;
             }
         }
@@ -73,6 +80,7 @@ void AHDRocketProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor
 {
     // 벽이나 지면에 직접 닿았을 때도 폭발
     GetWorldTimerManager().ClearTimer(ProximityCheckTimerHandle);
+    GetWorldTimerManager().ClearTimer(DelayedExplosionTimerHandle);
     TriggerExplosion(Hit.ImpactPoint, Hit.ImpactNormal);
 }
 
@@ -81,6 +89,7 @@ void AHDRocketProjectile::TriggerExplosion(FVector ExplosionLocation, FVector Im
     // 타이머 클리어 (중복 방지)
     GetWorldTimerManager().ClearTimer(ProximityCheckTimerHandle);
     GetWorldTimerManager().ClearTimer(ExplosionTimerHandle);
+    GetWorldTimerManager().ClearTimer(DelayedExplosionTimerHandle);
     
     // 만약 인자로 들어온 위치가 ZeroVector(자폭 타이머 호출)라면 현재 내 위치를 사용
     FVector FinalLocation = ExplosionLocation.IsZero() ? GetActorLocation() : ExplosionLocation;

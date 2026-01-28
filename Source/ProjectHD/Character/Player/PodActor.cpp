@@ -5,39 +5,46 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/AudioComponent.h"
 
 APodActor::APodActor()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	// ★★★ PodMesh (외부 껍데기) ★★★
 	PodMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PodMesh"));
 	RootComponent = PodMesh;
     
-	// 물리 시뮬레이션 설정
-	PodMesh->SetSimulatePhysics(false); // BeginPlay에서 켜짐
+	// 물리 설정
+	PodMesh->SetSimulatePhysics(false); // 초기엔 꺼둠
+	PodMesh->SetEnableGravity(true);
 	PodMesh->SetNotifyRigidBodyCollision(true);
+    
+	// 질량 먼저 설정
+	PodMesh->SetMassOverrideInKg(NAME_None, 1000.0f, true);
+    
+	// 감쇠 설정
 	PodMesh->SetLinearDamping(0.0f);
+	PodMesh->SetAngularDamping(0.0f);
     
 	// 콜리전 설정
 	PodMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	PodMesh->SetCollisionObjectType(ECC_WorldDynamic);
 	PodMesh->SetCollisionResponseToAllChannels(ECR_Block);
-	PodMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore); // 플레이어 무시
-	PodMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore); // 카메라 무시
+	PodMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	PodMesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 
-	// ★★★ InternalElevatorMesh (내부 승강기) ★★★
 	InternalElevatorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("InternalMesh"));
 	InternalElevatorMesh->SetupAttachment(RootComponent);
     
-	// 콜리전 완전히 끔 (순수 비주얼용)
+	// 콜리전 완전히 끔
+	InternalElevatorMesh->SetSimulatePhysics(false); // 물리 끔!
 	InternalElevatorMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	InternalElevatorMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	// ★★★ CharacterAnchor (플레이어 부착점) ★★★
+	// 플레이어 부착점
 	CharacterAnchor = CreateDefaultSubobject<USceneComponent>(TEXT("CharacterAnchor"));
 	CharacterAnchor->SetupAttachment(InternalElevatorMesh);
-	CharacterAnchor->SetRelativeLocation(FVector(0.f, 0.f, 48.f)); // 캡슐 절반 높이
+	CharacterAnchor->SetRelativeLocation(FVector(0.f, 0.f, 48.f));
 }
 
 void APodActor::BeginPlay()
@@ -49,6 +56,21 @@ void APodActor::BeginPlay()
 		FOnTimelineFloat ProgressFunction;
 		ProgressFunction.BindUFunction(this, FName("HandleRiseProgress"));
 		RiseTimeline.AddInterpFloat(RiseCurve, ProgressFunction);
+	}    
+	
+	if (FallingSound)
+	{
+		FallingSoundComponent = UGameplayStatics::SpawnSoundAttached(
+			FallingSound,
+			RootComponent,
+			NAME_None,
+			FVector::ZeroVector,
+			EAttachLocation::KeepRelativeOffset,
+			true, // Auto Destroy
+			1.0f, // Volume
+			1.0f, // Pitch
+			0.0f  // Start Time
+		);
 	}
 }
 
@@ -74,7 +96,7 @@ void APodActor::Tick(float DeltaTime)
 		{
 			OnPodLanded();
 			// 공급 포드처럼 바닥에 살짝 박히는 느낌을 주려면 위치 보정
-			SetActorLocation(GroundHit.ImpactPoint + FVector(0.f, 0.f, -50.f));
+			SetActorLocation(GroundHit.ImpactPoint + FVector(0.f, 0.f, -80.f));
 		}
 	}
 }
@@ -99,13 +121,38 @@ void APodActor::OnPodLanded()
 	// 박힌 후 회전값 정렬 (기울어짐 방지)
 	SetActorRotation(FRotator(0.f, GetActorRotation().Yaw, 0.f));
     
+	// 착지 사운드
+	if (ImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			ImpactSound,
+			GetActorLocation(),
+			1.0f,
+			1.0f
+		);
+	}
+	
+	// 부착된 플레이어의 bIsOnPod false
+	TArray<AActor*> AttachedActors;
+	GetAttachedActors(AttachedActors);
+    
+	for (AActor* Actor : AttachedActors)
+	{
+		AFPSCharacter* Player = Cast<AFPSCharacter>(Actor);
+		if (Player)
+		{
+			Player->bIsOnPod = false;
+		}
+	}
+	
 	RiseTimeline.PlayFromStart();
 }
 
 void APodActor::HandleRiseProgress(float Value)
 {
 	// 0에서 1로 변하는 Value값을 이용해 내부 메쉬의 Z축 높이 조절
-	float NewZ = FMath::Lerp(-200.f, 0.f, Value);
+	float NewZ = FMath::Lerp(-106.f, 0.f, Value);
 	InternalElevatorMesh->SetRelativeLocation(FVector(0.f, 0.f, NewZ));
 	
 	if (Value >= 1.0f)
@@ -124,34 +171,34 @@ void APodActor::OnRiseFinished()
 		AFPSCharacter* Player = Cast<AFPSCharacter>(Actor);
 		if (Player)
 		{
-			// 1. 부착 해제
+			// 부착 해제
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
             
-			// ★★★ 2. 메시 회전 다시 확인 (레그돌 이후 이상해질 수 있음) ★★★
+			// 메시 회전 다시 확인
 			Player->GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 			Player->GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
             
-			// ★★★ 3. 캐릭터를 지면 위로 약간 띄워서 안착 (땅 뚫림 방지) ★★★
+			// 캐릭터를 지면 위로 약간 띄워서 안착
 			FVector CurrentLoc = Player->GetActorLocation();
 			Player->SetActorLocation(CurrentLoc + FVector(0, 0, 10.f));
             
-			// 4. 콜리전 및 중력 원복
+			// 리전 및 중력 원복
 			Player->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			Player->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Block);
 			Player->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 			Player->GetCapsuleComponent()->SetEnableGravity(true);
             
-			// 5. 이동 모드 복구
+			// 이동 모드 복구
 			Player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 			Player->GetCharacterMovement()->GravityScale = 1.0f;
             
-			// 6. 입력 활성화
+			// 입력 활성화
 			if (APlayerController* PC = Cast<APlayerController>(Player->GetController()))
 			{
 				Player->EnableInput(PC);
 			}
             
-			// ★★★ 7. 회전 모드 복구 ★★★
+			// 회전 모드 복구
 			Player->bUseControllerRotationPitch = false;
 			Player->bUseControllerRotationYaw = false;
 			Player->bUseControllerRotationRoll = false;
