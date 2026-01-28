@@ -199,20 +199,12 @@ void AStratagemBeacon::TriggerStrike()
                     // 라인 트레이스가 닿은 곳이 실제 폭발 위치
                     FinalExplosionPos = TerrainHit.ImpactPoint;
                 }
-                // -----------------------------
-    
-                // 시각 효과 및 지점 데미지                
-<<<<<<< Updated upstream
-                if (i % 3 == 0)
-=======
-                if (i % 2 == 0)
->>>>>>> Stashed changes
+                
+                // 이펙트 및 데미지
+                if (ClusterExplosionFX)
                 {
-                    if (ClusterExplosionFX)
-                    {
-                        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ClusterExplosionFX, FinalExplosionPos);
-                    }
-                }
+                    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ClusterExplosionFX, FinalExplosionPos);
+                }                
                 
                 if (ClusterExplosionSound)
                 {
@@ -227,7 +219,7 @@ void AStratagemBeacon::TriggerStrike()
                 {
                     for (auto& PHit : PointHits)
                     {
-                        UGameplayStatics::ApplyPointDamage(PHit.GetActor(), 50.f, FinalExplosionPos - PHit.ImpactPoint, PHit, GetInstigatorController(), this, UDamageType::StaticClass());
+                        UGameplayStatics::ApplyPointDamage(PHit.GetActor(), 30.f, FinalExplosionPos - PHit.ImpactPoint, PHit, GetInstigatorController(), this, UDamageType::StaticClass());
                     }
                 }
             }, Delay, false);
