@@ -53,6 +53,11 @@ AEnemyBase* AEnemyPoolManager::AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, 
 	{
 		// 비활성화된 적이 있으면 꺼내기
 		EnemyToUse = Pool.InactivePool.Pop();
+		
+		if (!IsValid(EnemyToUse))
+		{
+			EnemyToUse = nullptr;
+		}
 	}
 	else
 	{
@@ -61,8 +66,11 @@ AEnemyBase* AEnemyPoolManager::AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, 
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		EnemyToUse = GetWorld()->SpawnActor<AEnemyBase>(EnemyClass, Location, Rotation, SpawnParams);
         
-		// 매니저를 알 수 있게 설정 (반환 시 필요)
-		EnemyToUse->SetPoolManager(this); 
+		if (EnemyToUse)
+		{
+			// 매니저를 알 수 있게 설정 (반환 시 필요)
+			EnemyToUse->SetPoolManager(this); 
+		}		
 	}
 
 	if (EnemyToUse)
@@ -78,16 +86,10 @@ AEnemyBase* AEnemyPoolManager::AcquireEnemy(TSubclassOf<AEnemyBase> EnemyClass, 
 			// 찾았다면 해당 위치로 텔레포트 (물리 처리 포함)
 			EnemyToUse->SetActorLocationAndRotation(SafeLocation, SafeRotation, false, nullptr, ETeleportType::TeleportPhysics);
 		}
-
-		// AI 컨트롤러가 없다면 새로 생성하고 빙의
-		if (EnemyToUse->GetController() == nullptr)
-		{
-			EnemyToUse->SpawnDefaultController();
-		}		
-	}
-
-	// 모든 상태 초기화
-	EnemyToUse->InitEnemy();
+		
+		// 모든 상태 초기화
+		EnemyToUse->InitEnemy();
+	}	
 	
 	return EnemyToUse;
 }

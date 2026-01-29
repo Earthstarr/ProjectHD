@@ -13,6 +13,8 @@
 #include "Components/StateTreeAIComponent.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
 #include "NavigationInvokerComponent.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AISense_Sight.h"
 
 AEnemyBase::AEnemyBase()
 {
@@ -24,6 +26,9 @@ AEnemyBase::AEnemyBase()
     
     PrimaryActorTick.bCanEverTick = true;
     PrimaryActorTick.bStartWithTickEnabled = true;
+    
+    GetCharacterMovement()->bEnablePhysicsInteraction = false;
+    GetCharacterMovement()->AvoidanceConsiderationRadius = 0.0f;
 }
 
 void AEnemyBase::BeginPlay()
@@ -64,6 +69,7 @@ void AEnemyBase::UpdateTickRate()
     else if (Distance < 5000.0f)
     {
         // 중거리: 0.1초마다
+        SetActorTickInterval(0.1f);
     }
     else if (Distance < 8000.0f)
     {
@@ -156,8 +162,25 @@ void AEnemyBase::Die()
     // AI 정지
     if (AAIController* AIC = Cast<AAIController>(GetController()))
     {
+        // AIC 타이머 정리
+        GetWorldTimerManager().ClearAllTimersForObject(AIC);
+        
+        // StateTree 먼저 정지
+        if (UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>())
+        {
+            STComp->StopLogic("Die");
+            STComp->SetComponentTickEnabled(false);
+        }
+        
+        // Perception 정리
+        if (UAIPerceptionComponent* PercComp = AIC->FindComponentByClass<UAIPerceptionComponent>())
+        {
+            PercComp->Deactivate();
+            PercComp->ForgetAll();
+        }
+        
         AIC->StopMovement();
-        AIC->UnPossess();
+        //AIC->UnPossess();
     }
 
     // 사망 애니메이션이 있으면 재생, 없으면 바로 레그돌
@@ -284,8 +307,25 @@ void AEnemyBase::ForceDespawn()
     // AI 정지
     if (AAIController* AIC = Cast<AAIController>(GetController()))
     {
+        // AIC 타이머 정리
+        GetWorldTimerManager().ClearAllTimersForObject(AIC);
+
+        // StateTree 정지
+        if (UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>())
+        {
+            STComp->StopLogic("Die");
+            STComp->SetComponentTickEnabled(false);
+        }
+
+        // Perception 정리
+        if (UAIPerceptionComponent* PercComp = AIC->FindComponentByClass<UAIPerceptionComponent>())
+        {
+            PercComp->Deactivate();
+            PercComp->ForgetAll();
+        }
+        
         AIC->StopMovement();
-        AIC->UnPossess();
+        // AIC->UnPossess();
     }   
     /*
     // 사망 애니메이션이 있으면 재생, 없으면 바로 레그돌
@@ -315,83 +355,117 @@ void AEnemyBase::ForceDespawn()
 // 다시 스폰시 초기화
 void AEnemyBase::InitEnemy()
 {
-    bIsDead = false;
+      bIsDead = false;
+      bIsMissionSpawned = false;
+      bIsIdle = false;
+      CurrentHealth = MaxHealth;
+
+      // 먼저 타이머 정리
+      GetWorldTimerManager().ClearAllTimersForObject(this);
+
+      // 틱/스켈레톤 복구
+      SetActorTickEnabled(true);
+      SetActorTickInterval(0.0f);
+      LastDistanceCheckTime = 0.0f;
+      CachedPlayer = UGameplayStatics::GetPlayerPawn(this, 0);
+
+      GetMesh()->SetComponentTickEnabled(true);
+      GetMesh()->bNoSkeletonUpdate = false;
+      GetMesh()->SetSimulatePhysics(false);
     
-    // 미션지역 적 정찰대로 재활용 초기화
-    bIsMissionSpawned = false;
-    bIsIdle = false;
-    
-    CurrentHealth = MaxHealth;
-    SetActorHiddenInGame(false);
-    
-    if (AAIController* AIC = Cast<AAIController>(GetController()))
+    // CharacterMovement 재활성화 (공중 사망적은 checkiflanded에서 비활성화됨)
+    if (UCharacterMovementComponent* MoveComp = GetCharacterMovement())
     {
-        SetInstigator(this);
-        
-        // 컨트롤러에 붙어있는 StateTreeComponent 찾기
-        UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>();
-        if (STComp)
-        {
-            // 이전에 멈춰있던 스테이트 트리를 처음부터 다시 시작
-            STComp->StopLogic("Restarting from Pool");
-            STComp->StartLogic();
-        }
-    }    
+        MoveComp->SetMovementMode(MOVE_Walking);
+        MoveComp->SetComponentTickEnabled(true);
+    }
     
-    // 애니메이션 몽타주 초기화
+    // 캡슐 컴포넌트 콜리전 복구
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+    // 애니메이션 초기화
     if (UAnimInstance* AnimInst = GetMesh()->GetAnimInstance())
     {
-        // 현재 재생 중인 모든 몽타주를 0초의 블렌드 타임으로 즉시 중단
         AnimInst->Montage_Stop(0.0f);
     }
 
-    // 모든 컴포넌트 콜리전 복구
-    TArray<UPrimitiveComponent*> VisualComponents;
-    GetComponents<UPrimitiveComponent>(VisualComponents);
-    
-    for (UPrimitiveComponent* Comp : VisualComponents)
-    {    
-        // 히트박스는 초기값 NoCollision
-        FString CompName = Comp->GetName();
-        if (CompName.Contains("HitBox") || CompName.Contains("Mouth"))
-        {
-            Comp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-            Comp->SetCollisionResponseToAllChannels(ECR_Overlap);
-            Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-            continue;
-        }
-        
-        // 일반 콜리전 복구
-        Comp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-        Comp->SetCollisionResponseToAllChannels(ECR_Block);
-        
-        Comp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-    }
+      // 콜리전 복구
+      TArray<UPrimitiveComponent*> VisualComponents;
+      GetComponents<UPrimitiveComponent>(VisualComponents);
 
-    // 틱 및 스켈레톤 업데이트 복구
-    SetActorTickEnabled(true);
-    GetMesh()->SetComponentTickEnabled(true);
-    GetMesh()->bNoSkeletonUpdate = false;
-    GetMesh()->SetSimulatePhysics(false);
-    
-    // 모든 타이머 초기화
-    GetWorldTimerManager().ClearAllTimersForObject(this);
-    
-    // 거리기반 틱 초기화
-    SetActorTickInterval(0.0f);
-    LastDistanceCheckTime = 0.0f;
-    CachedPlayer = UGameplayStatics::GetPlayerPawn(this, 0);
-    
-    // 내비 인보커
-    if (NavInvoker)
-    {
-        NavInvoker->Activate(true); 
-        NavInvoker->SetGenerationRadii(1000.f, 1500.f);
-    }
+      for (UPrimitiveComponent* Comp : VisualComponents)
+      {
+          FString CompName = Comp->GetName();
+          if (CompName.Contains("HitBox") || CompName.Contains("Mouth"))
+          {
+              Comp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+              Comp->SetCollisionResponseToAllChannels(ECR_Overlap);
+              Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+              continue;
+          }
+
+          Comp->SetCollisionResponseToAllChannels(ECR_Block);
+          Comp->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+          Comp->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+      }
+
+      // 내비 인보커
+      if (NavInvoker)
+      {
+          NavInvoker->Activate(true);
+          NavInvoker->SetGenerationRadii(1000.f, 1500.f);
+      }    
+
+      // AI 초기화 (타이머는 ClearAll 이후에 설정)
+      if (AAIController* AIC = Cast<AAIController>(GetController()))
+      {
+          SetInstigator(this);
+
+          if (UAIPerceptionComponent* PercComp = AIC->FindComponentByClass<UAIPerceptionComponent>())
+          {
+              PercComp->Deactivate();
+              PercComp->ForgetAll();
+          }
+
+          if (UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>())
+          {
+              STComp->SetComponentTickEnabled(false);
+              STComp->StopLogic("Pool Reset");
+          }
+
+          // 딜레이 후 Perception + StateTree 함께 시작
+          FTimerHandle AIResetHandle;
+          GetWorldTimerManager().SetTimer(AIResetHandle, [this, AIC]()
+          {
+              if (!IsValid(this) || !IsValid(AIC)) return;
+
+              if (UAIPerceptionComponent* PercComp = AIC->FindComponentByClass<UAIPerceptionComponent>())
+              {
+                  PercComp->Activate();
+                  PercComp->RequestStimuliListenerUpdate();
+              }
+
+              if (UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>())
+              {
+                  STComp->SetComponentTickEnabled(true);
+                  STComp->RestartLogic();
+              }
+
+              SetActorHiddenInGame(false);
+
+          }, 0.5f, false);
+      }
+
+      SetActorHiddenInGame(true);  // 딜레이 동안 숨김
 }
 
 void AEnemyBase::ReturnToPool()
 {
+    if (AAIController* AIC = Cast<AAIController>(GetController()))
+    {
+        //AIC->UnPossess();
+    }
+
     if (PoolManager)
     {        
         PoolManager->ReleaseEnemy(this);

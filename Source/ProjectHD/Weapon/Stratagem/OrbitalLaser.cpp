@@ -39,12 +39,41 @@ void AOrbitalLaser::BeginPlay()
 
     if (LaserLoopSound)
     {
-        AudioComp = UGameplayStatics::SpawnSoundAtLocation(this, LaserLoopSound, GetActorLocation());
+        AudioComp = UGameplayStatics::SpawnSoundAttached(
+            LaserLoopSound,
+            RootComponent,
+            NAME_None,
+            FVector::ZeroVector,
+            EAttachLocation::KeepRelativeOffset,
+            true,
+            1.0f,
+            1.0f,
+            0.0f,
+            nullptr,
+            nullptr,
+            true
+        );
     }
     
     // delaytime 뒤에 시작
     FTimerHandle TimerHandle;
     GetWorldTimerManager().SetTimer(TimerHandle, this, &AOrbitalLaser::ActivateLaser, delaytime, false);
+}
+
+void AOrbitalLaser::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    // 타이머 정리
+    GetWorldTimerManager().ClearTimer(DamageTimerHandle);
+    GetWorldTimerManager().ClearTimer(SearchTimerHandle);
+    GetWorldTimerManager().ClearTimer(GroundCheckTimerHandle);
+    
+    // 오디오 정리
+    if (AudioComp && AudioComp->IsPlaying())
+    {
+        AudioComp->Stop();
+    }
+    
+    Super::EndPlay(EndPlayReason);
 }
 
 void AOrbitalLaser::Tick(float DeltaTime)
@@ -73,7 +102,7 @@ void AOrbitalLaser::Tick(float DeltaTime)
         LaserFX->SetVectorParameter(BeamEndName, CurrentImpactPoint + CachedBeamEndOffset);
     }
     if (ImpactFX) ImpactFX->SetWorldLocation(CurrentImpactPoint + FVector(0, 0, 20.f));
-    if (AudioComp) AudioComp->SetWorldLocation(CurrentImpactPoint);
+    if (IsValid(AudioComp)) AudioComp->SetWorldLocation(CurrentImpactPoint);
 }
 
 void AOrbitalLaser::CheckGroundHeight()
