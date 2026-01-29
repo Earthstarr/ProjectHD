@@ -37,8 +37,6 @@ void AEnemy_Chimera::InitEnemy()
 {
 	Super::InitEnemy();
 	
-	Super::InitEnemy();
-    
 	// 키메라 전용 초기화
 	if (RightArmCollision)
 	{
