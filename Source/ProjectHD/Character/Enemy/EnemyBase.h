@@ -13,7 +13,10 @@ class PROJECTHD_API AEnemyBase : public ACharacter
 
 public:
     AEnemyBase();
-
+    
+    virtual void Tick(float DeltaTime) override;
+    virtual void BeginPlay() override;
+    
 protected:
     // 체력 시스템
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
@@ -49,6 +52,15 @@ protected:
     FVector LastAttackerLocation;
     
     float ReturnToPoolTime = 15.0f;
+    
+    // 거리 기반 틱 최적화
+    UPROPERTY()
+    APawn* CachedPlayer;
+
+    float TickDistanceCheckInterval = 1.0f;  // 거리 체크 주기
+    float LastDistanceCheckTime = 0.0f;
+
+    void UpdateTickRate();
             
 public:
     UPROPERTY(BlueprintReadOnly, Category = "Stat")
@@ -80,5 +92,6 @@ public:
     virtual void ForceDespawn();
     
     FORCEINLINE bool IsDead() const { return bIsDead; }
+   
     
 };
