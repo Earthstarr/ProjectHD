@@ -72,7 +72,7 @@ private:
 
 	// 거리 체크 주기
 	UPROPERTY(EditAnywhere, Category = "Spawn")
-	float DespawnCheckInterval = 2.0f;
+	float DespawnCheckInterval = 4.0f;
 
 	// 거리 체크 로직
 	void CheckEnemyDistances();

@@ -6,7 +6,7 @@ AEggActor::AEggActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
-	MaxHealth = 200.f;
+	MaxHealth = 50.f;
 	CurrentHealth = MaxHealth;
 	
 	EggMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EggMesh"));

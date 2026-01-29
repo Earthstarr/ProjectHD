@@ -247,7 +247,8 @@ void AFPSCharacter::BeginPlay()
     };
     EagleRearm.Type = EStratagemType::Rearm; // 타겟이 될 타입을 지정하거나 별도 Enum 추가
     EagleRearm.bUseStack = false; // 재무장 명령 자체는 일반 쿨타임 방식
-    EagleRearm.MaxCooldown = 0.0f;
+    EagleRearm.MaxCooldown = 1.0f;
+    EagleRearm.CurrentCooldown = 0.0f;    
 
     // 위젯 생성 및 화면 추가
     if (MainHUDWidgetClass)
@@ -584,8 +585,6 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
                 FGameplayAbilitySpec(CurrentWeaponData->AimAbility, 1, static_cast<int32>(EAbilityInputID::Aim)));
             CurrentWeaponAbilityHandles.Add(Handle);
         }
-        
-        
     }
     
     // 애니메이션 레이어 교체

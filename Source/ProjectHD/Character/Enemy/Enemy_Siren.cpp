@@ -72,6 +72,7 @@ void AEnemy_Siren::InitEnemy()
 	// 오브젝트 풀에서 꺼낼 때 증원 상태 초기화
 	CleanupReinforcement();
 	bIsCoolingDown = false;
+	bIsReinforcing = false;
 }
 
 void AEnemy_Siren::OnHitBoxOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
