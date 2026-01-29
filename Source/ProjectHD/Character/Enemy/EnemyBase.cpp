@@ -21,6 +21,60 @@ AEnemyBase::AEnemyBase()
     // 내비 인보커
     //NavInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));    
     //NavInvoker->SetGenerationRadii(1000.f, 1500.f);
+    
+    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.bStartWithTickEnabled = true;
+}
+
+void AEnemyBase::BeginPlay()
+{
+    Super::BeginPlay();
+    
+    CachedPlayer = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+}
+
+void AEnemyBase::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+    
+    if (bIsDead) return;
+    
+    // 1초마다 거리 체크
+    LastDistanceCheckTime += DeltaTime;
+    if (LastDistanceCheckTime >= TickDistanceCheckInterval)
+    {
+        LastDistanceCheckTime = 0.0f;
+        UpdateTickRate();
+    }
+}
+
+// 거리별로 틱 조정
+void AEnemyBase::UpdateTickRate()
+{
+    if (!CachedPlayer) return;
+
+    float Distance = FVector::Dist(GetActorLocation(), CachedPlayer->GetActorLocation());
+
+    // 거리별 틱 간격 조정
+    if (Distance < 2000.0f)
+    {
+        // 가까움: 매 프레임
+        SetActorTickInterval(0.0f);
+    }
+    else if (Distance < 5000.0f)
+    {
+        // 중거리: 0.1초마다
+    }
+    else if (Distance < 8000.0f)
+    {
+        // 원거리: 0.2초마다
+        SetActorTickInterval(0.2f);
+    }
+    else
+    {
+        // 아주 멀리: 0.5초마다
+        SetActorTickInterval(0.5f);
+    }
 }
 
 float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -322,6 +376,11 @@ void AEnemyBase::InitEnemy()
     
     // 모든 타이머 초기화
     GetWorldTimerManager().ClearAllTimersForObject(this);
+    
+    // 거리기반 틱 초기화
+    SetActorTickInterval(0.0f);
+    LastDistanceCheckTime = 0.0f;
+    CachedPlayer = UGameplayStatics::GetPlayerPawn(this, 0);
     
     // 내비 인보커
     if (NavInvoker)
