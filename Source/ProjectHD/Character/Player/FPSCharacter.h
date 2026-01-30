@@ -330,6 +330,13 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
     class UUserWidget* MainHUDWidget;
 
+    // 미니맵
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+    TSubclassOf<class UUserWidget> MinimapWidgetClass;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "UI")
+    class UUserWidget* MinimapWidget;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
     UNiagaraSystem* MuzzleFlashFX;
     
@@ -522,6 +529,11 @@ public:
     
     UPROPERTY(EditAnywhere, Category = "Input")
     class UInputAction* InteractAction;
+
+    UPROPERTY(EditAnywhere, Category = "Input")
+    class UInputAction* MinimapToggleAction;
+
+    void ToggleMinimap();
 
     // 이벤트 델리게이트
     UPROPERTY(BlueprintAssignable, Category = "Stratagem")

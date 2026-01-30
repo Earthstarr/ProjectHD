@@ -48,6 +48,8 @@ private:
     AActor* CurrentTarget;            // 현재 추격 중인 적
 
     FVector CurrentImpactPoint;       // 레이저가 지면에 닿는 현재 좌표
+    
+    UPROPERTY()
     class UAudioComponent* AudioComp;
 
     void FindNewTarget();             // 가장 가까운 적 찾기

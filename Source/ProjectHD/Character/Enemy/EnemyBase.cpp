@@ -425,6 +425,10 @@ void AEnemyBase::InitEnemy()
           {
               PercComp->Deactivate();
               PercComp->ForgetAll();
+
+              // 감각 강제 리셋
+              PercComp->SetSenseEnabled(UAISense_Sight::StaticClass(), false);
+              PercComp->SetSenseEnabled(UAISense_Hearing::StaticClass(), false);
           }
 
           if (UStateTreeAIComponent* STComp = AIC->FindComponentByClass<UStateTreeAIComponent>())
@@ -441,6 +445,9 @@ void AEnemyBase::InitEnemy()
 
               if (UAIPerceptionComponent* PercComp = AIC->FindComponentByClass<UAIPerceptionComponent>())
               {
+                  // 감각 다시 활성화
+                  PercComp->SetSenseEnabled(UAISense_Sight::StaticClass(), true);
+                  PercComp->SetSenseEnabled(UAISense_Hearing::StaticClass(), true);
                   PercComp->Activate();
                   PercComp->RequestStimuliListenerUpdate();
               }
@@ -469,5 +476,5 @@ void AEnemyBase::ReturnToPool()
     if (PoolManager)
     {        
         PoolManager->ReleaseEnemy(this);
-    }    
+    }
 }
