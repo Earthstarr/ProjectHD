@@ -25,19 +25,19 @@
 
 AFPSCharacter::AFPSCharacter()
 {
-    //ASC ÄÄÆ÷³ÍÆ® »ı¼º
+    // ASC ì»´í¬ë„ŒíŠ¸ ìƒì„±
     AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 
-    // ¼­¹ö/Å¬¶óÀÌ¾ğÆ® °£ ÅÂ±× º¹Á¦ ¼³Á¤
-    AbilitySystemComponent->SetIsReplicated(true);    
+    // ì„œë²„/í´ë¼ì´ì–¸íŠ¸ ê°„ íƒœê·¸ ë³µì œ ì„¤ì •
+    AbilitySystemComponent->SetIsReplicated(true);
 
-    // Çï´ÙÀÌ¹öÁî »óÅÂ °ü¸® º¹Á¦ ¸ğµå ¼³Á¤
+    // ì–´ë¹Œë¦¬í‹° ë³µì œ ëª¨ë“œ ì„¤ì •
     AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-    // Ä¸½¶ Å©±â ¼³Á¤
+    // ìº¡ìŠ í¬ê¸° ì„¤ì •
     GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
-    // Ä³¸¯ÅÍ È¸Àü ¼³Á¤ (3ÀÎÄª Á¤¼®)
+    // ìºë¦­í„° íšŒì „ ì„¤ì • (3ì¸ì¹­ ì„¤ì •)
     bUseControllerRotationPitch = false;
     bUseControllerRotationYaw = false;
     bUseControllerRotationRoll = false;
@@ -45,32 +45,32 @@ AFPSCharacter::AFPSCharacter()
     GetCharacterMovement()->bOrientRotationToMovement = true;
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 300.0f, 0.0f);
 
-    // ½ºÇÁ¸µ ¾Ï(CameraBoom) ¼³Á¤
+    // ìŠ¤í”„ë§ ì•”(CameraBoom) ì„¤ì •
     CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
     CameraBoom->SetupAttachment(RootComponent);
     CameraBoom->TargetArmLength = 500.0f;
     CameraBoom->bUsePawnControlRotation = true;
 
-    // Ä«¸Ş¶ó¸¦ Ä³¸¯ÅÍ ¿À¸¥ÂÊ ¾î±ú ÂÊÀ¸·Î »ìÂ¦ ¿Å±è
+    // ì¹´ë©”ë¼ ìºë¦­í„° ì˜¤ë¥¸ìª½ ì–´ê¹¨ ìª½ìœ¼ë¡œ ì‚´ì§ ì´ë™
     CameraBoom->SocketOffset = FVector(0.f, 120.f, 80.f);
 
-    // 3ÀÎÄª Ä«¸Ş¶ó ¼³Á¤
+    // 3ì¸ì¹­ ì¹´ë©”ë¼ ì„¤ì •
     ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
     ThirdPersonCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
     ThirdPersonCamera->bUsePawnControlRotation = false;
 
-    // ¸Ş½Ã ¹× ÃÑ±â ¼³Á¤
+    // ë©”ì‹œ ë° ì´êµ¬ ì„¤ì •
     GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
     GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
     WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
 
-    // ºí·çÇÁ¸°Æ®¿¡¼­ ¼³Á¤ÇÑ ¼ÒÄÏ ÀÌ¸§(¿¹: WeaponSocket)¿¡ ºÎÂø
+    // ë¸”ë£¨í”„ë¦°íŠ¸ì—ì„œ ì„¤ì •í•œ ì†Œì¼“ ì´ë¦„(ì˜ˆ: WeaponSocket)ì— ë¶€ì°©
     WeaponMesh->SetupAttachment(GetMesh(), TEXT("WeaponSocket"));
-    
-    // Ã¼·Â, ½ºÅ×¹Ì³ª °ü¸®¿ë AttributeSet
+
+    // ì²´ë ¥, ìŠ¤íƒœë¯¸ë‚˜ ê´€ë¦¬ìš© AttributeSet
     AttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("AttributeSet"));
-    
-    // ³»ºñ ÀÎº¸Ä¿
+
+    // ë„¤ë¹„ ì¸ë³´ì»¤
     NavInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));
 }
 
@@ -81,7 +81,7 @@ UAbilitySystemComponent* AFPSCharacter::GetAbilitySystemComponent() const
 
 float AFPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
     class AController* EventInstigator, AActor* DamageCauser)
-{    
+{
     float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
     if (AttributeSet && ActualDamage > 0.0f)
@@ -96,128 +96,128 @@ float AFPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& D
 void AFPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
-    
-    // ³»ºñ »ı¼º ¹üÀ§ ¼³Á¤
+
+    // ë„¤ë¹„ ë©”ì‹œ ìƒì„± ë²”ìœ„ ì„¤ì •
     if (NavInvoker)
     {
-        // Ã¹ ¹øÂ° ÀÎÀÚ: GenerationRadius, µÎ ¹øÂ° ÀÎÀÚ: RemovalRadius
+        // ì²« ë²ˆì§¸ ì¸ì: GenerationRadius, ë‘ ë²ˆì§¸ ì¸ì: RemovalRadius
         NavInvoker->SetGenerationRadii(10000.f, 12000.f);
     }
 
     if (AbilitySystemComponent)
     {
-        // ASC ÃÊ±âÈ­, ¼­¹ö¿¡¼­¸¸ ¾îºô¸®Æ¼ ºÎ¿©
-        AbilitySystemComponent->InitAbilityActorInfo(this, this);        
+        // ASC ì´ˆê¸°í™”, ì„œë²„ì—ì„œë§Œ ì–´ë¹Œë¦¬í‹° ë¶€ì—¬
+        AbilitySystemComponent->InitAbilityActorInfo(this, this);
     }
-    
-    // Attribute ¼¼ÆÃ
+
+    // Attribute ì„¤ì •
     if (AbilitySystemComponent && AttributeSet)
     {
-        // Health ¼Ó¼º º¯È­ °¨Áö
+        // Health ì†ì„± ë³€í™” ê°ì§€
         AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
             AttributeSet->GetHealthAttribute()).AddUObject(this, &AFPSCharacter::HandleHealthChanged);
 
-        // Stamina ¼Ó¼º º¯È­ °¨Áö
+        // Stamina ì†ì„± ë³€í™” ê°ì§€
         AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
             AttributeSet->GetStaminaAttribute()).AddUObject(this, &AFPSCharacter::HandleStaminaChanged);
-            
-        // ÃÊ±â UI ¼ÂÆÃÀ» À§ÇÑ ÃÖÃÊ È£Ãâ
+
+        // ì´ˆê¸° UI ì—…ë°ì´íŠ¸ ìœ„í•´ ë°”ë¡œ í˜¸ì¶œ
         OnHealthChanged.Broadcast(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
         OnStaminaChanged.Broadcast(AttributeSet->GetStamina(), AttributeSet->GetMaxStamina());
-    }   
-        
+    }
+
     if (HasAuthority())
     {
-        // GAS : ¹«±â ±³Ã¼ ´É·Â
+        // GAS: ë¬´ê¸° êµì²´ ëŠ¥ë ¥
         if (WeaponChangeAbilityClass)
         {
             AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(WeaponChangeAbilityClass));
         }
-        
-        // GAS : ´Ş¸®±â ´É·Â 
+
+        // GAS: ë‹¬ë¦¬ê¸° ëŠ¥ë ¥
         if (SprintAbilityClass)
         {
             AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(SprintAbilityClass, 1, static_cast<int32>(EAbilityInputID::Sprint)));
         }
-        
-        // GAS : ¼ö·ùÅº ´øÁö±â ´É·Â
+
+        // GAS: ìˆ˜ë¥˜íƒ„ ë˜ì§€ê¸° ëŠ¥ë ¥
         if (GrenadeAbilityClass)
         {
             AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(GrenadeAbilityClass, 1, static_cast<int32>(EAbilityInputID::Grenade)));
         }
     }
-    
+
     OnGrenadeChanged.Broadcast(CurrentGrenadeCount, MaxGrenadeCount);
 
-    // 1, 2, 3¹ø ¹«±â ¼³Á¤
+    // 1, 2, 3ë²ˆ ë¬´ê¸° ë“±ë¡
     if (FirstWeaponData) WeaponInventory.Add(FWeaponInstance(FirstWeaponData));
     if (SecondWeaponData) WeaponInventory.Add(FWeaponInstance(SecondWeaponData));
     if (ThirdWeaponData) WeaponInventory.Add(FWeaponInstance(ThirdWeaponData));
 
-    // Ã¹ ¹øÂ° ¹«±â ÀåÂø
+    // ì²« ë²ˆì§¸ ë¬´ê¸° ì¥ì°©
     if (WeaponInventory.Num() > 0)
     {
         EquipWeapon(WeaponInventory[0].WeaponData);
     }
-    
+
     if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
     {
         if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
         {
             Subsystem->AddMappingContext(DefaultMappingContext, 0);
 
-            // ½ºÆ®¶óÅ¸Áª¿ë ÄÁÅØ½ºÆ® µî·Ï Ãß°¡
+            // ìŠ¤íŠ¸ë¼íƒ€ì ¬ ì»¨í…ìŠ¤íŠ¸ ì¶”ê°€
             if (StratagemMappingContext)
             {
-                Subsystem->AddMappingContext(StratagemMappingContext, 1); // ¿ì¼±¼øÀ§ 1
+                Subsystem->AddMappingContext(StratagemMappingContext, 1); // ìš°ì„ ìˆœìœ„ 1
             }
         }
     }
 
-    // 500kg ÆøÅº
+    // 500kg í­íƒ„
     FStratagemData Bomb;
     Bomb.Name = TEXT("500kg Bomb");
     Bomb.Command = { EStratagemDirection::Up, EStratagemDirection::Right, EStratagemDirection::Down, EStratagemDirection::Down, EStratagemDirection::Down };
     Bomb.BeaconColor = FLinearColor::Red;
     Bomb.MaxCooldown = 120.0f;
     Bomb.CurrentCooldown = 0.0f;
-    Bomb.bUseStack = true;  // ½ºÅÃ »ç¿ë
+    Bomb.bUseStack = true;  // ìŠ¤íƒ ì‚¬ìš©
     Bomb.MaxStack = 2;
     Bomb.CurrentStack = 2;
     Bomb.bIsOnCooldown = false;
-    Bomb.Type = EStratagemType::Bomb500kg;  
-    
-    // ÀÌ±Û Áı¼ÓÅº
+    Bomb.Type = EStratagemType::Bomb500kg;
+
+    // ì´ê¸€ í´ëŸ¬ìŠ¤í„°
     FStratagemData ClusterBomb;
     ClusterBomb.Name = TEXT("Eagle Cluster Bomb");
     ClusterBomb.Command = { EStratagemDirection::Up, EStratagemDirection::Right, EStratagemDirection::Down, EStratagemDirection::Down, EStratagemDirection::Right };
-    ClusterBomb.BeaconColor = FLinearColor(1.0f, 0.5f, 0.0f); // ÁÖÈ²»ö
-    ClusterBomb.MaxCooldown = 90.0f; // ÀÌ±ÛÀº ÄğÅ¸ÀÓÀÌ ÂªÀº ´ë½Å »ç¿ë È½¼ö Á¦ÇÑÀÌ ÀÖ´Â °æ¿ì°¡ ¸¹À½
+    ClusterBomb.BeaconColor = FLinearColor(1.0f, 0.5f, 0.0f); // ì£¼í™©ìƒ‰
+    ClusterBomb.MaxCooldown = 90.0f; // ì´ê¸€ì€ ì¿¨íƒ€ì„ì´ ì§§ì€ ëŒ€ì‹  ì‚¬ìš© íšŸìˆ˜ ì œí•œì´ ìˆëŠ” ê²½ìš°ê°€ ë§ìŒ
     ClusterBomb.CurrentCooldown = 0.0f;
-    ClusterBomb.bUseStack = true;   // ½ºÅÃ »ç¿ë
+    ClusterBomb.bUseStack = true;   // ìŠ¤íƒ ì‚¬ìš©
     ClusterBomb.MaxStack = 3;
     ClusterBomb.CurrentStack = 3;
     ClusterBomb.bIsOnCooldown = false;
     ClusterBomb.Type = EStratagemType::EagleCluster;
-    
-    // ±Ëµµ ·¹ÀÌÀú
+
+    // ê¶¤ë„ ë ˆì´ì €
     FStratagemData OrbitalLaser;
     OrbitalLaser.Name = TEXT("Orbital Laser");
-    OrbitalLaser.Command = { 
-        EStratagemDirection::Right, 
-        EStratagemDirection::Down, 
-        EStratagemDirection::Up, 
-        EStratagemDirection::Right, 
-        EStratagemDirection::Down 
+    OrbitalLaser.Command = {
+        EStratagemDirection::Right,
+        EStratagemDirection::Down,
+        EStratagemDirection::Up,
+        EStratagemDirection::Right,
+        EStratagemDirection::Down
     };
     OrbitalLaser.BeaconColor = FLinearColor(0.5f, 0.0f, 1.0f);
     OrbitalLaser.MaxCooldown = 300.0f;
     OrbitalLaser.CurrentCooldown = 0.0f;
     OrbitalLaser.bIsOnCooldown = false;
     OrbitalLaser.Type = EStratagemType::OrbitalLaser;
-    
-    // ¼¾Æ®¸®
-    FStratagemData Sentry;  
+
+    // ì„¼íŠ¸ë¦¬
+    FStratagemData Sentry;
     Sentry.Name = TEXT("Sentry");
     Sentry.Command = { EStratagemDirection::Down, EStratagemDirection::Up, EStratagemDirection::Right, EStratagemDirection::Left };
     Sentry.BeaconColor = FLinearColor::Green;
@@ -225,9 +225,9 @@ void AFPSCharacter::BeginPlay()
     Sentry.CurrentCooldown = 0.0f;
     Sentry.bIsOnCooldown = false;
     Sentry.Type = EStratagemType::Sentry;
-    
-    // º¸±ŞÇ° (ÆÄ¶û)
-    FStratagemData Supply;  
+
+    // ë³´ê¸‰í’ˆ (íŒŒë‘)
+    FStratagemData Supply;
     Supply.Name = TEXT("Supply Pod");
     Supply.Command = { EStratagemDirection::Down, EStratagemDirection::Down, EStratagemDirection::Up, EStratagemDirection::Right };
     Supply.BeaconColor = FLinearColor::Blue;
@@ -235,22 +235,22 @@ void AFPSCharacter::BeginPlay()
     Supply.CurrentCooldown = 0.0f;
     Supply.bIsOnCooldown = false;
     Supply.Type = EStratagemType::Supply;
-    
-    // ÀÌ±Û Àç¹«Àå
+
+    // ì´ê¸€ ì¬ë¬´ì¥
     FStratagemData EagleRearm;
     EagleRearm.Name = TEXT("Eagle Rearm");
-    EagleRearm.Command = { EStratagemDirection::Up, 
-        EStratagemDirection::Up, 
-        EStratagemDirection::Left, 
-        EStratagemDirection::Up, 
-        EStratagemDirection::Right 
+    EagleRearm.Command = { EStratagemDirection::Up,
+        EStratagemDirection::Up,
+        EStratagemDirection::Left,
+        EStratagemDirection::Up,
+        EStratagemDirection::Right
     };
-    EagleRearm.Type = EStratagemType::Rearm; // Å¸°ÙÀÌ µÉ Å¸ÀÔÀ» ÁöÁ¤ÇÏ°Å³ª º°µµ Enum Ãß°¡
-    EagleRearm.bUseStack = false; // Àç¹«Àå ¸í·É ÀÚÃ¼´Â ÀÏ¹İ ÄğÅ¸ÀÓ ¹æ½Ä
+    EagleRearm.Type = EStratagemType::Rearm; // íƒ€ì…ì´ ì—†ìœ¼ë©´ ìƒˆ Enum ì¶”ê°€
+    EagleRearm.bUseStack = false; // ì¬ë¬´ì¥ ìì²´ëŠ” ì¼ë°˜ ì¿¨íƒ€ì„ ì‚¬ìš©
     EagleRearm.MaxCooldown = 1.0f;
-    EagleRearm.CurrentCooldown = 0.0f;    
+    EagleRearm.CurrentCooldown = 0.0f;
 
-    // À§Á¬ »ı¼º ¹× È­¸é Ãß°¡
+    // ë©”ì¸ HUD ìœ„ì ¯ ì¶”ê°€
     if (MainHUDWidgetClass)
     {
         MainHUDWidget = CreateWidget<UUserWidget>(GetWorld(), MainHUDWidgetClass);
@@ -259,8 +259,8 @@ void AFPSCharacter::BeginPlay()
             MainHUDWidget->AddToViewport();
         }
     }
-    
-    // ½ÃÀÛÇÏ°í °¢ ½ºÆ®¶óÅ¸Áª ÇöÀç ½ºÅÃÀ» ´Ù½ÃÇÑ¹ø ÃÊ±âÈ­
+
+    // ì—ë””í„°ì—ì„œ ì„¤ì •í•œ ìŠ¤íŠ¸ë¼íƒ€ì ¬ ìŠ¤íƒì„ ë‹¤ì‹œ ì´ˆê¸°í™”
     for (FStratagemData& Data : StratagemList)
     {
         if (Data.bUseStack)
@@ -268,31 +268,42 @@ void AFPSCharacter::BeginPlay()
             Data.CurrentStack = Data.MaxStack;
         }
     }
+
+    // ë¯¸ë‹ˆë§µ ìœ„ì ¯ ìƒì„± (ìˆ¨ê¸´ ìƒíƒœë¡œ ì‹œì‘)
+    if (MinimapWidgetClass)
+    {
+        MinimapWidget = CreateWidget<UUserWidget>(GetWorld(), MinimapWidgetClass);
+        if (MinimapWidget)
+        {
+            MinimapWidget->AddToViewport();
+            MinimapWidget->SetVisibility(ESlateVisibility::Hidden);
+        }
+    }
 }
 
 void AFPSCharacter::SwitchWeapon(int32 SlotIndex)
 {
-    // ÀçÀåÀü, ÁÖ»ç±â »ç¿ëÁßÀÌ¸é return
+    // ì¬ì¥ì „, ì£¼ì‚¬ê¸° ì‚¬ìš©ì¤‘ì´ë©´ return
     if (bIsReloading || bIsUsingStim) return;
-    
-    // ÇØ´ç ÀÎµ¦½º¿¡ ¹«±â°¡ ÀÖ´ÂÁö È®ÀÎ
+
+    // í•´ë‹¹ ì¸ë±ìŠ¤ì— ë¬´ê¸°ê°€ ìˆëŠ”ì§€ í™•ì¸
     if (!WeaponInventory.IsValidIndex(SlotIndex) || WeaponInventory[SlotIndex].WeaponData == nullptr)
     {
         return;
     }
 
-    // ÀÌ¹Ì µé°í ÀÖ´Â ¹«±â¶ó¸é ¹«½Ã
+    // ì´ë¯¸ ë“¤ê³  ìˆëŠ” ë¬´ê¸°ë©´ ë¬´ì‹œ
     if (CurrentWeaponIndex == SlotIndex && CurrentWeaponData == WeaponInventory[SlotIndex].WeaponData)
     {
         return;
     }
-    
+
     if (AbilitySystemComponent)
     {
         FGameplayEventData Payload;
         Payload.EventTag = FGameplayTag::RequestGameplayTag(FName("Event.Weapon.Swap"));
-        
-        // ½½·Ô Á¤º¸¸¦ ´ã¾Æ º¸³¿
+
+        // ìŠ¬ë¡¯ ì¸ë±ìŠ¤ë¥¼ ì „ë‹¬
         Payload.EventMagnitude = static_cast<float>(SlotIndex);
 
         AbilitySystemComponent->HandleGameplayEvent(Payload.EventTag, &Payload);
@@ -312,16 +323,16 @@ void AFPSCharacter::ClearCurrentWeaponAbilities()
 
 void AFPSCharacter::AddKillCombo()
 {
-    // ÄŞº¸ ¼ıÀÚ Áõ°¡
+    // ì½¤ë³´ ì¹´ìš´íŠ¸ ì¦ê°€
     KillComboCount++;
 
-    // UI °»½Å¿ë µ¨¸®°ÔÀÌÆ® È£Ãâ
+    // UI ê°±ì‹ ìš© ë¸ë¦¬ê²Œì´íŠ¸ í˜¸ì¶œ
     OnComboChanged.Broadcast(KillComboCount);
 
-    // ±âÁ¸ Å¸ÀÌ¸Ó°¡ ÀÛµ¿ ÁßÀÌ¸é ÃÊ±âÈ­ (Refresh)
+    // ê¸°ì¡´ íƒ€ì´ë¨¸ê°€ ì‘ë™ ì¤‘ì´ë©´ ì´ˆê¸°í™” (Refresh)
     GetWorldTimerManager().ClearTimer(ComboTimerHandle);
 
-    // 10ÃÊ µÚ¿¡ ResetKillCombo ÇÔ¼ö¸¦ È£ÃâÇÏµµ·Ï Å¸ÀÌ¸Ó ¼³Á¤
+    // ì¼ì • ì‹œê°„ í›„ì— ResetKillCombo í•¨ìˆ˜ í˜¸ì¶œí•˜ë„ë¡ íƒ€ì´ë¨¸ ì„¤ì •
     GetWorldTimerManager().SetTimer(ComboTimerHandle, this, &AFPSCharacter::ResetKillCombo, ComboExpireTime, false);
 }
 
@@ -333,14 +344,14 @@ void AFPSCharacter::ResetKillCombo()
 
 void AFPSCharacter::UpdateAimOffset(float DeltaTime)
 {
-    // ÄÁÆ®·Ñ·¯ÀÇ È¸Àü°ª°ú Ä³¸¯ÅÍÀÇ È¸Àü°ª Â÷ÀÌ
+    // ì»¨íŠ¸ë¡¤ëŸ¬ì˜ íšŒì „ê°’ê³¼ ìºë¦­í„°ì˜ íšŒì „ê°’ ë¹„êµ
     FRotator ControlRotation = GetControlRotation();
     FRotator ActorRotation = GetActorRotation();
-    
-    // µÎ È¸Àü°ªÀÇ Â÷ÀÌ(Delta)¸¦ Á¤±ÔÈ­ÇÏ¿© ÃßÃâ
+
+    // ë‘ íšŒì „ê°’ì˜ ì°¨ì´(Delta)ë¥¼ ì •ê·œí™”í•˜ì—¬ ì €ì¥
     FRotator Delta = (ControlRotation - ActorRotation).GetNormalized();
 
-    // Pitch °ª ÀúÀå
+    // Pitch ê°’ ë³´ê°„
     AimPitch = FMath::FInterpTo(AimPitch, Delta.Pitch, DeltaTime, 15.0f);
 }
 
@@ -348,7 +359,7 @@ bool AFPSCharacter::CanEagleRearm() const
 {
     for (const FStratagemData& Data : StratagemList)
     {
-        // ½ºÅÃÀ» »ç¿ëÇÏ´Â ½ºÆ®¶óÅ¸Áª(ÀÌ±Û) Áß ÇÏ³ª¶óµµ Ç®½ºÅÃÀÌ ¾Æ´Ï¸é Àç¹«Àå °¡´É
+        // ìŠ¤íƒì„ ì‚¬ìš©í•˜ëŠ” ìŠ¤íŠ¸ë¼íƒ€ì ¬(ì´ê¸€) ì¤‘ í•˜ë‚˜ë¼ë„ í’€ìŠ¤íƒì´ ì•„ë‹ˆë©´ ì¬ë¬´ì¥ ê°€ëŠ¥
         if (Data.bUseStack && Data.CurrentStack < Data.MaxStack)
         {
            return true;
@@ -361,15 +372,15 @@ void AFPSCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
     UpdateAimOffset(DeltaTime);
-    
-    // Æ÷µå ¾È¿¡ ÀÖÀ» ¶§ ½Ã¾ß¸¦ Á¤ ¾Æ·¡·Î °íÁ¤
+
+    // í¬ë“œ ì•ˆì— ìˆì„ ë•Œ ì‹œì•¼ë¥¼ ë§µ ì•„ë˜ë¡œ ê³ ì •
     if (bIsOnPod && Controller)
     {
         FRotator CurrentRot = GetControlRotation();
         Controller->SetControlRotation(FRotator(-90.f, CurrentRot.Yaw, CurrentRot.Roll));
     }
 
-    // ½ºÆ®¶óÅ¸Áª ÄğÅ¸ÀÓ ¾÷µ¥ÀÌÆ®
+    // ìŠ¤íŠ¸ë¼íƒ€ì ¬ ì¿¨íƒ€ì„ ì—…ë°ì´íŠ¸
     for (FStratagemData& Data : StratagemList)
     {
         if (Data.bIsOnCooldown)
@@ -380,14 +391,14 @@ void AFPSCharacter::Tick(float DeltaTime)
             {
                 Data.CurrentCooldown = 0.0f;
                 Data.bIsOnCooldown = false;
-                
-                // Àç¹«ÀåÀÌ ³¡³µ´Ù¸é ½ºÅÃ º¹±¸
+
+                // ì¬ë¬´ì¥ì´ ëë‚¬ë‹¤ë©´ ìŠ¤íƒ ë³µêµ¬
                 if (Data.bUseStack && Data.bIsRearming)
                 {
                     Data.CurrentStack = Data.MaxStack;
                     Data.bIsRearming = false;
                 }
-            }            
+            }
         }
     }
 }
@@ -398,32 +409,31 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
     if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
     {
-        // ÀÌµ¿ ¹× ½Ã¼± Ã³¸®
+        // ì´ë™ ë° ì‹œì•¼ ì²˜ë¦¬
         EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFPSCharacter::Move);
         EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFPSCharacter::Look);
 
-        // Á¡ÇÁ
+        // ì í”„
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-        // ´Ş¸®±â
+        // ë‹¬ë¦¬ê¸°
         EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AFPSCharacter::OnSprintStarted);
         EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AFPSCharacter::OnSprintCompleted);
-        
-        // ¼ö·ùÅº ´øÁö±â
+
+        // ìˆ˜ë¥˜íƒ„ ë˜ì§€ê¸°
         EnhancedInputComponent->BindAction(GrenadeAction, ETriggerEvent::Started, this, &AFPSCharacter::OnGrenadeStart);
-        //EnhancedInputComponent->BindAction(GrenadeAction, ETriggerEvent::Completed, this, &AFPSCharacter::OnGrenadeCompleted);
-        
-        // ÁÖ»ç±â »ç¿ë
+
+        // ì£¼ì‚¬ê¸° ì‚¬ìš©
         EnhancedInputComponent->BindAction(StimAction, ETriggerEvent::Started, this, &AFPSCharacter::OnStimStart);
-        
-        // »ç°İ (FireWeapon ÇÔ¼ö ¿¬°á)
+
+        // ì‚¬ê²© (FireWeapon í•¨ìˆ˜ ì—°ë™)
         if (FireAction)
         {
-            // ´©¸¦ ¶§ OnFireStarted È£Ãâ
+            // ëˆ„ë¥¼ ë•Œ OnFireStarted í˜¸ì¶œ
             EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &AFPSCharacter::OnFireStarted);
 
-            // ¶¿ ¶§ OnFireCompleted È£Ãâ
+            // ë—„ ë•Œ OnFireCompleted í˜¸ì¶œ
             EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AFPSCharacter::OnFireCompleted);
         }
 
@@ -438,27 +448,32 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
             EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &AFPSCharacter::Reload);
         }
 
-        // ¹«±â ½½·Ô ¼±ÅÃ ¹ÙÀÎµù
+        // ë¬´ê¸° ìŠ¬ë¡¯ í‚¤ ë°”ì¸ë”©
         EnhancedInputComponent->BindAction(WeaponSlot1Action, ETriggerEvent::Started, this, &AFPSCharacter::OnSelectWeapon1);
         EnhancedInputComponent->BindAction(WeaponSlot2Action, ETriggerEvent::Started, this, &AFPSCharacter::OnSelectWeapon2);
         EnhancedInputComponent->BindAction(WeaponSlot3Action, ETriggerEvent::Started, this, &AFPSCharacter::OnSelectWeapon3);
 
-        // Q Å° (¸Ş´º ¿­±â/´İ±â)
+        // Q í‚¤ (ë©”ë‰´ ì—´ê¸°/ë‹«ê¸°)
         EnhancedInputComponent->BindAction(StratagemMenuAction, ETriggerEvent::Started, this, &AFPSCharacter::OnStratagemMenuAction);
-        //EnhancedInputComponent->BindAction(StratagemMenuAction, ETriggerEvent::Completed, this, &AFPSCharacter::OnStratagemMenuAction);
 
-        // ½ºÆ®¶óÅ¸Áª ¹æÇâ ÀÔ·Â
+        // ìŠ¤íŠ¸ë¼íƒ€ì ¬ ë°©í–¥ ì…ë ¥
         EnhancedInputComponent->BindAction(StratagemInputAction, ETriggerEvent::Triggered, this, &AFPSCharacter::OnStratagemInputAction);
-        
-        // »óÈ£ÀÛ¿ë ÀÔ·Â
+
+        // ìƒí˜¸ì‘ìš© ì…ë ¥
         EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AFPSCharacter::OnInteract);
+
+        // ë¯¸ë‹ˆë§µ í† ê¸€
+        if (MinimapToggleAction)
+        {
+            EnhancedInputComponent->BindAction(MinimapToggleAction, ETriggerEvent::Started, this, &AFPSCharacter::ToggleMinimap);
+        }
     }
 }
 
 void AFPSCharacter::Move(const FInputActionValue& Value)
 {
     if (bIsDead) return;
-    
+
     FVector2D MovementVector = Value.Get<FVector2D>();
 
     if (Controller != nullptr)
@@ -487,7 +502,7 @@ void AFPSCharacter::Look(const FInputActionValue& Value)
 void AFPSCharacter::HandleHealthChanged(const FOnAttributeChangeData& Data)
 {
     OnHealthChanged.Broadcast(Data.NewValue, AttributeSet->GetMaxHealth());
-    
+
     if (Data.NewValue <= 0.0f)
     {
         Die();
@@ -499,12 +514,12 @@ void AFPSCharacter::HandleStaminaChanged(const FOnAttributeChangeData& Data)
     float NewStamina = Data.NewValue;
     OnStaminaChanged.Broadcast(NewStamina, AttributeSet->GetMaxStamina());
 
-    // ½ºÅ×¹Ì³ª°¡ 0 ÀÌÇÏ·Î ¶³¾îÁö¸é OnSprintCompleted¸¦ È£ÃâÇØ 2ÃÊ ÆĞ³ÎÆ¼ ½ÃÀÛ
+    // ìŠ¤íƒœë¯¸ë‚˜ê°€ 0 ì´í•˜ë¡œ ë–¨ì–´ì§€ë©´ OnSprintCompleted í˜¸ì¶œí•´ ë‹¬ë¦¬ê¸° ì¤‘ì§€
     if (NewStamina <= 0.0f)
     {
-        OnSprintCompleted(); 
-        
-        // GAS ³»ºÎÀûÀ¸·Î Sprint ÀÔ·ÂÀ» Release Ã³¸®ÇØ¼­ ¾îºô¸®Æ¼¸¦ °­Á¦ Á¾·á
+        OnSprintCompleted();
+
+        // GAS ë‚´ë¶€ì ìœ¼ë¡œ Sprint ì…ë ¥ì„ Release ì²˜ë¦¬í•´ì„œ ì–´ë¹Œë¦¬í‹° ì •ìƒ ì¢…ë£Œ
         if (AbilitySystemComponent)
         {
             AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInputID::Sprint));
@@ -516,24 +531,24 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
 {
     if (!NewWeaponData || !AbilitySystemComponent) return;
 
-    // ÀÌ¹Ì ¹«±â¸¦ µé°í ÀÖ´Â °æ¿ì¿¡¸¸ ÀúÀå
+    // ì´ë¯¸ ë¬´ê¸°ë¥¼ ë“¤ê³  ìˆëŠ” ê²½ìš°ì—ë§Œ ì €ì¥
     if (CurrentWeaponData && WeaponInventory.IsValidIndex(CurrentWeaponIndex))
     {
         WeaponInventory[CurrentWeaponIndex].CurrentAmmoCount = CurrentAmmo;
         WeaponInventory[CurrentWeaponIndex].CurrentMagCount = CurrentMagCount;
     }
 
-    // ±âÁ¸ ¹«±â ¾îºô¸®Æ¼ Á¦°Å
+    // ê¸°ì¡´ ë¬´ê¸° ì–´ë¹Œë¦¬í‹° ì œê±°
     ClearCurrentWeaponAbilities();
 
     CurrentWeaponData = NewWeaponData;
     WeaponMesh->SetSkeletalMesh(CurrentWeaponData->WeaponMesh);
-    
-    // ¹«±â º° À§Ä¡ Á¶Á¤
+
+    // ë¬´ê¸° ì† ìœ„ì¹˜ ì„¤ì •
     WeaponMesh->SetRelativeLocation(NewWeaponData->GripLocationOffset);
     WeaponMesh->SetRelativeRotation(NewWeaponData->GripRotationOffset);
 
-    // ÀÎº¥Åä¸®¿¡¼­ »õ ¹«±â Á¤º¸¸¦ Ã£¾Æ Ä³¸¯ÅÍ º¯¼ö¿¡ µ¿±âÈ­
+    // ì¸ë²¤í† ë¦¬ì—ì„œ ìƒˆ ë¬´ê¸° ë°ì´í„°ë¥¼ ì°¾ì•„ ìºë¦­í„° ë°ì´í„°ì™€ ë™ê¸°í™”
     bool bFound = false;
 
     for (int32 i = 0; i < WeaponInventory.Num(); ++i)
@@ -550,7 +565,7 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
         }
     }
 
-    // ÀÎº¥Åä¸®¿¡ ¾ø´Â »õ ¹«±â¶ó¸é Ãß°¡
+    // ì¸ë²¤í† ë¦¬ì— ì—†ëŠ” ìƒˆ ë¬´ê¸°ë©´ ì¶”ê°€
     if (!bFound)
     {
         FWeaponInstance NewInstance(NewWeaponData);
@@ -562,7 +577,7 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
         CurrentWeaponIndex = NewIdx;
     }
 
-    // »õ ¾îºô¸®Æ¼ ºÎ¿© ¹× ÇÚµé ÀúÀå
+    // ìƒˆ ì–´ë¹Œë¦¬í‹° ë¶€ì—¬ ë° í•¸ë“¤ ì €ì¥
     if (HasAuthority())
     {
         if (CurrentWeaponData->FireAbility)
@@ -586,49 +601,49 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
             CurrentWeaponAbilityHandles.Add(Handle);
         }
     }
-    
-    // ¾Ö´Ï¸ŞÀÌ¼Ç ·¹ÀÌ¾î ±³Ã¼
+
+    // ì• ë‹ˆë©”ì´ì…˜ ë ˆì´ì–´ êµì²´
     if (UAnimInstance* AnimInst = GetMesh()->GetAnimInstance())
     {
         if (NewWeaponData->WeaponAnimLayer)
         {
-            // »õ·Î¿î ¹«±âÀÇ ·¹ÀÌ¾î¸¦ ¸ŞÀÎ ABP¿¡ ¸µÅ©
+            // ìƒˆë¡œìš´ ë¬´ê¸°ìš© ë ˆì´ì–´ë¥¼ í˜„ì¬ ABPì— ë§í¬
             AnimInst->LinkAnimClassLayers(NewWeaponData->WeaponAnimLayer);
         }
     }
 
-    // ÇöÀç ¹«±âÀÇ ÀåÀü ¸ùÅ¸ÁÖ °»½Å
+    // í˜„ì¬ ë¬´ê¸°ì— ë§ëŠ” ëª½íƒ€ì£¼ ì„¤ì •
     CurrentReloadMontage = NewWeaponData->ReloadMontage;
 
-    // UI °»½Å µ¨¸®°ÔÀÌÆ® È£Ãâ
+    // UI ê°±ì‹  ë¸ë¦¬ê²Œì´íŠ¸ í˜¸ì¶œ
     OnAmmoChanged.Broadcast(CurrentAmmo, CurrentMagCount, MaxMagCount);
 }
 
-// GAS : ´Ş¸®±â
+// GAS : ë‹¬ë¦¬ê¸°
 void AFPSCharacter::OnSprintStarted()
-{        
+{
     bSprintButtonDown = true;
-    
-    // Á¶ÁØ ÁßÀÌ°Å³ª »ç°İ ÁßÀÌ¸é ÀÔ·Â¸¸ ÀúÀåÇÏ°í ¸®ÅÏ
+
+    // ì¡°ì¤€ ì¤‘ì´ê±°ë‚˜ ì‚¬ê²© ì¤‘ì´ë©´ ì…ë ¥ë§Œ ì €ì¥í•˜ê³  ë¦¬í„´
     if (bIsAiming || bFireButtonDown) return;
 
     if (AbilitySystemComponent)
     {
         float CurrentStamina = AttributeSet->GetStamina();
-        
-        // ½ºÅ×¹Ì³ª°¡ 0º¸´Ù Å©´Ù¸é, 2ÃÊ ´ë±â ÁßÀÌ¶óµµ Áï½Ã ÅÂ±× Á¦°Å
+
+        // ìŠ¤íƒœë¯¸ë‚˜ê°€ 0ë³´ë‹¤ í¬ë‹¤ë©´, 2ì´ˆ ëŒ€ê¸° ìƒíƒœë¼ë„ íƒœê·¸ ì œê±°
         if (CurrentStamina > 0.0f)
         {
             FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
             AbilitySystemComponent->RemoveLooseGameplayTag(ExhaustedTag);
-            
-            // 2ÃÊ È¸º¹ Å¸ÀÌ¸Ó Áß´Ü
+
+            // 2ì´ˆ íšŒë³µ íƒ€ì´ë¨¸ ì¤‘ë‹¨
             GetWorldTimerManager().ClearTimer(TimerHandle_StaminaRegen);
-            
-            // ±âÁ¸ È¸º¹ È¿°ú Á¦°Å
+
+            // ê¸°ì¡´ íšŒë³µ íš¨ê³¼ ì œê±°
             AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaRegenEffectClass, AbilitySystemComponent);
 
-            // ´Ş¸®±â ½ÇÇà
+            // ë‹¬ë¦¬ê¸° ì‹œì‘
             AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Sprint));
         }
     }
@@ -637,17 +652,17 @@ void AFPSCharacter::OnSprintStarted()
 void AFPSCharacter::OnSprintCompleted()
 {
     bSprintButtonDown = false;
-    
+
     if (AbilitySystemComponent)
     {
         AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInputID::Sprint));
-        
+
         FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
         if (!AbilitySystemComponent->HasMatchingGameplayTag(ExhaustedTag))
         {
             AbilitySystemComponent->AddLooseGameplayTag(ExhaustedTag);
         }
-        
+
         GetWorldTimerManager().SetTimer(TimerHandle_StaminaRegen, this, &AFPSCharacter::StartStaminaRegen, 2.0f, false);
     }
 }
@@ -656,19 +671,19 @@ void AFPSCharacter::StartStaminaRegen()
 {
     if (AbilitySystemComponent)
     {
-        // Å»Áø ÅÂ±× Á¦°Å
+        // íƒˆì§„ íƒœê·¸ ì œê±°
         FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
         AbilitySystemComponent->RemoveLooseGameplayTag(ExhaustedTag);
 
-        // ½ºÅ×¹Ì³ª È¸º¹ GE Àû¿ë
+        // ìŠ¤íƒœë¯¸ë‚˜ íšŒë³µ GE ì ìš©
         if (StaminaRegenEffectClass)
         {
             AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaRegenEffectClass, AbilitySystemComponent);
-            
+
             FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
             EffectContext.AddSourceObject(this);
             FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(StaminaRegenEffectClass, 1.0f, EffectContext);
-            
+
             if (SpecHandle.IsValid())
             {
                 AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
@@ -681,40 +696,40 @@ void AFPSCharacter::Die()
 {
     if (bIsDead) return;
     bIsDead = true;
-    
+
     if (DeathVoiceSound)
     {
         UGameplayStatics::PlaySound2D(this, DeathVoiceSound);
-        OnSoundPlayed.Broadcast(FName("DeathVoiceSound")); // ÀÚ¸·
+        OnSoundPlayed.Broadcast(FName("DeathVoiceSound")); // ìë§‰
     }
-        
-    // ¸ğµç ÀÌµ¿/¹°¸® Á¤Áö
+
+    // ëª¨ë“  ì´ë™/ì…ë ¥ ì°¨ë‹¨
     GetCharacterMovement()->StopMovementImmediately();
     GetCharacterMovement()->DisableMovement();
     GetCharacterMovement()->SetComponentTickEnabled(false);
-    
-    // ·¹±×µ¹ È°¼ºÈ­
+
+    // ë˜ê·¸ëŒ í™œì„±í™”
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     GetMesh()->SetSimulatePhysics(true);
     GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 
-    // 5ÃÊ µÚ ºÎÈ° Å¸ÀÌ¸Ó
+    // 5ì´ˆ í›„ ë¶€í™œ íƒ€ì´ë¨¸
     FTimerHandle RespawnHandle;
     GetWorldTimerManager().SetTimer(RespawnHandle, this, &AFPSCharacter::RespawnWithPod, 5.0f, false);
 }
 
 void AFPSCharacter::RespawnWithPod()
-{    
+{
     bIsDead = false;
     bIsOnPod = true;
-    
+
     if (RespawnVoiceSound)
     {
         UGameplayStatics::PlaySound2D(this, RespawnVoiceSound);
-        OnSoundPlayed.Broadcast(FName("RespawnVoiceSound")); // ÀÚ¸·
+        OnSoundPlayed.Broadcast(FName("RespawnVoiceSound")); // ìë§‰
     }
-    
-    // Ã¼·Â ¹× »óÅÂ ÃÊ±âÈ­
+
+    // ì²´ë ¥ ë° ìƒíƒœ ì´ˆê¸°í™”
     if (AttributeSet)
     {
         AttributeSet->SetHealth(AttributeSet->GetMaxHealth());
@@ -722,7 +737,7 @@ void AFPSCharacter::RespawnWithPod()
         OnHealthChanged.Broadcast(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
         OnStaminaChanged.Broadcast(AttributeSet->GetStamina(), AttributeSet->GetMaxStamina());
     }
-    
+
     CurrentGrenadeCount = MaxGrenadeCount;
     CurrentStimCount = MaxStimCount;
     OnGrenadeChanged.Broadcast(CurrentGrenadeCount, MaxGrenadeCount);
@@ -743,73 +758,73 @@ void AFPSCharacter::RespawnWithPod()
         CurrentMagCount = CurrentWeaponData->MaxMag;
         OnAmmoChanged.Broadcast(CurrentAmmo, CurrentMagCount, MaxMagCount);
     }
-    
-    // ·¹±×µ¹ Á¾·á    
+
+    // ë˜ê·¸ëŒ í•´ì œ
     GetMesh()->SetSimulatePhysics(false);
     GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
     GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
     GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
-    
-    // CharacterMovement ´Ù½Ã ÄÑ±â
+
+    // CharacterMovement ë‹¤ì‹œ ì¼œê¸°
     GetCharacterMovement()->SetComponentTickEnabled(true);
-    
-    // Ä³¸¯ÅÍ¸¦ ¿ÏÀüÈ÷ ºñÈ°¼ºÈ­
+
+    // ìºë¦­í„°ë¥¼ ì¼ì‹œì  ë¹„í™œì„±í™”
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     GetCapsuleComponent()->SetEnableGravity(false);
     GetCharacterMovement()->SetMovementMode(MOVE_None);
     GetCharacterMovement()->GravityScale = 0.0f;
-    
-    // ½Ã¾ß¸¦ Á¤ ¾Æ·¡·Î °íÁ¤ (-90µµ)
+
+    // ì‹œì•¼ë¥¼ ë§µ ì•„ë˜ë¡œ ê³ ì • (-90ë„)
     if (APlayerController* PC = Cast<APlayerController>(GetController()))
     {
         FRotator CurrentRot = PC->GetControlRotation();
         PC->SetControlRotation(FRotator(-90.f, CurrentRot.Yaw, 0.f));
     }
-    
+
     float RandomX = FMath::RandRange(-1500.f, 1500.f);
     float RandomY = FMath::RandRange(-1500.f, 1500.f);
 
-    // Á×Àº À§Ä¡¿¡¼­ ·£´ıÀ§Ä¡·Î ½ºÆù
+    // í˜„ì¬ ìœ„ì¹˜ì—ì„œ ëœë¤ìœ„ì¹˜ë¡œ ìŠ¤í°
     FVector SpawnLoc = GetActorLocation() + FVector(RandomX, RandomY, 40000.f);
-    
+
     if (PodClass)
     {
         APodActor* NewPod = GetWorld()->SpawnActor<APodActor>(PodClass, SpawnLoc, FRotator::ZeroRotator);
         if (NewPod && NewPod->PodMesh)
         {
-            // Anchor À§Ä¡ °¡Á®¿À±â
+            // Anchor ìœ„ì¹˜ ê°€ì ¸ì˜¤ê¸°
             FVector AnchorWorldLoc = NewPod->GetCharacterAnchor()->GetComponentLocation();
-                        
-            //Ä¸½¶ Àı¹İ(48) »©¼­ ¹ßÀÌ Anchor¿¡ ´êµµ·Ï
+
+            // ìº¡ìŠ ë†’ì´(48) ë³´ì • í›„ Anchorì— ë§ì¶”ê¸°
             AnchorWorldLoc.Z -= 48.f;
-                        
+
             SetActorLocation(AnchorWorldLoc);
             SetActorRotation(FRotator::ZeroRotator);
-                        
+
             // Pod physics
             UStaticMeshComponent* PodMeshComp = NewPod->PodMesh;
             PodMeshComp->SetSimulatePhysics(true);
             PodMeshComp->SetEnableGravity(true);
             PodMeshComp->WakeRigidBody();
-            
+
             if (FBodyInstance* BodyInst = PodMeshComp->GetBodyInstance())
             {
                 BodyInst->bLockXRotation = true;
                 BodyInst->bLockYRotation = true;
             }
-            
+
             PodMeshComp->SetPhysicsLinearVelocity(FVector(0, 0, -9000.f));
-            
-            // 1ÇÁ·¹ÀÓ µÚ¿¡ ºÙÀÌ±â
+
+            // 1í”„ë ˆì„ ë’¤ì— ë¶™ì´ê¸°
             GetWorldTimerManager().SetTimerForNextTick([this, NewPod]()
             {
                 if (NewPod && NewPod->GetCharacterAnchor())
                 {
                     AttachToComponent(
-                        NewPod->GetCharacterAnchor(), 
+                        NewPod->GetCharacterAnchor(),
                         FAttachmentTransformRules::KeepWorldTransform
                     );
-                    
+
                     GetCapsuleComponent()->IgnoreActorWhenMoving(NewPod, true);
                     GetMesh()->IgnoreActorWhenMoving(NewPod, true);
                 }
@@ -818,18 +833,18 @@ void AFPSCharacter::RespawnWithPod()
     }
 }
 
-// ¼ö·ùÅº ´øÁö±â
+// ìˆ˜ë¥˜íƒ„ ë˜ì§€ê¸°
 void AFPSCharacter::OnGrenadeStart()
 {
     if (bIsReloading || bIsUsingStim) return;
-    
-    // ¼ö·ùÅºÀÌ 0°³º¸´Ù ¸¹À» ¶§¸¸ ½ÇÇà
+
+    // ìˆ˜ë¥˜íƒ„ì´ 0ë³´ë‹¤ ë§ìœ¼ë©´ ë˜ì§€ê¸° ì‹œì‘
     if (!bIsThrowingGrenade && CurrentGrenadeCount > 0 && AbilitySystemComponent)
     {
         bIsThrowingGrenade = true;
         AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Grenade));
-        
-        // °³¼ö °¨¼Ò ¹× UI °»½Å
+
+        // ê°œìˆ˜ ê°ì†Œ ë° UI ê°±ì‹ 
         CurrentGrenadeCount--;
         OnGrenadeChanged.Broadcast(CurrentGrenadeCount, MaxGrenadeCount);
     }
@@ -842,29 +857,29 @@ void AFPSCharacter::OnGrenadeCompleted()
 
 void AFPSCharacter::OnStimStart()
 {
-    // °³¼ö ¹× »óÅÂ Ã¼Å©
+    // ì¡°ê±´ ë° ìƒíƒœ ì²´í¬
     if (CurrentStimCount <= 0 || bIsReloading || bIsThrowingGrenade || bIsUsingStim) return;
-        
+
     UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-    
-    // ÁÖ»ç±â ¸ùÅ¸ÁÖ°¡ ÇÒ´çµÇ¾î ÀÖ°í Àç»ı °¡´ÉÇÑÁö È®ÀÎ
+
+    // ì£¼ì‚¬ê¸° ëª½íƒ€ì£¼ê°€ í• ë‹¹ë˜ì–´ ìˆê³  ì¬ìƒ ê°€ëŠ¥í•œì§€ í™•ì¸
     if (AnimInstance && StimMontage)
     {
         bIsUsingStim = true;
-        
-        // ¸ùÅ¸ÁÖ¸¦ Àç»ıÇÏ°í ¹İÈ¯µÈ ±æÀÌ È®ÀÎ
+
+        // ëª½íƒ€ì£¼ë¥¼ ì¬ìƒí•˜ê³  ë°˜í™˜ëœ ì‹œê°„ í™•ì¸
         float Duration = AnimInstance->Montage_Play(StimMontage, 1.0f);
-        
+
         if (Duration > 0.0f)
         {
-            // ¸ùÅ¸ÁÖ Á¾·á/Ãë¼Ò ½Ã ½ÇÇàµÉ ÇÔ¼ö¸¦ ¿¬°á
+            // ëª½íƒ€ì£¼ ì¢…ë£Œ/ì¤‘ë‹¨ ì‹œ í˜¸ì¶œë  í•¨ìˆ˜ë¥¼ ë°”ì¸ë”©
             FOnMontageEnded EndedDelegate;
             EndedDelegate.BindUObject(this, &AFPSCharacter::HandleStimMontageEnded);
             AnimInstance->Montage_SetEndDelegate(EndedDelegate, StimMontage);
         }
         else
         {
-            // Àç»ı ½ÇÆĞ½Ã Áï½Ã º¯¼ö¸¦ false
+            // ì¬ìƒ ì‹¤íŒ¨ì‹œ ìƒíƒœ í”Œë˜ê·¸ë¥¼ false
             bIsUsingStim = false;
         }
     }
@@ -885,16 +900,16 @@ void AFPSCharacter::OnInteract()
     FCollisionQueryParams Params;
     Params.AddIgnoredActor(this);
 
-    // ±¸Ã¼ ¹İÁö¸§
-    float SweepRadius = 50.0f; 
-    
+    // êµ¬ì²´ ìŠ¤ìœ„í”„
+    float SweepRadius = 50.0f;
+
     bool bHit = GetWorld()->SweepSingleByChannel(
-        Hit, 
-        Start, 
-        End, 
-        FQuat::Identity, 
-        ECC_Visibility, 
-        FCollisionShape::MakeSphere(SweepRadius), 
+        Hit,
+        Start,
+        End,
+        FQuat::Identity,
+        ECC_Visibility,
+        FCollisionShape::MakeSphere(SweepRadius),
         Params
     );
 
@@ -906,7 +921,7 @@ void AFPSCharacter::OnInteract()
             Interactable->Interact(this);
         }
     }
-    
+
     //DrawDebugCapsule(GetWorld(), Start + (End - Start) * 0.5f, 150.f + SweepRadius, SweepRadius, FRotationMatrix::MakeFromZ(End - Start).ToQuat(), FColor::Green, false, 2.0f);
 }
 
@@ -920,23 +935,23 @@ void AFPSCharacter::ApplyStimEffect()
         FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(StimEffectClass, 1.0f, EffectContext);
         if (SpecHandle.IsValid())
         {
-            // Å»Áø »óÅÂ Á¦°Å ¹× GE Àû¿ë
+            // íƒˆì§„ ìƒíƒœ í•´ì œ ë° GE ì ìš©
             FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
             AbilitySystemComponent->RemoveLooseGameplayTag(ExhaustedTag);
-            
+
             AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-                
+
             CurrentStimCount--;
             OnStimChanged.Broadcast(CurrentStimCount, MaxStimCount);
 
-            // ÁÖ»ç±â È¿°úÀ½
+            // ì£¼ì‚¬ê¸° íš¨ê³¼ìŒ
             if (StimSound)
             {
                 UGameplayStatics::PlaySoundAtLocation(this, StimSound, GetActorLocation());
             }
         }
     }
-    
+
     OnStimChanged.Broadcast(CurrentStimCount, MaxStimCount);
 }
 
@@ -948,18 +963,18 @@ void AFPSCharacter::OnStimCompleted()
 void AFPSCharacter::OnFireStarted()
 {
     if (bIsDead) return;
-    
+
     bFireButtonDown = true;
-    
+
     if (!bIsAiming) return;
-    
+
     if (bIsStratagemReady)
     {
         ThrowBeacon();
         return;
     }
 
-    // GAS : ÀÔ·Â ID¸¦ ÅëÇØ »ç°İ ¾îºô¸®Æ¼ ½ÇÇà
+    // GAS : ì…ë ¥ IDì— ë”°ë¥¸ ì‚¬ê²© ì–´ë¹Œë¦¬í‹° ì‹œì‘
     if (AbilitySystemComponent)
     {
         AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Fire));
@@ -968,10 +983,10 @@ void AFPSCharacter::OnFireStarted()
 
 void AFPSCharacter::StartFiring()
 {
-    // Ã¹ ¹ß Áï½Ã ¹ß»ç
+    // ì²« ë°œ ì¦‰ì‹œ ë°œì‚¬
     FireWeapon();
 
-    // FireRate¿¡ ¸ÂÃç ¹İº¹ Å¸ÀÌ¸Ó ¼³Á¤ (1.0 / 10.0 = 0.1ÃÊ °£°İ)
+    // FireRateì— ë”°ë¥¸ ë°˜ë³µ íƒ€ì´ë¨¸ ì„¤ì • (1.0 / 10.0 = 0.1ì´ˆ ê°„ê²©)
     float TimeBetweenShots = 1.0f / FireRate;
     GetWorldTimerManager().SetTimer(TimerHandle_AutomaticFire, this, &AFPSCharacter::FireWeapon, TimeBetweenShots, true);
 }
@@ -980,7 +995,7 @@ void AFPSCharacter::OnFireCompleted()
 {
     bFireButtonDown = false;
 
-    // GAS : ÀÔ·ÂÀÌ »ç¶óÁüÀ» ¾îºô¸®Æ¼¿¡ ¾Ë¸²
+    // GAS : ì…ë ¥ì´ í•´ì œëìŒì„ ì–´ë¹Œë¦¬í‹°ì— ì•Œë¦¼
     if (AbilitySystemComponent)
     {
         AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInputID::Fire));
@@ -1000,20 +1015,20 @@ void AFPSCharacter::StopFiring()
 void AFPSCharacter::Reload()
 {
     if (bIsDead) return;
-    
+
     if (CurrentAmmo >= MaxAmmoInMag || CurrentMagCount <= 0 || bIsReloading || bIsThrowingGrenade || bIsUsingStim) return;
-    
+
     if (bSprintButtonDown)
     {
         GetCharacterMovement()->MaxWalkSpeed = SprintWalkSpeed;
     }
-    
+
     bIsReloading = true;
 
     // GAS Reload
     if (AbilitySystemComponent)
     {
-        // ÀÔ·Â ID¸¦ ÅëÇÑ ½ÇÇà (¹Ì¸® Á¤ÀÇÇÑ EAbilityInputID::Reload »ç¿ë)
+        // ì…ë ¥ IDì— ë”°ë¥¸ ì‹œì‘ (ë¯¸ë¦¬ ë“±ë¡ëœ EAbilityInputID::Reload ì‚¬ìš©)
         AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Reload));
     }
 }
@@ -1021,13 +1036,13 @@ void AFPSCharacter::Reload()
 void AFPSCharacter::FinishReload()
 {
     bIsReloading = false;
-    
+
     if (bIsAiming)
     {
-        // Á¶ÁØ ¼Óµµ Àû¿ë
+        // ì¡°ì¤€ ì†ë„ ì ìš©
         GetCharacterMovement()->MaxWalkSpeed = AimWalkSpeed;
 
-        // ÀçÀåÀüÀÌ ³¡³¯À» ¶§ ¹öÆ° ´©¸£°íÀÖÀ¸¸é ¹Ù·Î »ç°İ
+        // ì¬ì¥ì „ì´ ëë‚¬ì„ ë•Œ ë²„íŠ¼ ëˆŒë ¤ìˆìœ¼ë©´ ë°”ë¡œ ì‚¬ê²©
         if (bFireButtonDown && AbilitySystemComponent)
         {
             AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInputID::Fire));
@@ -1042,14 +1057,14 @@ void AFPSCharacter::FinishReload()
     {
         GetCharacterMovement()->MaxWalkSpeed = NormalWalkSpeed;
     }
-    
-    OnAmmoChanged.Broadcast(CurrentAmmo, CurrentMagCount, MaxMagCount);    
+
+    OnAmmoChanged.Broadcast(CurrentAmmo, CurrentMagCount, MaxMagCount);
 }
 
 
 void AFPSCharacter::ResetRotationMode()
 {
-    // Á¶ÁØ ÁßÀÌ ¾Æ´Ï°í »ç°İ ¹öÆ°À» ¶¼¼­ Å¸ÀÌ¸Ó°¡ ³¡³­ ½ÃÁ¡ÀÏ ¶§¸¸ º¹±¸
+    // ì¡°ì¤€ ìƒíƒœ ì•„ë‹ˆê³  ì—ì„ ë²„íŠ¼ì´ ë–¨ì–´ì§„ íƒ€ì´ë°ì— íšŒì „ ë°©ì‹ ë³µì›
     if (!bIsAiming)
     {
         bUseControllerRotationYaw = false;
@@ -1058,9 +1073,9 @@ void AFPSCharacter::ResetRotationMode()
 }
 
 void AFPSCharacter::OnAimStarted_Implementation()
-{   
+{
     if (bIsDead) return;
-    
+
     bAimButtonDown = true;
     bIsAiming = true;
 
@@ -1068,7 +1083,7 @@ void AFPSCharacter::OnAimStarted_Implementation()
     if (AbilitySystemComponent)
     {
         AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Aim));
-    }    
+    }
 }
 
 void AFPSCharacter::OnAimCompleted_Implementation()
@@ -1090,8 +1105,8 @@ void AFPSCharacter::OnAimCompleted_Implementation()
 
 void AFPSCharacter::FireWeapon()
 {
-    // ThirdPersonCamera¸¦ »ç°İÀÇ ±âÁØÀ¸·Î »ç¿ë
-    if (!ThirdPersonCamera || !CurrentWeaponData) return;    
+    // ThirdPersonCameraë¥¼ ê¸°ë°˜ìœ¼ë¡œ ë¼ì¸íŠ¸ë ˆì´ìŠ¤ ì‹œì‘
+    if (!ThirdPersonCamera || !CurrentWeaponData) return;
 
     FVector Start = ThirdPersonCamera->GetComponentLocation();
     FVector ForwardVector = ThirdPersonCamera->GetForwardVector();
@@ -1099,7 +1114,7 @@ void AFPSCharacter::FireWeapon()
 
     FHitResult HitResult;
     FCollisionQueryParams Params;
-    Params.AddIgnoredActor(this); // ÀÚ½ÅÀº ¸ÂÁö ¾ÊÀ½
+    Params.AddIgnoredActor(this); // ìì‹ ì€ ë¬´ì‹œ ì²˜ë¦¬
 
     bool bHit = GetWorld()->LineTraceSingleByChannel(
         HitResult,
@@ -1111,10 +1126,10 @@ void AFPSCharacter::FireWeapon()
 
     if (APlayerController* PC = Cast<APlayerController>(GetController()))
     {
-        // À§·Î Æ¢´Â ¹İµ¿ (Pitch´Â À½¼ö °ªÀÌ À§·Î ¿Ã¶ó°¨)
+        // ìœ„ë¡œ íŠ€ëŠ” ë°˜ë™ (Pitchê°€ ìŒìˆ˜ë©´ í™”ë©´ì´ ìœ„ë¡œ ì˜¬ë¼ê°)
         AddControllerPitchInput(-RecoilPitch);
 
-        // ÁÂ¿ì·Î ¹«ÀÛÀ§ÇÏ°Ô Èçµé¸®´Â ¹İµ¿
+        // ì¢Œìš°ë¡œ ëœë¤í•˜ê²Œ í”ë“¤ë¦¬ëŠ” ë°˜ë™
         float RandomYaw = FMath::FRandRange(-RecoilYaw, RecoilYaw);
         AddControllerYawInput(RandomYaw);
     }
@@ -1124,7 +1139,7 @@ void AFPSCharacter::FireWeapon()
         FVector MuzzleLocation = WeaponMesh->GetSocketLocation(TEXT("MuzzleSocket"));
         FRotator MuzzleRotation = WeaponMesh->GetSocketRotation(TEXT("MuzzleSocket"));
 
-        // È­¸é Á¤Áß¾Ó(¿¡ÀÓ)ÀÌ °¡¸®Å°´Â ½ÇÁ¦ ¿ùµå ÁÂÇ¥¸¦ Ã£±â À§ÇØ ¶óÀÎ Æ®·¹ÀÌ½º »ç¿ë
+        // í™”ë©´ ì •ì¤‘ì•™(ì¡°ì¤€ì )ì´ ê°€ë¦¬í‚¤ëŠ” ì›”ë“œ ì¢Œí‘œë¥¼ ì°¾ê¸° ìœ„í•´ ë¼ì¸ íŠ¸ë ˆì´ìŠ¤ ì‚¬ìš©
         FVector LookAtLocation;
         FVector CameraLocation = ThirdPersonCamera->GetComponentLocation();
         FVector CameraForward = ThirdPersonCamera->GetForwardVector();
@@ -1134,17 +1149,17 @@ void AFPSCharacter::FireWeapon()
         FCollisionQueryParams QueryParams;
         QueryParams.AddIgnoredActor(this);
 
-        // Ä«¸Ş¶ó Á¤¸éÀ¸·Î ¹«¾ùÀÌ ÀÖ´ÂÁö È®ÀÎ
+        // ì¹´ë©”ë¼ ë°©í–¥ìœ¼ë¡œ ë¬¼ì²´ê°€ ìˆëŠ”ì§€ í™•ì¸
         if (GetWorld()->LineTraceSingleByChannel(AimHitResult, CameraLocation, TraceEnd, ECC_Visibility, QueryParams))
         {
-            LookAtLocation = AimHitResult.ImpactPoint; // ºÎµúÈù °÷
+            LookAtLocation = AimHitResult.ImpactPoint; // ë¶€ë”ªíŒ ì 
         }
         else
         {
-            LookAtLocation = TraceEnd; // Çã°øÀÏ °æ¿ì ¾ÆÁÖ ¸Õ °÷
+            LookAtLocation = TraceEnd; // ì—†ìœ¼ë©´ ìµœëŒ€ ì‚¬ì •ê±°ë¦¬ ë ì 
         }
 
-        // ÃÑ±¸¿¡¼­ '¿¡ÀÓÀÌ °¡¸®Å°´Â ÁöÁ¡'À» ¹Ù¶óº¸´Â È¸Àü°ª °è»ê
+        // ì´êµ¬ì—ì„œ 'ì¡°ì¤€ì ì´ ê°€ë¦¬í‚¤ëŠ” ìœ„ì¹˜'ë¥¼ ë°”ë¼ë³´ëŠ” íšŒì „ê°’ ê³„ì‚°
         FRotator TargetRotation = (LookAtLocation - MuzzleLocation).Rotation();
 
         FActorSpawnParameters ActorSpawnParams;
@@ -1152,7 +1167,7 @@ void AFPSCharacter::FireWeapon()
         ActorSpawnParams.Owner = this;
         ActorSpawnParams.Instigator = this;
 
-        // ÃÑ±¸ È­¿° ½ºÆù
+        // ì´êµ¬ í™”ì—¼ ìƒì„±
         if (MuzzleFlashFX)
         {
             UNiagaraFunctionLibrary::SpawnSystemAtLocation(
@@ -1163,7 +1178,7 @@ void AFPSCharacter::FireWeapon()
             );
         }
 
-        // »ç°İ »ç¿îµå
+        // ë°œì‚¬ ì‚¬ìš´ë“œ
         if (CurrentWeaponData->FireSound)
         {
             UGameplayStatics::PlaySoundAtLocation(this, CurrentWeaponData->FireSound, GetActorLocation());
@@ -1172,47 +1187,47 @@ void AFPSCharacter::FireWeapon()
         APlayerController* PC = Cast<APlayerController>(GetController());
         if (PC && FireCameraShakeClass)
         {
-            //Ä«¸Ş¶ó Èçµé±â
+            // ì¹´ë©”ë¼ ì…°ì´í¬
             PC->ClientStartCameraShake(FireCameraShakeClass);
         }
-                
-        // ¼ÒÀ½
+
+        // ì†ŒìŒ
         if (CurrentWeaponData)
         {
             UAISense_Hearing::ReportNoiseEvent(
-                GetWorld(), 
-                GetActorLocation(), 
+                GetWorld(),
+                GetActorLocation(),
                 CurrentWeaponData->Loudness,
                 this,
                 0.0f,
                 FName(TEXT("Noise"))
             );
         }
-         
-        // ÃÖÁ¾ ¹ß»ç
+
+        // íˆ¬ì‚¬ì²´ ë°œì‚¬
         GetWorld()->SpawnActor<AHDProjectile>(CurrentWeaponData->ProjectileClass, MuzzleLocation, TargetRotation, ActorSpawnParams);
 
         CurrentAmmo--;
 
         OnAmmoChanged.Broadcast(CurrentAmmo, CurrentMagCount, MaxMagCount);
     }
-    
-    // Fire ¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı ·ÎÁ÷ Ãß°¡
+
+    // Fire ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ ë¡œì§ ì¶”ê°€
     if (CurrentWeaponData && CurrentWeaponData->FireMontage)
     {
         UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
         if (AnimInstance)
         {
-            // ¹ß»ç °£°İ °è»ê 
-            float FireInterval = 1.0f / FireRate; 
+            // ë°œì‚¬ ê°„ê²© ê³„ì‚°
+            float FireInterval = 1.0f / FireRate;
 
-            // ¸ùÅ¸ÁÖÀÇ ½ÇÁ¦ ±æÀÌ °¡Á®¿À±â
+            // ëª½íƒ€ì£¼ì˜ ì›ë˜ ê¸¸ì´ ê°€ì ¸ì˜¤ê¸°
             float MontageLength = CurrentWeaponData->FireMontage->GetPlayLength();
 
-            // Àç»ı ¼Óµµ(PlayRate) °è»ê
+            // ì¬ìƒ ì†ë„(PlayRate) ê³„ì‚°
             float CalculatedPlayRate = MontageLength / FireInterval;
 
-            // °è»êµÈ ¼Óµµ·Î Àç»ı
+            // ê³„ì‚°ëœ ì†ë„ë¡œ ì¬ìƒ
             AnimInstance->Montage_Play(CurrentWeaponData->FireMontage, CalculatedPlayRate);
         }
     }
@@ -1224,29 +1239,29 @@ void AFPSCharacter::ThrowBeacon()
 
     FStratagemData& ActiveData = StratagemList[ActiveStratagemIndex];
 
-    // ½ºÅÃÇüÀÎ °æ¿ì Ã¼Å©
+    // ìŠ¤íƒë°©ì‹ì¼ ë•Œ ì²´í¬
     if (ActiveData.bUseStack)
     {
         if (ActiveData.CurrentStack > 0)
         {
             ActiveData.CurrentStack--;
-            
-            // ¸¶Áö¸· ½ºÅÃÀ» ´Ù ½èÀ» ¶§¸¸ ÀÚµ¿À¸·Î Àç¹«Àå ½ÃÀÛ
+
+            // ë§ˆì§€ë§‰ ìŠ¤íƒì„ ì“´ ê²½ìš° ë‹¤ìŒ ì¿¨íƒ€ì„ì€ ìë™ìœ¼ë¡œ ì¬ë¬´ì¥ ì‹œì‘
             if (ActiveData.CurrentStack <= 0)
             {
                 ActiveData.bIsOnCooldown = true;
                 ActiveData.bIsRearming = true;
                 ActiveData.CurrentCooldown = ActiveData.MaxCooldown;
             }
-            else 
+            else
             {
-                // ½ºÅÃÀÌ ³²¾ÆÀÖÀ¸¸é ÄğÅ¸ÀÓÀ» µ¹¸®Áö ¾ÊÀ½
+                // ìŠ¤íƒì´ ë‚¨ì•„ìˆìœ¼ë©´ ì¿¨íƒ€ì„ì€ ì ìš©í•˜ì§€ ì•ŠìŒ
                 ActiveData.bIsOnCooldown = false;
                 ActiveData.CurrentCooldown = 0.0f;
             }
         }
     }
-    else // ÀÏ¹İ ½ºÆ®¶óÅ¸Áª
+    else // ì¼ë°˜ ìŠ¤íŠ¸ë¼íƒ€ì ¬
     {
         ActiveData.bIsOnCooldown = true;
         ActiveData.CurrentCooldown = ActiveData.MaxCooldown;
@@ -1260,7 +1275,7 @@ void AFPSCharacter::ThrowBeacon()
     SpawnParams.Owner = this;
     SpawnParams.Instigator = GetInstigator();
 
-    // ºñÄÁ ½ºÆù
+    // ë¹„ì½˜ ìƒì„±
     AStratagemBeacon* SpawnedBeacon = GetWorld()->SpawnActor<AStratagemBeacon>(
         BeaconClass,
         SpawnLocation,
@@ -1268,7 +1283,7 @@ void AFPSCharacter::ThrowBeacon()
         SpawnParams
     );
     /*
-    // ¼º°øÀûÀ¸·Î ½ºÆùµÇ¾ú´Ù¸é ¼³Á¤ Àû¿ë
+    // ì •ìƒì ìœ¼ë¡œ ìƒì„±ë˜ì—ˆë‹¤ë©´ ì¿¨íƒ€ì„ ì‹œì‘
     if (SpawnedBeacon && StratagemList.IsValidIndex(ActiveStratagemIndex))
     {
         StratagemList[ActiveStratagemIndex].bIsOnCooldown = true;
@@ -1296,50 +1311,50 @@ void AFPSCharacter::ThrowBeacon()
             ProjectileComp->Velocity = ControlRot.Vector() * ThrowForce;
         }
     }
-    
-    // »óÅÂ ÃÊ±âÈ­
+
+    // ìƒíƒœ ì´ˆê¸°í™”
     CurrentInputStack.Empty();
     bIsStratagemReady = false;
     bIsSelectingStratagem = false;
     //CurrentCommandStep = 0;
 
-    // UI ÃÊ±âÈ­ ½ÅÈ£ (ºó ½ºÅÃ Àü¼Û)
+    // UI ì´ˆê¸°í™” ì‹ í˜¸ (ë¹ˆ ìŠ¤íƒ ì „ë‹¬)
     OnStratagemStackUpdated.Broadcast(CurrentInputStack);
 }
 
 void AFPSCharacter::OnStratagemMenuAction(const FInputActionValue& Value)
 {
     if (bIsThrowingGrenade || bIsUsingStim) return;
-    
+
     bIsSelectingStratagem = !bIsSelectingStratagem;
 
     if (bIsSelectingStratagem)
     {
-        CurrentCommandStep = 0;   
+        CurrentCommandStep = 0;
         OnStratagemStepUpdated.Broadcast(CurrentCommandStep);
         OnStratagemMenuOpened.Broadcast(CanEagleRearm());
     }
     else
     {
-        // ¸Ş´º¸¦ ´İÀ» ¶§ ÀÔ·Â ½ºÅÃ ÃÊ±âÈ­
+        // ë©”ë‰´ê°€ ë‹«í ë•Œ ì…ë ¥ ìƒíƒœ ì´ˆê¸°í™”
         CurrentInputStack.Empty();
         bIsStratagemReady = false;
 
-        // UI¿¡ ºó ½ºÅÃÀ» º¸³»¼­ È­»ìÇ¥µéÀ» ´Ù½Ã È¸»öÀ¸·Î ¸¸µê
+        // UIì— ë¹ˆ ìŠ¤íƒì„ ì „ë‹¬í•´ í™”ì‚´í‘œë“¤ì´ ë‹¤ì‹œ íšŒìƒ‰ìœ¼ë¡œ ë³€ê²½
         OnStratagemStackUpdated.Broadcast(CurrentInputStack);
 
         if (!bIsStratagemReady)
         {
             CurrentCommandStep = 0;
             OnStratagemStepUpdated.Broadcast(CurrentCommandStep);
-        }        
+        }
     }
 }
 
 void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
-{    
+{
     if (!bIsSelectingStratagem || bIsStratagemReady) return;
-        
+
     bool bAnyValidStratagemAvailable = false;
     for (const FStratagemData& Data : StratagemList)
     {
@@ -1350,14 +1365,14 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
         }
     }
 
-    // ¸ğµÎ ÄğÅ¸ÀÓÁßÀÌ¸é return
+    // ëª¨ë‘ ì¿¨íƒ€ì„ì´ë©´ return
     if (!bAnyValidStratagemAvailable) return;
 
-    FVector2D InputValue = Value.Get<FVector2D>();    
-    
+    FVector2D InputValue = Value.Get<FVector2D>();
+
     EStratagemDirection DetectedDir = EStratagemDirection::None;
 
-    // Vector2D °ªÀ» ºĞ¼®ÇÏ¿© ¹æÇâ °áÁ¤
+    // Vector2D ê°’ì„ ë¶„ì„í•˜ì—¬ ë°©í–¥ íŒë‹¨
     if (InputValue.Y > 0.5f) DetectedDir = EStratagemDirection::Up;
     else if (InputValue.Y < -0.5f) DetectedDir = EStratagemDirection::Down;
     else if (InputValue.X < -0.5f) DetectedDir = EStratagemDirection::Left;
@@ -1365,22 +1380,22 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
 
     if (DetectedDir == EStratagemDirection::None) return;
 
-    // ÀÔ·Â ½ºÅÃ¿¡ Ãß°¡
+    // ì…ë ¥ ìŠ¤íƒì— ì¶”ê°€
     CurrentInputStack.Add(DetectedDir);
 
     bool bAnyMatchFound = false;
     int32 CompletedIndex = -1;
 
-    // ¸ğµç ½ºÆ®¶óÅ¸Áª Á¶»ç
+    // ëª¨ë“  ìŠ¤íŠ¸ë¼íƒ€ì ¬ ìˆœíšŒ
     for (int32 i = 0; i < StratagemList.Num(); ++i)
     {
-        // ÄğÅ¸ÀÓÀÌ¸é continue
+        // ì¿¨íƒ€ì„ì´ë©´ continue
         if (StratagemList[i].bIsOnCooldown) continue;
 
         const TArray<EStratagemDirection>& TargetCommand = StratagemList[i].Command;
         bool bIsStillValid = true;
 
-        // ÀÔ·ÂÇÑ ±æÀÌ¸¸Å­ ´ëÁ¶
+        // ì…ë ¥ëœ ê¸¸ì´ë§Œí¼ ë¹„êµ
         for (int32 j = 0; j < CurrentInputStack.Num(); ++j)
         {
             if (j >= TargetCommand.Num() || CurrentInputStack[j] != TargetCommand[j])
@@ -1393,7 +1408,7 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
         if (bIsStillValid)
         {
             bAnyMatchFound = true;
-            // ¿ÏÀüÈ÷ ³¡±îÁö ¸ÂÃè´ÂÁö È®ÀÎ
+            // ì™„ì „íˆ ì¼ì¹˜í•˜ëŠ” ì»¤ë§¨ë“œì¸ì§€ í™•ì¸
             if (CurrentInputStack.Num() == TargetCommand.Num())
             {
                 CompletedIndex = i;
@@ -1401,17 +1416,18 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
         }
     }
 
-    // °á°ú Ã³¸®
-    if (CompletedIndex != -1) // ÃÖÁ¾ ¿Ï¼º
+    // ê²°ê³¼ ì²˜ë¦¬
+    if (CompletedIndex != -1) // ì»¤ë§¨ë“œ ì™„ì„±
     {
         FStratagemData& Selected = StratagemList[CompletedIndex];
 
-        // Àç¹«Àå Ä¿¸ÇµåÀÎ °æ¿ì
+        // ì¬ë¬´ì¥ ì»¤ë§¨ë“œì¼ ê²½ìš°
         if (Selected.Type == EStratagemType::Rearm)
         {
             if (CanEagleRearm())
             {
-                for (FStratagemData& Data : StratagemList)  // ½ºÅÃÇü ½ºÆ®¶óÅ¸Àë ½ºÅÃÀ» 0À¸·Î ¹Ù²Ù°í Äğ´Ù¿î»óÅÂ·Î
+                // ìŠ¤íƒì„ ì“°ëŠ” ìŠ¤íŠ¸ë¼íƒ€ì ¬ ìŠ¤íƒì„ 0ìœ¼ë¡œ ë°”ê¾¸ê³  ì¿¨ë‹¤ìš´ìƒíƒœë¡œ
+                for (FStratagemData& Data : StratagemList)
                 {
                     if (Data.bUseStack && Data.CurrentStack < Data.MaxStack && Data.CurrentStack != 0)
                     {
@@ -1420,39 +1436,40 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
                         Data.bIsRearming = true;
                         Data.CurrentCooldown = Data.MaxCooldown;
                         if (StratagemCompleteSound) UGameplayStatics::PlaySound2D(this, StratagemCompleteSound);
-                        
-                        if (EagleRearmSound)    // ÀÌ±Û ÀçÀåÀü º¸ÀÌ½º
+
+                        // ì´ê¸€ ì¬ë¬´ì¥ ë³´ì´ìŠ¤
+                        if (EagleRearmSound)
                         {
                             UGameplayStatics::PlaySoundAtLocation(this, EagleRearmSound, GetActorLocation());
-                            OnSoundPlayed.Broadcast(FName("Eagle_Rearm")); // ÀÚ¸·
+                            OnSoundPlayed.Broadcast(FName("Eagle_Rearm")); // ìë§‰
                         }
                     }
                 }
-                // Àç¹«Àå ¸í·ÉÀº Áï½Ã ¼º°ø Ã³¸®                
+                // ì¬ë¬´ì¥ ì™„ë£Œì‹œ ìƒíƒœ ì •ë¦¬ ì²˜ë¦¬
                 CurrentInputStack.Empty();
                 bIsSelectingStratagem = false;
                 bIsSelectingStratagem = false;
-                
+
                 OnStratagemStackUpdated.Broadcast(CurrentInputStack);
                 return;
             }
             else
             {
-                // Á¶°ÇÀÌ ¾È ¸ÂÀ¸¸é ¿ÀÀÔ·Â Ã³¸®ÇÏ°Å³ª ¹«½Ã
+                // ì¬ë¬´ì¥ í•  ìˆ˜ ì—†ìœ¼ë©´ ë¬´ì…ë ¥ ì²˜ë¦¬í•˜ê±°ë‚˜ ë¬´ì‹œ
                 CurrentInputStack.Empty();
                 if (StratagemErrorSound) UGameplayStatics::PlaySound2D(this, StratagemErrorSound);
             }
         }
         else
         {
-            // ÀÏ¹İ ½ºÆ®¶óÅ¸Áª
+            // ì¼ë°˜ ìŠ¤íŠ¸ë¼íƒ€ì ¬
             if (StratagemCompleteSound) UGameplayStatics::PlaySound2D(this, StratagemCompleteSound);
             ActiveStratagemIndex = CompletedIndex;
             bIsStratagemReady = true;
-            
+
         }
     }
-    else if (!bAnyMatchFound) // ÇÏ³ª¶óµµ ¸Â´Â °Ô ¾øÀ¸¸é ¸®¼Â
+    else if (!bAnyMatchFound) // í•˜ë‚˜ë„ ë§ëŠ” ê²Œ ì—†ìœ¼ë©´ ì´ˆê¸°í™”
     {
         CurrentInputStack.Empty();
 
@@ -1469,6 +1486,20 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
         }
     }
 
-    // UI¿¡ ÇöÀç ÀÔ·Â »óÅÂ Àü´Ş    
+    // UIì— í˜„ì¬ ì…ë ¥ ìƒíƒœ ì „ë‹¬
     OnStratagemStackUpdated.Broadcast(CurrentInputStack);
+}
+
+void AFPSCharacter::ToggleMinimap()
+{
+    if (!MinimapWidget) return;
+
+    if (MinimapWidget->GetVisibility() == ESlateVisibility::Visible)
+    {
+        MinimapWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+    else
+    {
+        MinimapWidget->SetVisibility(ESlateVisibility::Visible);
+    }
 }

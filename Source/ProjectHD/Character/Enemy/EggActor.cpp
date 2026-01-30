@@ -5,28 +5,25 @@
 AEggActor::AEggActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	
+
 	MaxHealth = 50.f;
 	CurrentHealth = MaxHealth;
-	
+
+	// EggMesh를 CapsuleComponent에 붙임
 	EggMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("EggMesh"));
-	RootComponent = EggMesh;
-	
-	UCapsuleComponent* ParentCapsule = GetCapsuleComponent();
-	if (ParentCapsule)
-	{
-		// 충돌을 완전히 끔
-		ParentCapsule->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		ParentCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
-		// 물리 연산에서 제외
-		ParentCapsule->SetCanEverAffectNavigation(false);
-		// 에디터에서 안 보이게 아주 작게 만듦
-		ParentCapsule->SetCapsuleSize(1.f, 1.f);
-	}
-	
-	// 실제 피격 판정
-	EggMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	EggMesh->SetCollisionResponseToAllChannels(ECR_Block);
+	EggMesh->SetupAttachment(GetCapsuleComponent());
+
+	// 캡슐 크기 설정 (에그 크기에 맞게 조정)
+	GetCapsuleComponent()->InitCapsuleSize(50.f, 50.f);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Block);
+
+	// EggMesh 콜리전은 끄고 캡슐로 판정
+	EggMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// ACharacter 기본 SkeletalMesh 숨기기
+	GetMesh()->SetVisibility(false);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AEggActor::BeginPlay()

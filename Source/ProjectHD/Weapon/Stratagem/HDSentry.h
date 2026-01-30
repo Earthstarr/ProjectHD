@@ -84,11 +84,15 @@ protected:
 private:
     bool bIsDeployed = false;  // 사격 가능 상태
     bool bIsDeploying = false; // 기둥 올라오는 중
-    
+
     UPROPERTY()
     AActor* CurrentTarget = nullptr;
 
     FTimerHandle FireTimerHandle;
+    FTimerHandle SearchTimerHandle;  // 적 탐색 타이머
+
+    // 히트 결과 캐싱 (매번 할당 방지)
+    TArray<FHitResult> CachedHitResults;
 
     void FindNearestEnemy();
     void RotateToTarget(float DeltaTime);
