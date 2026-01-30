@@ -72,6 +72,16 @@ AFPSCharacter::AFPSCharacter()
 
     // 네비 인보커
     NavInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("NavInvoker"));
+    
+    // 문제가 되는 물리 및 에셋 로드 관련 설정을 이 조건문 안에 넣기
+    if (!HasAnyFlags(RF_ClassDefaultObject))
+    {
+        // 웨폰 메시의 물리 처리를 생성자 시점에서 하지 않도록 방어
+        if (WeaponMesh)
+        {
+            WeaponMesh->bApplyImpulseOnDamage = false;
+        }
+    }
 }
 
 UAbilitySystemComponent* AFPSCharacter::GetAbilitySystemComponent() const

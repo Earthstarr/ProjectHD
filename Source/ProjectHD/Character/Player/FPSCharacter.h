@@ -25,6 +25,7 @@ enum class EStratagemDirection : uint8
 UENUM(BlueprintType)
 enum class EStratagemType : uint8
 {
+    None,
     Bomb500kg,
     Supply,
     EagleCluster,
@@ -44,16 +45,16 @@ struct FStratagemData
 
     // 스트라타젬 아이콘 이미지
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stratagem")
-    class UTexture2D* Icon;
+    class UTexture2D* Icon = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     TArray<EStratagemDirection> Command;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    FLinearColor BeaconColor;
+    FLinearColor BeaconColor = FLinearColor::White;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    EStratagemType Type;
+    EStratagemType Type= EStratagemType::None;
 
     // 쿨타임 설정 (총 시간)
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -88,20 +89,21 @@ struct FWeaponInstance
     GENERATED_BODY()
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    UWeaponDataAsset* WeaponData;
+    UWeaponDataAsset* WeaponData = nullptr;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 CurrentAmmoCount;
+    int32 CurrentAmmoCount = 0;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
-    int32 CurrentMagCount;
+    int32 CurrentMagCount = 0;
 
     FWeaponInstance() : WeaponData(nullptr), CurrentAmmoCount(0), CurrentMagCount(0) {}
+    
     FWeaponInstance(UWeaponDataAsset* Data)
     {
         WeaponData = Data;
-        CurrentAmmoCount = Data->MaxAmmoInMag;
-        CurrentMagCount = Data->MaxMag;
+        CurrentAmmoCount = Data ? Data->MaxAmmoInMag : 0; // Data가 null일 경우 방어 코드
+        CurrentMagCount = Data ? Data->MaxMag : 0;
     }
 };
 
