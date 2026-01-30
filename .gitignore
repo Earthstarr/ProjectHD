@@ -377,3 +377,20 @@ Build/
 *.suo
 *.opensdf
 *.VC.db
+
+# 패키징 결과물 및 빌드 폴더 (26GB의 주범일 가능성 높음)
+ArchivedBuilds/
+Builds/
+Package/
+StagedBuilds/
+
+# 소스코드 컴파일 시 생성되는 대용량 디버그 파일
+*.pdb
+*.obj
+*.ilk
+*.exp
+*.lib
+
+# 기타 언리얼 임시 파일
+.ignore
+DerivedDataCache/
