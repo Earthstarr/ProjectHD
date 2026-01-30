@@ -28,6 +28,9 @@ AHDSentry::AHDSentry()
     // 터렛
     TurretMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TurretMesh"));
     TurretMesh->SetupAttachment(PillarMesh);
+
+    // 히트 결과 배열 미리 할당
+    CachedHitResults.Reserve(50);
 }
 
 void AHDSentry::BeginPlay()
@@ -76,18 +79,17 @@ void AHDSentry::Tick(float DeltaTime)
         }
     }
 
-    // 전개 완료 후 적 추적 및 회전
+    // 전개 완료 후 적 추적 및 회전 (FindNearestEnemy는 타이머로 별도 호출)
     if (bIsDeployed)
     {
-        FindNearestEnemy();
-
-        if (CurrentTarget)
+        if (CurrentTarget && !Cast<AEnemyBase>(CurrentTarget)->bIsDead)
         {
             RotateToTarget(DeltaTime);
         }
         else
         {
-            // 타겟 없으면 사격 중지
+            // 타겟 없거나 죽었으면 사격 중지
+            CurrentTarget = nullptr;
             GetWorldTimerManager().ClearTimer(FireTimerHandle);
         }
     }
@@ -96,40 +98,60 @@ void AHDSentry::Tick(float DeltaTime)
 // 시야에서 보이면서 가장 가까운 적 찾기
 void AHDSentry::FindNearestEnemy()
 {
-    TArray<FHitResult> OutHits;
+    // 현재 타겟이 유효하고 살아있으면 유지
+    if (IsValid(CurrentTarget))
+    {
+        if (AEnemyBase* Enemy = Cast<AEnemyBase>(CurrentTarget))
+        {
+            if (!Enemy->bIsDead)
+            {
+                float DistSquared = FVector::DistSquared(GetActorLocation(), Enemy->GetActorLocation());
+                if (DistSquared < DetectionRadius * DetectionRadius)
+                {
+                    return; // 기존 타겟 유지
+                }
+            }
+        }
+    }
+
+    // 새 타겟 찾기
+    CachedHitResults.Reset();
     FVector MyLoc = GetActorLocation();
-    FVector MuzzleLoc = TurretMesh->GetSocketLocation(TEXT("Muzzle")); // 시야 체크 시작점
+    FVector MuzzleLoc = TurretMesh->GetSocketLocation(TEXT("Muzzle"));
     FCollisionShape DetectionSphere = FCollisionShape::MakeSphere(DetectionRadius);
-    
+
+    FCollisionQueryParams QueryParams;
+    QueryParams.AddIgnoredActor(this);
+
     // Pawn 채널에서 주변 모든 적 탐색
-    bool bHit = GetWorld()->SweepMultiByChannel(OutHits, MyLoc, MyLoc, FQuat::Identity, ECC_Pawn, DetectionSphere);
+    bool bHit = GetWorld()->SweepMultiByChannel(CachedHitResults, MyLoc, MyLoc, FQuat::Identity, ECC_Pawn, DetectionSphere, QueryParams);
 
     AActor* BestTarget = nullptr;
-    float MinDist = DetectionRadius;
+    float MinDistSquared = DetectionRadius * DetectionRadius;
 
     if (bHit)
     {
-        for (auto& Hit : OutHits)
-        {            
+        for (const FHitResult& Hit : CachedHitResults)
+        {
             AEnemyBase* FoundActor = Cast<AEnemyBase>(Hit.GetActor());
             if (FoundActor && FoundActor->ActorHasTag(TEXT("Enemy")) && !FoundActor->bIsDead)
             {
                 // 시야 체크
                 FVector TargetLoc = FoundActor->GetActorLocation();
                 FHitResult SightHit;
-                FCollisionQueryParams Params;
-                Params.AddIgnoredActor(this);
-                Params.AddIgnoredActor(FoundActor);
+                FCollisionQueryParams SightParams;
+                SightParams.AddIgnoredActor(this);
+                SightParams.AddIgnoredActor(FoundActor);
 
                 // 시야를 가리는 장애물이 있는지 확인
-                bool bIsBlocked = GetWorld()->LineTraceSingleByChannel(SightHit, MuzzleLoc, TargetLoc, ECC_Visibility, Params);
+                bool bIsBlocked = GetWorld()->LineTraceSingleByChannel(SightHit, MuzzleLoc, TargetLoc, ECC_Visibility, SightParams);
 
-                if (!bIsBlocked) // 장애물에 걸리지 않은 경우에만 타겟 후보로 등록
+                if (!bIsBlocked)
                 {
-                    float Dist = FVector::Dist(MyLoc, FoundActor->GetActorLocation());
-                    if (Dist < MinDist)
+                    float DistSquared = FVector::DistSquared(MyLoc, FoundActor->GetActorLocation());
+                    if (DistSquared < MinDistSquared)
                     {
-                        MinDist = Dist;
+                        MinDistSquared = DistSquared;
                         BestTarget = FoundActor;
                     }
                 }
@@ -231,7 +253,11 @@ void AHDSentry::Fire()
 void AHDSentry::OnDeployFinished()
 {
     bIsDeploying = false;
-    bIsDeployed = true; // 이제부터 Tick에서 타겟 탐색 시작
+    bIsDeployed = true;
+
+    // 0.25초마다 적 탐색 (매 틱 대신)
+    GetWorldTimerManager().SetTimer(SearchTimerHandle, this, &AHDSentry::FindNearestEnemy, 0.25f, true);
+    FindNearestEnemy(); // 첫 탐색 즉시 실행
 }
 
 void AHDSentry::StopFiringAndRetract()
@@ -241,11 +267,12 @@ void AHDSentry::StopFiringAndRetract()
     bIsRetracting = true;
     bIsDeployed = false; // 더 이상 적을 찾거나 회전하지 않음
 
-    // 사격 타이머 중지
+    // 타이머 중지
     GetWorldTimerManager().ClearTimer(FireTimerHandle);
+    GetWorldTimerManager().ClearTimer(SearchTimerHandle);
 
     // 블루프린트에 퇴각 애니메이션 시작 알림
-    StartRetractSequence();    
+    StartRetractSequence();
 }
 
 void AHDSentry::OnRetractFinished()

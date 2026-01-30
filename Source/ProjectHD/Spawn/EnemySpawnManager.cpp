@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
+#include "ProjectHD/Character/Enemy/EggActor.h"
 
 AEnemySpawnManager::AEnemySpawnManager()
 {
@@ -139,6 +140,9 @@ void AEnemySpawnManager::CheckEnemyDistances()
         
         // 미션 지역 적은 무시
         if (Enemy->bIsMissionSpawned) continue;
+        
+        // EggActor는 디스폰하지 않음
+        if (Cast<AEggActor>(Enemy)) continue;
         
         // 거리가 멀면 풀로 반환
         float DistanceSq = FVector::DistSquared(PlayerLoc, Enemy->GetActorLocation());        
