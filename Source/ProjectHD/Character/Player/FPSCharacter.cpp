@@ -22,6 +22,7 @@
 #include "Perception/AISense_Hearing.h"
 #include "NavigationInvokerComponent.h"
 #include "PodActor.h"
+#include "ProjectHD/Mission/DataLinkTerminal.h"
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -1363,6 +1364,25 @@ void AFPSCharacter::OnStratagemMenuAction(const FInputActionValue& Value)
 
 void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
 {
+    FVector2D InputValue = Value.Get<FVector2D>();
+
+    EStratagemDirection DetectedDir = EStratagemDirection::None;
+
+    // Vector2D 값을 분석하여 방향 판단
+    if (InputValue.Y > 0.5f) DetectedDir = EStratagemDirection::Up;
+    else if (InputValue.Y < -0.5f) DetectedDir = EStratagemDirection::Down;
+    else if (InputValue.X < -0.5f) DetectedDir = EStratagemDirection::Left;
+    else if (InputValue.X > 0.5f) DetectedDir = EStratagemDirection::Right;
+
+    if (DetectedDir == EStratagemDirection::None) return;
+
+    // 데이터 링크 터미널 입력 처리
+    if (ActiveDataLinkTerminal)
+    {
+        ActiveDataLinkTerminal->ProcessDirectionInput(DetectedDir);
+        return;
+    }
+
     if (!bIsSelectingStratagem || bIsStratagemReady) return;
 
     bool bAnyValidStratagemAvailable = false;
@@ -1377,18 +1397,6 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
 
     // 모두 쿨타임이면 return
     if (!bAnyValidStratagemAvailable) return;
-
-    FVector2D InputValue = Value.Get<FVector2D>();
-
-    EStratagemDirection DetectedDir = EStratagemDirection::None;
-
-    // Vector2D 값을 분석하여 방향 판단
-    if (InputValue.Y > 0.5f) DetectedDir = EStratagemDirection::Up;
-    else if (InputValue.Y < -0.5f) DetectedDir = EStratagemDirection::Down;
-    else if (InputValue.X < -0.5f) DetectedDir = EStratagemDirection::Left;
-    else if (InputValue.X > 0.5f) DetectedDir = EStratagemDirection::Right;
-
-    if (DetectedDir == EStratagemDirection::None) return;
 
     // 입력 스택에 추가
     CurrentInputStack.Add(DetectedDir);

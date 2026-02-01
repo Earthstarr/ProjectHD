@@ -34,6 +34,16 @@ void AMissionBase::CompleteMission()
 	{
 		MissionStatus = EMissionStatus::Completed;
 		OnMissionStatusChanged.Broadcast(MissionStatus);
+
+		// 미션 완료 사운드 및 자막
+		if (MissionCompleteSound)
+		{
+			UGameplayStatics::PlaySound2D(this, MissionCompleteSound);
+		}
+		if (!MissionCompleteSubtitleKey.IsNone())
+		{
+			OnSoundPlayed.Broadcast(MissionCompleteSubtitleKey);
+		}
 	}
 }
 

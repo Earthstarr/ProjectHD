@@ -51,7 +51,7 @@ void AOrbitalLaser::BeginPlay()
             0.0f,
             nullptr,
             nullptr,
-            true
+            false  // bAutoDestroy: false로 변경 - 가상화 시 파괴 방지
         );
     }
     

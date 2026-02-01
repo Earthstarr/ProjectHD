@@ -6,7 +6,7 @@ AEggActor::AEggActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	MaxHealth = 50.f;
+	MaxHealth = 10.f;
 	CurrentHealth = MaxHealth;
 
 	// EggMesh를 CapsuleComponent에 붙임
