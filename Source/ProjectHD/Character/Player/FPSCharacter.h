@@ -13,6 +13,7 @@
 class AHDProjectile;
 class UNiagaraSystem;
 class UGameplayEffect;
+class ADataLinkTerminal;
 
 // 스트라타젬 입력 화살표 방향
 UENUM(BlueprintType)
@@ -574,7 +575,11 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
     float MouseSensitivity = 0.3f;
-    
+
+    // 데이터 링크 터미널 (입력 처리용)
+    UPROPERTY()
+    ADataLinkTerminal* ActiveDataLinkTerminal = nullptr;
+
 protected:
     UPROPERTY(BlueprintReadWrite, Category = "Mesh")
     class USkeletalMeshComponent* WeaponMesh;
