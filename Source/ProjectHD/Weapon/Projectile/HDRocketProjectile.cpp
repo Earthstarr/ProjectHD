@@ -25,11 +25,11 @@ void AHDRocketProjectile::BeginPlay()
     // 0.1초마다 적 감지
     GetWorldTimerManager().SetTimer(ProximityCheckTimerHandle, this, &AHDRocketProjectile::CheckProximity, 0.1f, true, 0.3f);
     
-    // 4초 뒤에 폭발
+    // 3초 뒤에 폭발
     GetWorldTimerManager().SetTimer(
         ExplosionTimerHandle, 
         FTimerDelegate::CreateUObject(this, &AHDRocketProjectile::TriggerExplosion, FVector::ZeroVector, FVector::UpVector), 
-        4.0f, 
+        3.0f, 
         false
     );
 }

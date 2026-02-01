@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ProjectHD/SubtitleTypes.h"
 #include "MissionBase.generated.h"
 
 UENUM(BlueprintType)
@@ -52,6 +53,16 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Mission")
 	bool IsCompleted() const { return MissionStatus == EMissionStatus::Completed; }
+
+	// 미션 완료 시 사운드, 자막
+	UPROPERTY(EditAnywhere, Category = "Mission|Sound")
+	class USoundBase* MissionCompleteSound;
+
+	UPROPERTY(EditAnywhere, Category = "Mission|Sound")
+	FName MissionCompleteSubtitleKey;
+
+	UPROPERTY(BlueprintAssignable, Category = "Mission|Sound")
+	FOnSoundPlayedSignature OnSoundPlayed;	// 자막
 
 protected:
 	virtual void BeginPlay() override;
