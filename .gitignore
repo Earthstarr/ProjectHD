@@ -394,3 +394,4 @@ StagedBuilds/
 # 기타 언리얼 임시 파일
 .ignore
 DerivedDataCache/
+Plugins/Developer/RiderLink/Resources/Icon128.png
