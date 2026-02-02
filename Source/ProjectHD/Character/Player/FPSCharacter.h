@@ -580,6 +580,10 @@ public:
     UPROPERTY()
     ADataLinkTerminal* ActiveDataLinkTerminal = nullptr;
 
+    // 탈출 터미널 (입력 처리용)
+    UPROPERTY()
+    class AExtractionTerminal* ActiveExtractionTerminal = nullptr;
+
 protected:
     UPROPERTY(BlueprintReadWrite, Category = "Mesh")
     class USkeletalMeshComponent* WeaponMesh;
