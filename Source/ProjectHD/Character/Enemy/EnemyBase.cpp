@@ -61,17 +61,17 @@ void AEnemyBase::UpdateTickRate()
     float Distance = FVector::Dist(GetActorLocation(), CachedPlayer->GetActorLocation());
 
     // 거리별 틱 간격 조정
-    if (Distance < 2000.0f)
+    if (Distance < 1500.0f)
     {
         // 가까움: 매 프레임
         SetActorTickInterval(0.0f);
     }
-    else if (Distance < 5000.0f)
+    else if (Distance < 4000.0f)
     {
         // 중거리: 0.1초마다
         SetActorTickInterval(0.1f);
     }
-    else if (Distance < 8000.0f)
+    else if (Distance < 6000.0f)
     {
         // 원거리: 0.2초마다
         SetActorTickInterval(0.2f);

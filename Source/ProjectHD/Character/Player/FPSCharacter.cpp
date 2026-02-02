@@ -23,6 +23,7 @@
 #include "NavigationInvokerComponent.h"
 #include "PodActor.h"
 #include "ProjectHD/Mission/DataLinkTerminal.h"
+#include "ProjectHD/Mission/ExtractionTerminal.h"
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -1380,6 +1381,13 @@ void AFPSCharacter::OnStratagemInputAction(const FInputActionValue& Value)
     if (ActiveDataLinkTerminal)
     {
         ActiveDataLinkTerminal->ProcessDirectionInput(DetectedDir);
+        return;
+    }
+
+    // 탈출 터미널 입력 처리
+    if (ActiveExtractionTerminal)
+    {
+        ActiveExtractionTerminal->ProcessDirectionInput(DetectedDir);
         return;
     }
 

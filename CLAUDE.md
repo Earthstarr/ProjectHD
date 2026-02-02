@@ -29,9 +29,10 @@ Weapon/
 ├── Stratagem/  # AStratagemBeacon, AEagle, AHDSentry, AOrbitalLaser, AHDSupplyPod
 └── Projectile/ # HDProjectile, HDBombProjectile, HDRocketProjectile
 
-Mission/        # AMissionManager, AMissionBase, AEggDestructionMission
+Mission/        # AMissionManager, AMissionBase, AEggDestructionMission, ADataLinkMission, ADataLinkTerminal, AExtractionTerminal
 Spawn/          # AEnemyPoolManager, AEnemySpawnManager, ASpawnZone
 Effect/         # 카메라 쉐이크
+Core/           # UHDGameInstance (BGM 관리)
 ```
 
 ### 핵심 시스템
@@ -83,3 +84,16 @@ refactor: 코드 정리
 docs:     문서 수정
 chore:    설정 등 기타
 ```
+
+## Claude 지시사항
+
+- 새로운 기능 구현 완료 시 "진행 상황" 섹션 업데이트할 것
+- 중요한 아키텍처 변경이나 새 클래스 추가 시 "Architecture" 섹션도 업데이트할 것
+- 버그 수정이나 작은 변경은 기록 불필요
+
+## 진행 상황
+
+- 2026-02-02: 데이터 링크 미션 구현 (`DataLinkMission`, `DataLinkTerminal`)
+- 2026-02-02: `HDGameInstance` 추가 (BGM 관리)
+- 2026-02-02: 미션 클리어 자막/소리, 밸런스 조정
+- 2026-02-02: 탈출 터미널 시스템 구현 (`ExtractionTerminal`) - 모든 미션 완료 시 활성화, 3분 방어전
