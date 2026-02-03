@@ -32,6 +32,14 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Audio")
 	bool IsBGMPlaying() const;
 
+	// 레벨 전환 시 POD 강하로 스폰할지 여부
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn")
+	bool bShouldSpawnWithPod = false;
+
+	// POD 강하 스폰 위치 (PlayerStart 위치 기준)
+	UPROPERTY(BlueprintReadWrite, Category = "Spawn")
+	FVector PodSpawnLocation = FVector::ZeroVector;
+
 protected:
 	UPROPERTY()
 	class UAudioComponent* BGMComponent;

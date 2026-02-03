@@ -32,7 +32,8 @@ Weapon/
 Mission/        # AMissionManager, AMissionBase, AEggDestructionMission, ADataLinkMission, ADataLinkTerminal, AExtractionTerminal
 Spawn/          # AEnemyPoolManager, AEnemySpawnManager, ASpawnZone
 Effect/         # 카메라 쉐이크
-Core/           # UHDGameInstance (BGM 관리)
+Core/           # UHDGameInstance (BGM 관리, 레벨 전환 플래그)
+(Root)          # ALevelTransitionTrigger (레벨 전환 트리거)
 ```
 
 ### 핵심 시스템
@@ -93,6 +94,7 @@ chore:    설정 등 기타
 
 ## 진행 상황
 
+- 2026-02-03: 레벨 전환 트리거 및 POD 강하 스폰 시스템 (`LevelTransitionTrigger`, `SpawnWithPod`)
 - 2026-02-02: 데이터 링크 미션 구현 (`DataLinkMission`, `DataLinkTerminal`)
 - 2026-02-02: `HDGameInstance` 추가 (BGM 관리)
 - 2026-02-02: 미션 클리어 자막/소리, 밸런스 조정

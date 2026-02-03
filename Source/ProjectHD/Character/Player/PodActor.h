@@ -37,6 +37,10 @@ public:
     
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ImpactSound; // 착지 사운드
+
+	// 낙하 중 조종 힘 (방향키로 이동)
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float PodSteerForce = 500000.f;
 	
 	FORCEINLINE class UStaticMeshComponent* GetInternalElevatorMesh() const { return InternalElevatorMesh; }
 	FORCEINLINE USceneComponent* GetCharacterAnchor() const { return CharacterAnchor; }
@@ -53,6 +57,13 @@ protected:
 
 	// 착지 감지를 위한 라인트레이스 혹은 OnHit
 	virtual void NotifyHit(class UPrimitiveComponent* MyComp, AActor* Other, class UPrimitiveComponent* OtherComp, bool bSelfMoved, FVector HitLocation, FVector HitNormal, FVector NormalImpulse, const FHitResult& Hit) override;
+
+	// 적 즉사 처리
+	UFUNCTION()
+	void OnPodOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnElevatorOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
 	bool bLanded = false;

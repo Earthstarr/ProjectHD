@@ -24,6 +24,7 @@
 #include "PodActor.h"
 #include "ProjectHD/Mission/DataLinkTerminal.h"
 #include "ProjectHD/Mission/ExtractionTerminal.h"
+#include "ProjectHD/HDGameInstance.h"
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -291,6 +292,17 @@ void AFPSCharacter::BeginPlay()
             MinimapWidget->SetVisibility(ESlateVisibility::Hidden);
         }
     }
+
+    // 레벨 전환으로 들어왔으면 POD 강하로 스폰
+    UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(this));
+    if (GI && GI->bShouldSpawnWithPod)
+    {
+        GI->bShouldSpawnWithPod = false; // 플래그 리셋
+
+        // 약간의 딜레이 후 POD 강하 시작 (레벨 로드 완료 대기)
+        FTimerHandle SpawnPodHandle;
+        GetWorldTimerManager().SetTimer(SpawnPodHandle, this, &AFPSCharacter::SpawnWithPod, 0.5f, false);
+    }
 }
 
 void AFPSCharacter::SwitchWeapon(int32 SlotIndex)
@@ -487,6 +499,7 @@ void AFPSCharacter::Move(const FInputActionValue& Value)
     if (bIsDead) return;
 
     FVector2D MovementVector = Value.Get<FVector2D>();
+    CurrentMoveInput = MovementVector;  // Pod 조종용 저장
 
     if (Controller != nullptr)
     {
@@ -808,6 +821,76 @@ void AFPSCharacter::RespawnWithPod()
             FVector AnchorWorldLoc = NewPod->GetCharacterAnchor()->GetComponentLocation();
 
             // 캡슐 높이(48) 보정 후 Anchor에 맞추기
+            AnchorWorldLoc.Z -= 48.f;
+
+            SetActorLocation(AnchorWorldLoc);
+            SetActorRotation(FRotator::ZeroRotator);
+
+            // Pod physics
+            UStaticMeshComponent* PodMeshComp = NewPod->PodMesh;
+            PodMeshComp->SetSimulatePhysics(true);
+            PodMeshComp->SetEnableGravity(true);
+            PodMeshComp->WakeRigidBody();
+
+            if (FBodyInstance* BodyInst = PodMeshComp->GetBodyInstance())
+            {
+                BodyInst->bLockXRotation = true;
+                BodyInst->bLockYRotation = true;
+            }
+
+            PodMeshComp->SetPhysicsLinearVelocity(FVector(0, 0, -9000.f));
+
+            // 1프레임 뒤에 붙이기
+            GetWorldTimerManager().SetTimerForNextTick([this, NewPod]()
+            {
+                if (NewPod && NewPod->GetCharacterAnchor())
+                {
+                    AttachToComponent(
+                        NewPod->GetCharacterAnchor(),
+                        FAttachmentTransformRules::KeepWorldTransform
+                    );
+
+                    GetCapsuleComponent()->IgnoreActorWhenMoving(NewPod, true);
+                    GetMesh()->IgnoreActorWhenMoving(NewPod, true);
+                }
+            });
+        }
+    }
+}
+
+void AFPSCharacter::SpawnWithPod()
+{
+    bIsOnPod = true;
+
+    if (SpawnVoiceSound)
+    {
+        UGameplayStatics::PlaySound2D(this, SpawnVoiceSound);
+        OnSoundPlayed.Broadcast(FName("SpawnVoiceSound")); // 자막
+    }
+
+    // 캐릭터 일시적 비활성화
+    GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    GetCapsuleComponent()->SetEnableGravity(false);
+    GetCharacterMovement()->SetMovementMode(MOVE_None);
+    GetCharacterMovement()->GravityScale = 0.0f;
+
+    // 시야를 맵 아래로 고정 (-90도)
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        FRotator CurrentRot = PC->GetControlRotation();
+        PC->SetControlRotation(FRotator(-90.f, CurrentRot.Yaw, 0.f));
+    }
+
+    // 현재 위치(PlayerStart 위치) 기준으로 상공에서 스폰
+    FVector SpawnLoc = GetActorLocation() + FVector(0.f, 0.f, 40000.f);
+
+    if (PodClass)
+    {
+        APodActor* NewPod = GetWorld()->SpawnActor<APodActor>(PodClass, SpawnLoc, FRotator::ZeroRotator);
+        if (NewPod && NewPod->PodMesh)
+        {
+            // Anchor 위치 가져오기
+            FVector AnchorWorldLoc = NewPod->GetCharacterAnchor()->GetComponentLocation();
             AnchorWorldLoc.Z -= 48.f;
 
             SetActorLocation(AnchorWorldLoc);

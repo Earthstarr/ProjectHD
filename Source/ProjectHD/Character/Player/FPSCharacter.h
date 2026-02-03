@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
 #include "AbilitySystemInterface.h"
+#include "GenericTeamAgentInterface.h"
 #include "GameplayAbilitySpec.h"
 #include "ProjectHD/Weapon/WeaponDataAsset.h"
 #include "ProjectHD/SubtitleTypes.h" // 자막
@@ -136,9 +137,14 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboChanged, int32, NewCombo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStratagemMenuOpened, bool, bCanRearm);
 
 UCLASS()
-class PROJECTHD_API AFPSCharacter : public ACharacter, public IAbilitySystemInterface
+class PROJECTHD_API AFPSCharacter : public ACharacter, public IAbilitySystemInterface, public IGenericTeamAgentInterface
 {
     GENERATED_BODY()
+
+    // 팀 설정 (플레이어 = TeamId 0)
+    FGenericTeamId TeamId = FGenericTeamId(0);
+
+    virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 
 public:
     AFPSCharacter();
@@ -204,9 +210,13 @@ public:
 
     void Die();
     void RespawnWithPod();
+    void SpawnWithPod(); // 레벨 시작 시 POD 강하 스폰
     
     bool bIsDead = false;
     bool bIsOnPod = false;
+
+    // 현재 이동 입력값 (Pod 조종용)
+    FVector2D CurrentMoveInput = FVector2D::ZeroVector;
     
 protected:
     
@@ -477,9 +487,12 @@ protected:
     
     UPROPERTY(EditAnywhere, Category = "Audio")
     USoundBase* DeathVoiceSound;    // 사망시 보이스
-    
+
     UPROPERTY(EditAnywhere, Category = "Audio")
     USoundBase* RespawnVoiceSound;  // 재투입시 보이스
+
+    UPROPERTY(EditAnywhere, Category = "Audio")
+    USoundBase* SpawnVoiceSound;    // 레벨 시작 강하시 보이스
 
 public:
     virtual void Tick(float DeltaTime) override;

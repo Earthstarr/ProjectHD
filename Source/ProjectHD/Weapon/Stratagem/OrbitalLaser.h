@@ -43,6 +43,18 @@ protected:
     UPROPERTY(EditAnywhere, Category = "Laser|Sound")
     class USoundBase* LaserLoopSound; // 레이저 작동 지속음
 
+    // 레이저 끝점 오프셋 (임팩트 포인트 기준, 하늘 방향) - bUseWorldBeamOrigin이 false일 때 사용
+    UPROPERTY(EditAnywhere, Category = "Laser|Visual")
+    FVector BeamEndOffset = FVector(0, -20000, 100000);
+
+    // 빔 하늘 시작점 (월드 좌표) - 전함 위치 등 직접 지정
+    UPROPERTY(EditAnywhere, Category = "Laser|Visual")
+    FVector BeamSkyOrigin = FVector(0, 0, 50000);
+
+    // true면 BeamSkyOrigin 월드좌표 사용, false면 BeamEndOffset 상대좌표 사용
+    UPROPERTY(EditAnywhere, Category = "Laser|Visual")
+    bool bUseWorldBeamOrigin = false;
+
 private:
     UPROPERTY()
     AActor* CurrentTarget;            // 현재 추격 중인 적
@@ -80,8 +92,7 @@ private:
     const FName BeamStartName = FName("User_BeamStart");
     const FName BeamEndName = FName("User_BeamEnd");
     
-    // 벡터 캐싱
-    FVector CachedBeamEndOffset;
+    // 벡터 캐싱 (BeamEndOffset 사용으로 제거됨)
     
     // 히트 결과 재사용
     TArray<FHitResult> CachedHitResults;

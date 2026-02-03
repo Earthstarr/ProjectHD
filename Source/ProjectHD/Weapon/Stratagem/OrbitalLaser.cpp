@@ -19,10 +19,7 @@ AOrbitalLaser::AOrbitalLaser()
     // 지면 이펙트
     ImpactFX = CreateDefaultSubobject<UNiagaraComponent>(TEXT("ImpactFX"));
     ImpactFX->SetupAttachment(RootComponent);
-    
-    // 벡터 캐싱
-    CachedBeamEndOffset = FVector(0, -20000, 100000);
-    
+
     // 배열 미리 할당
     CachedHitResults.Reserve(50);
 }
@@ -99,7 +96,8 @@ void AOrbitalLaser::Tick(float DeltaTime)
     if (LaserFX)
     {
         LaserFX->SetVectorParameter(BeamStartName, CurrentImpactPoint + FVector(0, -10, -20));
-        LaserFX->SetVectorParameter(BeamEndName, CurrentImpactPoint + CachedBeamEndOffset);
+        FVector SkyPoint = bUseWorldBeamOrigin ? BeamSkyOrigin : (CurrentImpactPoint + BeamEndOffset);
+        LaserFX->SetVectorParameter(BeamEndName, SkyPoint);
     }
     if (ImpactFX) ImpactFX->SetWorldLocation(CurrentImpactPoint + FVector(0, 0, 20.f));
     if (IsValid(AudioComp)) AudioComp->SetWorldLocation(CurrentImpactPoint);
@@ -182,9 +180,9 @@ void AOrbitalLaser::UpdateLaserVisuals()
 {
     if (LaserFX)
     {
-        // 나이아가라 시스템 내부의 파라미터 이름과 일치 (User.BeamEnd)
         LaserFX->SetVectorParameter(BeamStartName, CurrentImpactPoint + FVector(0, -10, -20));
-        LaserFX->SetVectorParameter(BeamEndName, CurrentImpactPoint + CachedBeamEndOffset); // 대각선 하늘 위
+        FVector SkyPoint = bUseWorldBeamOrigin ? BeamSkyOrigin : (CurrentImpactPoint + BeamEndOffset);
+        LaserFX->SetVectorParameter(BeamEndName, SkyPoint);
     }
     
     if (ImpactFX)

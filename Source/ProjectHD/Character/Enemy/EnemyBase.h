@@ -4,12 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GenericTeamAgentInterface.h"
 #include "EnemyBase.generated.h"
 
 UCLASS()
-class PROJECTHD_API AEnemyBase : public ACharacter
+class PROJECTHD_API AEnemyBase : public ACharacter, public IGenericTeamAgentInterface
 {
     GENERATED_BODY()
+
+    // 팀 설정 (적 = TeamId 1)
+    FGenericTeamId TeamId = FGenericTeamId(1);
+
+    virtual FGenericTeamId GetGenericTeamId() const override { return TeamId; }
 
 public:
     AEnemyBase();
