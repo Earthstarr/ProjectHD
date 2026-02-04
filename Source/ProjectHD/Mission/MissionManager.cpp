@@ -36,7 +36,6 @@ void AMissionManager::CheckAllMissionsCompleted()
 {
 	if (AreAllMissionsCompleted())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("All missions completed!"));
 		OnAllMissionsCompleted.Broadcast();
 	}
 }
@@ -72,4 +71,15 @@ TArray<AMissionBase*> AMissionManager::GetActiveMissions() const
 	}
 
 	return ActiveMissions;
+}
+
+void AMissionManager::CompleteAllMissions()
+{
+	for (AMissionBase* Mission : RegisteredMissions)
+	{
+		if (Mission && !Mission->IsCompleted())
+		{
+			Mission->CompleteMission();
+		}
+	}
 }

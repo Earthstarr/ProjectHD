@@ -30,6 +30,10 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Mission")
 	TArray<AMissionBase*> GetActiveMissions() const;
+
+	// 디버그용: 모든 미션 즉시 완료
+	UFUNCTION(BlueprintCallable, Category = "Mission|Debug")
+	void CompleteAllMissions();
 	
 	UPROPERTY(BlueprintAssignable, Category = "Mission")
 	FOnMissionRegistered OnMissionRegistered;

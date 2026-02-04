@@ -53,6 +53,10 @@
 		{
 			"Name": "ChaosInsights",
 			"Enabled": false
+		},
+		{
+			"Name": "MetasoundExperimental",
+			"Enabled": true
 		}
 	]
 }

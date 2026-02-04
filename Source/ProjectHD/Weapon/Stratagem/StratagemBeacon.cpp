@@ -306,18 +306,27 @@ void AStratagemBeacon::ActivateBeacon()
         }
 
         if ((MyStratagemType == EStratagemType::Bomb500kg || MyStratagemType == EStratagemType::EagleCluster) && FighterSound && EagleClass)
-        {            
+        {
             FVector BeaconLoc = GetActorLocation();
 
-            FVector Forward = GetActorForwardVector();
-            FVector Right = GetActorRightVector();
+            // 플레이어 → 비콘 방향으로 비행
+            APawn* Player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+            FVector Forward = FVector::ForwardVector;
+            FVector Right = FVector::RightVector;
+
+            if (Player)
+            {
+                Forward = (BeaconLoc - Player->GetActorLocation()).GetSafeNormal2D();
+                Right = FVector::CrossProduct(FVector::UpVector, Forward);
+            }
+
             FVector Up = FVector::UpVector;
 
-            // 시작점: 비컨 위치로부터 뒤로 500m, 왼쪽으로 120m, 위로 200m
-            FVector FlyStart = BeaconLoc + (Forward * -50000.f) + (Right * -12000.f) + (Up * 20000.f);
+            // 시작점: 비컨 위치로부터 뒤로 1000m, 왼쪽으로 120m, 위로 400m
+            FVector FlyStart = BeaconLoc + (Forward * -300000.f) + (Right * -30000.f) + (Up * 100000.f);
 
-            // 도착점: 비컨 위치로부터 앞으로 800m, 오른쪽으로 120m, 위로 80m
-            FVector FlyEnd = BeaconLoc + (Forward * 80000.f) + (Right * 12000.f) + (Up * 8000.f);
+            // 도착점: 비컨 위치로부터 앞으로 1600m, 오른쪽으로 120m, 위로 800m
+            FVector FlyEnd = BeaconLoc + (Forward * 400000.f) + (Right * 30000.f) + (Up * 200000.f);
 
 
             FActorSpawnParameters SpawnParams;

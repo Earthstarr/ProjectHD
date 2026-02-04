@@ -421,6 +421,10 @@ void AEnemyBase::InitEnemy()
       {
           SetInstigator(this);
 
+          // 이전 타겟/이동 상태 클리어
+          AIC->ClearFocus(EAIFocusPriority::Gameplay);
+          AIC->StopMovement();
+
           if (UAIPerceptionComponent* PercComp = AIC->FindComponentByClass<UAIPerceptionComponent>())
           {
               PercComp->Deactivate();

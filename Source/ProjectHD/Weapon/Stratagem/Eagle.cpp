@@ -7,14 +7,25 @@
 AEagle::AEagle()
 {
     PrimaryActorTick.bCanEverTick = true;
-    
-    // SceneRoot¸¦ »ı¼ºÇÏ°í ·çÆ®·Î ¼³Á¤
+
+    // SceneRoot ìƒì„±
     SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneRoot"));
     RootComponent = SceneRoot;
 
-    // MeshComp¸¦ SceneRoot¿¡ ºÎÂø
+    // MeshCompë¥¼ SceneRootì— ë¶™ì„
     MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
     MeshComp->SetupAttachment(SceneRoot);
+
+    // ë‚ ê°œ íŠ¸ë ˆì¼ ì»´í¬ë„ŒíŠ¸ ìƒì„±
+    LeftWingTrail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LeftWingTrail"));
+    LeftWingTrail->SetupAttachment(SceneRoot);
+    LeftWingTrail->bAutoActivate = true;
+    LeftWingTrail->SetAutoDestroy(false);
+
+    RightWingTrail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("RightWingTrail"));
+    RightWingTrail->SetupAttachment(SceneRoot);
+    RightWingTrail->bAutoActivate = true;
+    RightWingTrail->SetAutoDestroy(false);
 
     bIsFlying = false;
     ElapsedTime = 0.f;
@@ -34,17 +45,16 @@ void AEagle::InitEagle(FVector Start, FVector End, float Duration)
 
     SetActorLocation(StartLoc);
 
-    // ºñÇà±â ¸Ó¸®°¡ ÁøÇà ¹æÇâÀ» ÇâÇÏµµ·Ï È¸Àü ¼³Á¤
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ó¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ È¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     FRotator LookAtRot = (EndLoc - StartLoc).Rotation();
-    SetActorRotation(LookAtRot);
-        
+    SetActorRotation(LookAtRot);        
 }
 
 void AEagle::SpawnFlareEffect()
 {
     if (FlareTemplate)
     {
-        // ºÎÂøÇÏÁö ¾Ê°í ÇöÀç À§Ä¡ÀÇ ¿ùµå¿¡ ½ºÆùÇÏ¿© ¾×ÅÍ ÆÄ±«¿Í ¹«°üÇÏ°Ô À¯Áö½ÃÅ´
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½å¿¡ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ä±ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å´
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(
             GetWorld(),
             FlareTemplate,
@@ -63,50 +73,66 @@ void AEagle::Tick(float DeltaTime)
         ElapsedTime += DeltaTime;
         float Alpha = ElapsedTime / FlightDuration;
 
-        // °¡·Î ÀÌµ¿ (¼±Çü º¸°£)
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
         FVector CurrentLocation = FMath::Lerp(StartLoc, EndLoc, Alpha);
 
-        // ¼¼·Î °î¼± (Æ÷¹°¼± ´À³¦ - Sin ÇÔ¼ö È°¿ë)
-        float CurveHeight = FMath::Sin(Alpha * PI) * -4000.f; // -°ªÀÌ¸é ¾Æ·¡·Î ¿À¸ñÇÑ °î¼±
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½î¼± (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ - Sin ï¿½Ô¼ï¿½ È°ï¿½ï¿½)
+        float CurveHeight = FMath::Sin(Alpha * PI) * -135000.f; // -ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½î¼±
         CurrentLocation.Z += CurveHeight;
 
         SetActorLocation(CurrentLocation);
 
-        // º¸ÀÌ½º
+        // ï¿½ï¿½ï¿½Ì½ï¿½
         if (!bVoicePlayed && Alpha >= VoiceStartAlpha)
         {
             if (EagleVoice)
             {
                 UGameplayStatics::PlaySoundAtLocation(this, EagleVoice, GetActorLocation());
-                OnSoundPlayed.Broadcast(FName("Eagle_Bomb")); // ÀÚ¸·
+                OnSoundPlayed.Broadcast(FName("Eagle_Bomb")); // ï¿½Ú¸ï¿½
             }
             bVoicePlayed = true;
         }
 
-        // ÇÃ·¹¾î 1¹ø ½ºÆù
+        // ï¿½Ã·ï¿½ï¿½ï¿½ 1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (!bHasFiredFlare1 && Alpha >= FlareAlpha1)
         {
             SpawnFlareEffect();
             bHasFiredFlare1 = true;
         }
         
-        // ÇÃ·¹¾î 2¹ø ½ºÆù
+        // ï¿½Ã·ï¿½ï¿½ï¿½ 2ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (!bHasFiredFlare2 && Alpha >= FlareAlpha2)
         {
             SpawnFlareEffect();
             bHasFiredFlare2 = true;
-        }
+        }    
         
-        // ÇÃ·¹¾î 3¹ø ½ºÆù
+        // ï¿½Ã·ï¿½ï¿½ï¿½ 3ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (!bHasFiredFlare3 && Alpha >= FlareAlpha3)
         {
             SpawnFlareEffect();
             bHasFiredFlare3 = true;
-        }
+        }       
 
-        // ºñÇà ¿Ï·á ½Ã Á¦°Å
+        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ï·ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (Alpha >= 1.0f)
         {
+            bIsFlying = false;
+           
+            if (LeftWingTrail) 
+            { 
+                LeftWingTrail->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+                //LeftWingTrail->Deactivate(); // ìƒˆë¡œìš´ ì…ì ìƒì„±ë§Œ ì¤‘ë‹¨
+            }
+            if (RightWingTrail) 
+            { 
+                RightWingTrail->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+                //RightWingTrail->Deactivate(); 
+            }
+            
+            MeshComp->SetVisibility(false);
+            MeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+            
             Destroy();
         }
     }

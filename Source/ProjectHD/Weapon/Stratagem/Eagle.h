@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "ProjectHD/SubtitleTypes.h" // ÀÚ¸·
+#include "ProjectHD/SubtitleTypes.h" // ï¿½Ú¸ï¿½
 
 #include "Eagle.generated.h"
 
@@ -21,11 +21,11 @@ protected:
 public:
     virtual void Tick(float DeltaTime) override;
 
-    // ºñÄÁ¿¡¼­ È£ÃâÇÏ¿© ºñÇà ½ÃÀÛ ÁöÁ¡°ú ³¡ ÁöÁ¡ ¼³Á¤
+    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½Ï¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     void InitEagle(FVector Start, FVector End, float Duration);
     
     UPROPERTY(BlueprintAssignable, Category = "Audio")
-    FOnSoundPlayedSignature OnSoundPlayed;  // ÀÚ¸·
+    FOnSoundPlayedSignature OnSoundPlayed;  // ï¿½Ú¸ï¿½
 
 private:
     
@@ -35,23 +35,39 @@ private:
     UPROPERTY(VisibleAnywhere)
     UStaticMeshComponent* MeshComp;
 
+    // ë‚ ê°œ íŠ¸ë ˆì¼
+    UPROPERTY(VisibleAnywhere, Category = "Effects")
+    class UNiagaraComponent* LeftWingTrail;
+
+    UPROPERTY(VisibleAnywhere, Category = "Effects")
+    class UNiagaraComponent* RightWingTrail;
+
+    UPROPERTY(EditAnywhere, Category = "Effects")
+    class UNiagaraSystem* WingTrailTemplate;
+
+    UPROPERTY(EditAnywhere, Category = "Effects")
+    FVector LeftWingOffset = FVector(0.f, -300.f, 0.f);
+
+    UPROPERTY(EditAnywhere, Category = "Effects")
+    FVector RightWingOffset = FVector(0.f, 300.f, 0.f);
+
     UPROPERTY(EditAnywhere, Category = "Effects")
     class USoundBase* EagleVoice;
     
     UPROPERTY(EditAnywhere, Category = "Effects")
     class UNiagaraSystem* FlareTemplate;
 
-    // ÇÃ·¹¾î¸¦ »Ñ¸®±â ½ÃÀÛÇÒ ½ÃÁ¡ (0.0 ~ 1.0)
+    // ï¿½Ã·ï¿½ï¿½î¸¦ ï¿½Ñ¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (0.0 ~ 1.0)
     UPROPERTY(EditAnywhere, Category = "Effects")
-    float FlareAlpha1 = 0.5f;
+    float FlareAlpha1 = 0.4f;
         
     UPROPERTY(EditAnywhere, Category = "Effects")
-    float FlareAlpha2 = 0.55f;
+    float FlareAlpha2 = 0.42f;
     
     UPROPERTY(EditAnywhere, Category = "Effects")
-    float FlareAlpha3 = 0.7f;
+    float FlareAlpha3 = 0.45f;
     
-    // ÀÌ±Û º¸ÀÌ½º ½ÃÁ¡
+    // ï¿½Ì±ï¿½ ï¿½ï¿½ï¿½Ì½ï¿½ ï¿½ï¿½ï¿½ï¿½
     UPROPERTY(EditAnywhere, Category = "Effects")
     float VoiceStartAlpha = 0.2f;
 
@@ -66,6 +82,6 @@ private:
     float ElapsedTime;
     bool bIsFlying;
     
-    // ÇÃ·¹¾î ÇÔ¼ö
+    // ï¿½Ã·ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½
     void SpawnFlareEffect();
 };
