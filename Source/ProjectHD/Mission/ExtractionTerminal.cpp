@@ -1,9 +1,11 @@
 #include "ExtractionTerminal.h"
+#include "ExtractionShip.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/WidgetComponent.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
 #include "ProjectHD/Weapon/WeaponDataAsset.h"
+#include "ProjectHD/HDGameInstance.h"
 #include "MissionManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
@@ -287,11 +289,6 @@ void AExtractionTerminal::StartDefense()
 
 void AExtractionTerminal::CompleteExtraction()
 {
-	ExtractionState = EExtractionState::Completed;
-
-	// 빛기둥 제거
-	RemoveBeamEffect();
-
 	// 타이머 위젯 제거
 	RemoveTimerWidget();
 
@@ -300,6 +297,49 @@ void AExtractionTerminal::CompleteExtraction()
 	{
 		UGameplayStatics::PlaySound2D(this, ExtractionCompleteSound);
 	}
+
+	// 수송선 스폰
+	SpawnExtractionShip();
+}
+
+void AExtractionTerminal::SpawnExtractionShip()
+{
+	if (!ExtractionShipClass) return;
+	if (SpawnedShip) return; // 이미 스폰됨 - 중복 방지
+
+	// 상태 변경하여 Tick에서 다시 호출되지 않도록
+	ExtractionState = EExtractionState::Completed;
+	
+	// 착륙 위치 계산
+	FVector LandingLocation = GetActorLocation() + ShipLandingOffset;
+
+	// 수송선 스폰
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	SpawnedShip = GetWorld()->SpawnActor<AExtractionShip>(
+		ExtractionShipClass,
+		LandingLocation + FVector(0.0f, 0.0f, 10000.0f), // 임시 스폰 위치 (StartArrival에서 재설정)
+		FRotator::ZeroRotator,
+		SpawnParams
+	);
+
+	if (SpawnedShip)
+	{
+		// 수송선 이벤트 바인딩
+		SpawnedShip->OnDepartureCompleted.AddDynamic(this, &AExtractionTerminal::OnShipDepartureCompleted);
+
+		// 비행 시작
+		SpawnedShip->StartArrival(LandingLocation);
+	}
+}
+
+void AExtractionTerminal::OnShipDepartureCompleted()
+{
+	ExtractionState = EExtractionState::Completed;
+
+	// 빛기둥 제거
+	RemoveBeamEffect();
 
 	OnExtractionStateChanged.Broadcast(ExtractionState);
 	OnExtractionCompleted.Broadcast();

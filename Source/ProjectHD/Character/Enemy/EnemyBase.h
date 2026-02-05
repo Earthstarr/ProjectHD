@@ -31,6 +31,10 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
     float NoiseLoud = 0.5f;
 
+    // 처치 시 획득 점수
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Stat")
+    int32 KillScoreValue = 10;
+
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Stat")
     float CurrentHealth;
     

@@ -551,6 +551,14 @@ public:
 
     void ToggleMinimap();
 
+    // HUD 숨기기 (탈출 컷씬용)
+    UFUNCTION(BlueprintCallable, Category = "HUD")
+    void HideAllHUD();
+
+    // 플레이어 상태 복구 (결과 화면 후)
+    UFUNCTION(BlueprintCallable, Category = "HUD")
+    void RestorePlayerState();
+
     // 이벤트 델리게이트
     UPROPERTY(BlueprintAssignable, Category = "Stratagem")
     FOnStratagemStepUpdated OnStratagemStepUpdated;

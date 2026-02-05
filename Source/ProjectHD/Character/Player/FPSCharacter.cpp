@@ -24,6 +24,7 @@
 #include "PodActor.h"
 #include "ProjectHD/Mission/DataLinkTerminal.h"
 #include "ProjectHD/Mission/ExtractionTerminal.h"
+#include "ProjectHD/Mission/IntroCutsceneManager.h"
 #include "ProjectHD/HDGameInstance.h"
 
 AFPSCharacter::AFPSCharacter()
@@ -109,6 +110,14 @@ float AFPSCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& D
 void AFPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
+
+    // 입력 모드 초기화 (레벨 전환 후 입력 복구)
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        PC->EnableInput(PC);
+        PC->bShowMouseCursor = false;
+        PC->SetInputMode(FInputModeGameOnly());
+    }
 
     // 네비 메시 생성 범위 설정
     if (NavInvoker)
@@ -295,13 +304,34 @@ void AFPSCharacter::BeginPlay()
 
     // 레벨 전환으로 들어왔으면 POD 강하로 스폰
     UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(this));
-    if (GI && GI->bShouldSpawnWithPod)
+    if (GI)
     {
-        GI->bShouldSpawnWithPod = false; // 플래그 리셋
+        // 현재 레벨이 미션 맵인지 확인
+        FString CurrentLevelName = GetWorld()->GetMapName();
+        CurrentLevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
 
-        // 약간의 딜레이 후 POD 강하 시작 (레벨 로드 완료 대기)
-        FTimerHandle SpawnPodHandle;
-        GetWorldTimerManager().SetTimer(SpawnPodHandle, this, &AFPSCharacter::SpawnWithPod, 0.5f, false);
+        UE_LOG(LogTemp, Warning, TEXT("[MissionTimer] CurrentLevel: %s, MissionLevel: %s"), *CurrentLevelName, *GI->MissionLevelName.ToString());
+
+        if (CurrentLevelName == GI->MissionLevelName.ToString())
+        {
+            // 미션 맵이면 타이머 리셋 및 시작
+            GI->ResetMissionResult();
+            GI->StartMissionTimer(this);
+            UE_LOG(LogTemp, Warning, TEXT("[MissionTimer] Timer Started!"));
+        }
+
+        // IntroCutsceneManager가 없을 때만 자동 POD 스폰
+        TArray<AActor*> FoundManagers;
+        UGameplayStatics::GetAllActorsOfClass(GetWorld(), AIntroCutsceneManager::StaticClass(), FoundManagers);
+
+        if (GI->bShouldSpawnWithPod && FoundManagers.Num() == 0)
+        {
+            GI->bShouldSpawnWithPod = false; // 플래그 리셋
+
+            // 약간의 딜레이 후 POD 강하 시작 (레벨 로드 완료 대기)
+            FTimerHandle SpawnPodHandle;
+            GetWorldTimerManager().SetTimer(SpawnPodHandle, this, &AFPSCharacter::SpawnWithPod, 0.5f, false);
+        }
     }
 }
 
@@ -722,6 +752,12 @@ void AFPSCharacter::Die()
     if (bIsDead) return;
     bIsDead = true;
 
+    // 미션 결과에 사망 기록
+    if (UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+    {
+        GI->AddPlayerDeath();
+    }
+
     if (DeathVoiceSound)
     {
         UGameplayStatics::PlaySound2D(this, DeathVoiceSound);
@@ -860,6 +896,12 @@ void AFPSCharacter::RespawnWithPod()
 
 void AFPSCharacter::SpawnWithPod()
 {
+    // 이미 포드 스폰 중이면 무시 (중복 호출 방지)
+    if (bIsOnPod)
+    {
+        return;
+    }
+
     bIsOnPod = true;
 
     if (SpawnVoiceSound)
@@ -1405,6 +1447,12 @@ void AFPSCharacter::ThrowBeacon()
         {
             ProjectileComp->Velocity = ControlRot.Vector() * ThrowForce;
         }
+
+        // 미션 결과에 스트라타젬 사용 기록
+        if (UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+        {
+            GI->AddStratagemUsed(ActiveData.Type);
+        }
     }
 
     // 상태 초기화
@@ -1610,5 +1658,48 @@ void AFPSCharacter::ToggleMinimap()
     else
     {
         MinimapWidget->SetVisibility(ESlateVisibility::Visible);
+    }
+}
+
+void AFPSCharacter::HideAllHUD()
+{
+    if (MainHUDWidget)
+    {        
+        MainHUDWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+    if (MinimapWidget)
+    {
+        MinimapWidget->SetVisibility(ESlateVisibility::Hidden);
+    }
+}
+
+void AFPSCharacter::RestorePlayerState()
+{
+    // HUD 다시 표시
+    if (MainHUDWidget)
+    {
+        MainHUDWidget->SetVisibility(ESlateVisibility::Visible);
+    }
+    if (MinimapWidget)
+    {
+        MinimapWidget->SetVisibility(ESlateVisibility::Hidden); // 기본 숨김 상태 유지
+    }
+
+    // 플레이어 보이기
+    SetActorHiddenInGame(false);
+    SetActorEnableCollision(true);
+
+    // 캐릭터 무브먼트 활성화
+    if (UCharacterMovementComponent* Movement = GetCharacterMovement())
+    {
+        Movement->SetMovementMode(MOVE_Walking);
+    }
+
+    // 입력 및 커서 복구
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        PC->EnableInput(PC);
+        PC->bShowMouseCursor = false;
+        PC->SetInputMode(FInputModeGameOnly());
     }
 }

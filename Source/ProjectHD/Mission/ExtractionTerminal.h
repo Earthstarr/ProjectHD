@@ -9,6 +9,7 @@ class AFPSCharacter;
 class AMissionManager;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class AExtractionShip;
 enum class EStratagemDirection : uint8;
 
 UENUM(BlueprintType)
@@ -55,7 +56,7 @@ protected:
 
 	// 방어전 시간 설정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extraction")
-	float DefenseTime = 180.0f;
+	float DefenseTime = 150.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Extraction")
 	float RemainingDefenseTime = 0.0f;
@@ -118,6 +119,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extraction|Sound")
 	class USoundBase* ExtractionCompleteSound;
 
+	// 수송선 설정
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extraction|Ship")
+	TSubclassOf<AExtractionShip> ExtractionShipClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Extraction|Ship")
+	FVector ShipLandingOffset = FVector(500.0f, 0.0f, 0.0f); // 터미널 기준 착륙 위치
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Extraction|Ship")
+	AExtractionShip* SpawnedShip;
+
 	// IInteractableInterface 구현
 	virtual void Interact(AFPSCharacter* Interactor) override;
 	virtual void OnOverlapBegin() override;
@@ -152,6 +163,13 @@ protected:
 	// 미션 완료 콜백
 	UFUNCTION()
 	void OnAllMissionsCompleted();
+
+	// 수송선 스폰
+	void SpawnExtractionShip();
+
+	// 수송선 이벤트 콜백
+	UFUNCTION()
+	void OnShipDepartureCompleted();
 
 public:
 	// 입력 처리 (FPSCharacter에서 호출)

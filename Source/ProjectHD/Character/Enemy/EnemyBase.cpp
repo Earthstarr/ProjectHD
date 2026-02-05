@@ -12,6 +12,7 @@
 #include "ProjectHD/Spawn/EnemyPoolManager.h"
 #include "Components/StateTreeAIComponent.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
+#include "ProjectHD/HDGameInstance.h"
 #include "NavigationInvokerComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
@@ -212,6 +213,12 @@ void AEnemyBase::Die()
         {
             Player->AddKillCombo();
         }
+    }
+
+    // 미션 결과에 킬 기록
+    if (UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+    {
+        GI->AddEnemyKill(KillScoreValue);
     }
     
     // 내비 인보커 끄기

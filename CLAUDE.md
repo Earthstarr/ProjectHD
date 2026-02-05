@@ -29,7 +29,7 @@ Weapon/
 ├── Stratagem/  # AStratagemBeacon, AEagle, AHDSentry, AOrbitalLaser, AHDSupplyPod
 └── Projectile/ # HDProjectile, HDBombProjectile, HDRocketProjectile
 
-Mission/        # AMissionManager, AMissionBase, AEggDestructionMission, ADataLinkMission, ADataLinkTerminal, AExtractionTerminal
+Mission/        # AMissionManager, AMissionBase, AEggDestructionMission, ADataLinkMission, ADataLinkTerminal, AExtractionTerminal, AExtractionShip, AIntroCutsceneManager, ACinematicPod
 Spawn/          # AEnemyPoolManager, AEnemySpawnManager, ASpawnZone
 Effect/         # 카메라 쉐이크
 Core/           # UHDGameInstance (BGM 관리, 레벨 전환 플래그)
@@ -63,6 +63,19 @@ Core/           # UHDGameInstance (BGM 관리, 레벨 전환 플래그)
 - `AMissionManager` - 미션 등록/완료 추적
 - 상태: NotStarted, InProgress, Completed, Failed
 
+**컷씬 시스템** (`Mission/`)
+
+*인트로 컷씬:*
+- `AIntroCutsceneManager` - 레벨 시퀀서 재생, 워밍업 에셋 프리로드
+- `ACinematicPod` - 컷씬용 낙하 포드 (Tick에서 Z축 하강, 나이아가라 궤적)
+- 흐름: BeginPlay → 플레이어 숨김 → 시퀀서 재생 → 완료 시 `Player->SpawnWithPod()`
+
+*탈출 컷씬:*
+- `AExtractionTerminal` - 모든 미션 완료 시 활성화, 커맨드 입력 → 방어전(150초) → 수송선 호출
+- `AExtractionShip` - 비행 상태머신 (Arriving → Landing → Waiting → Departing → Gone)
+- 흐름: 방어전 완료 → 수송선 도착 → 플레이어 탑승(오버랩) → 탈출 컷씬 → 결과 화면
+- `EaseInOutCubic()` 보간으로 부드러운 비행
+
 ### 주요 인터페이스
 
 - `IAbilitySystemInterface` - 플레이어 GAS 통합
@@ -94,6 +107,7 @@ chore:    설정 등 기타
 
 ## 진행 상황
 
+- 2026-02-05: 컷씬 시스템 아키텍처 정리 (`IntroCutsceneManager`, `CinematicPod`, `ExtractionTerminal`, `ExtractionShip`)
 - 2026-02-03: 레벨 전환 트리거 및 POD 강하 스폰 시스템 (`LevelTransitionTrigger`, `SpawnWithPod`)
 - 2026-02-02: 데이터 링크 미션 구현 (`DataLinkMission`, `DataLinkTerminal`)
 - 2026-02-02: `HDGameInstance` 추가 (BGM 관리)
