@@ -330,7 +330,7 @@ void AFPSCharacter::BeginPlay()
 
             // 약간의 딜레이 후 POD 강하 시작 (레벨 로드 완료 대기)
             FTimerHandle SpawnPodHandle;
-            GetWorldTimerManager().SetTimer(SpawnPodHandle, this, &AFPSCharacter::SpawnWithPod, 0.5f, false);
+            GetWorldTimerManager().SetTimer(SpawnPodHandle, [this]() { SpawnWithPod(); }, 0.5f, false);
         }
     }
 }
@@ -455,6 +455,45 @@ void AFPSCharacter::Tick(float DeltaTime)
             }
         }
     }
+
+    // 스프린트 토글: 움직일 때만 스태미나 소모
+    if (bSprintButtonDown && AbilitySystemComponent && AttributeSet)
+    {
+        FVector Velocity = GetVelocity();
+        float Speed = FVector(Velocity.X, Velocity.Y, 0.0f).Size(); // 수평 속도만 체크
+        float CurrentStamina = AttributeSet->GetStamina();
+
+        if (Speed > 10.0f && CurrentStamina > 0.0f) // 움직이고 있고 스태미나 있음
+        {
+            if (!bIsSprintActive && !bIsAiming && !bFireButtonDown)
+            {
+                // 회복 중이었다면 중단
+                GetWorldTimerManager().ClearTimer(TimerHandle_StaminaRegen);
+                AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaRegenEffectClass, AbilitySystemComponent);
+
+                FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
+                AbilitySystemComponent->RemoveLooseGameplayTag(ExhaustedTag);
+
+                // 스프린트 어빌리티 활성화
+                AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Sprint));
+                bIsSprintActive = true;
+            }
+        }
+        else if (bIsSprintActive) // 멈췄거나 스태미나 없음
+        {
+            // 스프린트 어빌리티 일시 정지 (토글은 유지)
+            AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInputID::Sprint));
+            bIsSprintActive = false;
+
+            // 스태미나 회복 시작
+            FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
+            if (!AbilitySystemComponent->HasMatchingGameplayTag(ExhaustedTag))
+            {
+                AbilitySystemComponent->AddLooseGameplayTag(ExhaustedTag);
+            }
+            GetWorldTimerManager().SetTimer(TimerHandle_StaminaRegen, this, &AFPSCharacter::StartStaminaRegen, 2.0f, false);
+        }
+    }
 }
 
 void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -471,9 +510,8 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-        // 달리기
-        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Triggered, this, &AFPSCharacter::OnSprintStarted);
-        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AFPSCharacter::OnSprintCompleted);
+        // 달리기 (토글)
+        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AFPSCharacter::OnSprintToggle);
 
         // 수류탄 던지기
         EnhancedInputComponent->BindAction(GrenadeAction, ETriggerEvent::Started, this, &AFPSCharacter::OnGrenadeStart);
@@ -520,6 +558,12 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
         if (MinimapToggleAction)
         {
             EnhancedInputComponent->BindAction(MinimapToggleAction, ETriggerEvent::Started, this, &AFPSCharacter::ToggleMinimap);
+        }
+
+        // 일시정지
+        if (PauseAction)
+        {
+            EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Started, this, &AFPSCharacter::TogglePause);
         }
     }
 }
@@ -677,36 +721,14 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
 // GAS : 달리기
 void AFPSCharacter::OnSprintStarted()
 {
+    // 토글 상태만 설정, 실제 스프린트 활성화는 Tick에서 속도 체크 후 처리
     bSprintButtonDown = true;
-
-    // 조준 중이거나 사격 중이면 입력만 저장하고 리턴
-    if (bIsAiming || bFireButtonDown) return;
-
-    if (AbilitySystemComponent)
-    {
-        float CurrentStamina = AttributeSet->GetStamina();
-
-        // 스태미나가 0보다 크다면, 2초 대기 상태라도 태그 제거
-        if (CurrentStamina > 0.0f)
-        {
-            FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
-            AbilitySystemComponent->RemoveLooseGameplayTag(ExhaustedTag);
-
-            // 2초 회복 타이머 중단
-            GetWorldTimerManager().ClearTimer(TimerHandle_StaminaRegen);
-
-            // 기존 회복 효과 제거
-            AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaRegenEffectClass, AbilitySystemComponent);
-
-            // 달리기 시작
-            AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Sprint));
-        }
-    }
 }
 
 void AFPSCharacter::OnSprintCompleted()
 {
     bSprintButtonDown = false;
+    bIsSprintActive = false;
 
     if (AbilitySystemComponent)
     {
@@ -719,6 +741,20 @@ void AFPSCharacter::OnSprintCompleted()
         }
 
         GetWorldTimerManager().SetTimer(TimerHandle_StaminaRegen, this, &AFPSCharacter::StartStaminaRegen, 2.0f, false);
+    }
+}
+
+void AFPSCharacter::OnSprintToggle()
+{
+    if (bSprintButtonDown)
+    {
+        // 달리기 중이면 해제
+        OnSprintCompleted();
+    }
+    else
+    {
+        // 달리기 시작
+        OnSprintStarted();
     }
 }
 
@@ -789,6 +825,9 @@ void AFPSCharacter::RespawnWithPod()
         UGameplayStatics::PlaySound2D(this, RespawnVoiceSound);
         OnSoundPlayed.Broadcast(FName("RespawnVoiceSound")); // 자막
     }
+
+    // 포드 탑승 중 캐릭터 외형 숨기기 (무기 메시 포함)
+    GetMesh()->SetVisibility(false, true);
 
     // 체력 및 상태 초기화
     if (AttributeSet)
@@ -894,7 +933,7 @@ void AFPSCharacter::RespawnWithPod()
     }
 }
 
-void AFPSCharacter::SpawnWithPod()
+void AFPSCharacter::SpawnWithPod(bool bPlaySound)
 {
     // 이미 포드 스폰 중이면 무시 (중복 호출 방지)
     if (bIsOnPod)
@@ -904,11 +943,14 @@ void AFPSCharacter::SpawnWithPod()
 
     bIsOnPod = true;
 
-    if (SpawnVoiceSound)
+    if (bPlaySound && SpawnVoiceSound)
     {
         UGameplayStatics::PlaySound2D(this, SpawnVoiceSound);
         OnSoundPlayed.Broadcast(FName("SpawnVoiceSound")); // 자막
     }
+
+    // 포드 탑승 중 캐릭터 외형 숨기기 (무기 메시 포함)
+    GetMesh()->SetVisibility(false, true);
 
     // 캐릭터 일시적 비활성화
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -1658,6 +1700,42 @@ void AFPSCharacter::ToggleMinimap()
     else
     {
         MinimapWidget->SetVisibility(ESlateVisibility::Visible);
+    }
+}
+
+void AFPSCharacter::TogglePause()
+{
+    APlayerController* PC = Cast<APlayerController>(GetController());
+    if (!PC) return;
+
+    bool bIsPaused = UGameplayStatics::IsGamePaused(GetWorld());
+
+    if (bIsPaused)
+    {
+        // 게임 재개
+        if (PauseWidget)
+        {
+            PauseWidget->RemoveFromParent();
+            PauseWidget = nullptr;
+        }
+        UGameplayStatics::SetGamePaused(GetWorld(), false);
+        PC->bShowMouseCursor = false;
+        PC->SetInputMode(FInputModeGameOnly());
+    }
+    else
+    {
+        // 게임 일시정지
+        if (PauseWidgetClass)
+        {
+            PauseWidget = CreateWidget<UUserWidget>(PC, PauseWidgetClass);
+            if (PauseWidget)
+            {
+                PauseWidget->AddToViewport(100); // 높은 Z-Order
+            }
+        }
+        UGameplayStatics::SetGamePaused(GetWorld(), true);
+        PC->bShowMouseCursor = true;
+        PC->SetInputMode(FInputModeUIOnly());
     }
 }
 

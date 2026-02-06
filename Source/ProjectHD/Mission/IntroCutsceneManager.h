@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "ProjectHD/SubtitleTypes.h"
 #include "IntroCutsceneManager.generated.h"
 
 class ULevelSequence;
@@ -50,6 +51,20 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Warmup")
 	FVector WarmupSpawnLocation = FVector(0.0f, 0.0f, -5000.0f);
 
+	// 컷씬 사운드
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	class USoundBase* IntroCutsceneSound;
+
+	// 자막 키
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	FName IntroCutsceneSubtitleKey;
+
+public:
+	// 자막 델리게이트
+	UPROPERTY(BlueprintAssignable, Category = "Sound")
+	FOnSoundPlayedSignature OnSoundPlayed;
+
+protected:
 	// 시퀀서 끝났을 때
 	UFUNCTION()
 	void OnSequenceFinished();

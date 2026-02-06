@@ -74,10 +74,13 @@ void APodActor::BeginPlay()
 			NAME_None,
 			FVector::ZeroVector,
 			EAttachLocation::KeepRelativeOffset,
-			true, // Auto Destroy
+			false, // bStopWhenAttachedToDestroyed
 			1.0f, // Volume
 			1.0f, // Pitch
-			0.0f  // Start Time
+			0.0f, // Start Time
+			nullptr, // Attenuation
+			nullptr, // Concurrency
+			false // bAutoDestroy - 수동으로 관리
 		);
 	}
 }
@@ -169,7 +172,13 @@ void APodActor::OnPodLanded()
 	PodMesh->SetSimulatePhysics(false);
 	// 박힌 후 회전값 정렬 (기울어짐 방지)
 	SetActorRotation(FRotator(0.f, GetActorRotation().Yaw, 0.f));
-    
+
+	// 낙하 사운드 정지
+	if (FallingSoundComponent)
+	{
+		FallingSoundComponent->Stop();
+	}
+
 	// 착지 사운드
 	if (ImpactSound)
 	{
@@ -229,7 +238,10 @@ void APodActor::OnRiseFinished()
 		{
 			// 부착 해제
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-            
+
+			// 캐릭터 외형 다시 보이게 (무기 메시 포함)
+			Player->GetMesh()->SetVisibility(true, true);
+
 			// 메시 회전 다시 확인
 			Player->GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 			Player->GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -96.f));

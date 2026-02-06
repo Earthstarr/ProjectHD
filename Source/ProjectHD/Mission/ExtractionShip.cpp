@@ -29,11 +29,18 @@ AExtractionShip::AExtractionShip()
 	BoardingZone->SetRelativeLocation(FVector(-200.0f, 0.0f, 0.0f)); // 쉽 뒤쪽
 	BoardingZone->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 
-	// 엔진 이펙트 위치
-	EngineEffectPoint = CreateDefaultSubobject<USceneComponent>(TEXT("EngineEffectPoint"));
-	EngineEffectPoint->SetupAttachment(RootComponent);
-	EngineEffectPoint->SetRelativeLocation(FVector(-400.0f, 0.0f, 0.0f)); // 쉽 뒤쪽 엔진
+	// 트레일 컴포넌트 (비활성 상태로 시작)
+	LeftTrail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("LeftTrail"));
+	LeftTrail->SetupAttachment(RootComponent);
+	LeftTrail->SetRelativeLocation(LeftTrailOffset);
+	LeftTrail->bAutoActivate = false;
+	LeftTrail->SetAutoDestroy(false);
 
+	RightTrail = CreateDefaultSubobject<UNiagaraComponent>(TEXT("RightTrail"));
+	RightTrail->SetupAttachment(RootComponent);
+	RightTrail->SetRelativeLocation(RightTrailOffset);
+	RightTrail->bAutoActivate = false;
+	RightTrail->SetAutoDestroy(false);
 }
 
 void AExtractionShip::BeginPlay()
@@ -43,18 +50,11 @@ void AExtractionShip::BeginPlay()
 	// 탑승 구역 오버랩 바인딩
 	BoardingZone->OnComponentBeginOverlap.AddDynamic(this, &AExtractionShip::HandleBoardingBeginOverlap);
 
-	// 엔진 이펙트 스폰
-	if (EngineEffect)
+	// 트레일 이펙트 에셋 설정
+	if (TrailEffect)
 	{
-		SpawnedEngineEffect = UNiagaraFunctionLibrary::SpawnSystemAttached(
-			EngineEffect,
-			EngineEffectPoint,
-			NAME_None,
-			FVector::ZeroVector,
-			FRotator::ZeroRotator,
-			EAttachLocation::KeepRelativeOffset,
-			true
-		);
+		if (LeftTrail) LeftTrail->SetAsset(TrailEffect);
+		if (RightTrail) RightTrail->SetAsset(TrailEffect);
 	}
 
 	// 엔진 사운드 루프
@@ -117,6 +117,10 @@ void AExtractionShip::StartArrival(const FVector& Destination)
 	FlightAlpha = 0.0f;
 	ShipState = EShipState::Arriving;
 
+	// 트레일 활성화
+	if (LeftTrail) LeftTrail->Activate();
+	if (RightTrail) RightTrail->Activate();
+
 	OnShipStateChanged.Broadcast(ShipState);
 	OnArrivalStarted();
 }
@@ -151,7 +155,7 @@ void AExtractionShip::StartLanding()
 	FlightAlpha = 0.0f;
 
 	FlightStartLocation = GetActorLocation();
-	FlightEndLocation = TargetLocation; // 최종 착륙 위치
+	FlightEndLocation = TargetLocation; // 최종 착륙 위치	
 
 	if (LandingSound)
 	{
@@ -184,6 +188,10 @@ void AExtractionShip::UpdateLanding(float DeltaTime)
 void AExtractionShip::CompleteLanding()
 {
 	ShipState = EShipState::Waiting;
+	
+	// 트레일 비활성화
+	if (LeftTrail) LeftTrail->Deactivate();
+	if (RightTrail) RightTrail->Deactivate();
 
 	OnShipStateChanged.Broadcast(ShipState);
 	OnLandingCompleted();
@@ -216,6 +224,16 @@ void AExtractionShip::StartDeparture()
 {
 	ShipState = EShipState::Departing;
 	FlightAlpha = 0.0f;
+
+	// 탈출 시작 사운드
+	if (DepartureSound)
+	{
+		UGameplayStatics::PlaySound2D(this, DepartureSound);
+	}
+
+	// 트레일 재활성화
+	if (LeftTrail) LeftTrail->Activate();
+	if (RightTrail) RightTrail->Activate();
 
 	FlightStartLocation = GetActorLocation();
 	// 목적지 (절대 좌표)
@@ -280,6 +298,12 @@ void AExtractionShip::CompleteDeparture()
 {
 	ShipState = EShipState::Gone;
 
+	// 탈출 완료 사운드
+	if (ExtractionCompleteSound)
+	{
+		UGameplayStatics::PlaySound2D(this, ExtractionCompleteSound);
+	}
+
 	// 쉽 숨기기
 	SetActorHiddenInGame(true);
 
@@ -289,10 +313,14 @@ void AExtractionShip::CompleteDeparture()
 		EngineSoundComponent->Stop();
 	}
 
-	// 엔진 이펙트 비활성화
-	if (SpawnedEngineEffect)
+	// 트레일 분리 (Eagle처럼 자연스럽게 사라지도록)
+	if (LeftTrail)
 	{
-		SpawnedEngineEffect->Deactivate();
+		LeftTrail->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	}
+	if (RightTrail)
+	{
+		RightTrail->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 	}
 
 	// 마우스 커서 표시 및 플레이어 이동 (적 AI 인식 방지)

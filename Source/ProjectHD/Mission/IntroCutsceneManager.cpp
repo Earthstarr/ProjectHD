@@ -31,6 +31,16 @@ void AIntroCutsceneManager::BeginPlay()
 
 void AIntroCutsceneManager::StartCutscene()
 {
+	// 인트로 컷씬 사운드 재생
+	if (IntroCutsceneSound)
+	{
+		UGameplayStatics::PlaySound2D(this, IntroCutsceneSound);
+	}
+	if (!IntroCutsceneSubtitleKey.IsNone())
+	{
+		OnSoundPlayed.Broadcast(IntroCutsceneSubtitleKey);
+	}
+
 	// 플레이어 입력 비활성화 및 HUD 숨기기
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
 	{
@@ -40,6 +50,9 @@ void AIntroCutsceneManager::StartCutscene()
 		{
 			Player->HideAllHUD();
 			Player->SetActorHiddenInGame(true);
+
+			// 컷씬 중에 미리 POD 강하 (워밍업용 - 렉 방지, 소리 없음)
+			Player->SpawnWithPod(false);
 		}
 	}
 

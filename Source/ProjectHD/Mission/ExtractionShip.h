@@ -44,9 +44,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UBoxComponent* BoardingZone;
 
-	// 엔진 이펙트 위치
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class USceneComponent* EngineEffectPoint;
 
 
 	// 상태
@@ -84,15 +81,22 @@ protected:
 	FRotator FlightStartRotation;
 	FRotator FlightEndRotation;
 
-	// 이펙트
+	// 트레일 이펙트
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship|Effects")
-	UNiagaraSystem* EngineEffect;
+	UNiagaraSystem* TrailEffect;
+
+	UPROPERTY(VisibleAnywhere, Category = "Ship|Effects")
+	UNiagaraComponent* LeftTrail;
+
+	UPROPERTY(VisibleAnywhere, Category = "Ship|Effects")
+	UNiagaraComponent* RightTrail;
+
+	// 트레일 위치 오프셋
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship|Effects")
+	FVector LeftTrailOffset = FVector(-400.0f, -200.0f, 0.0f);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship|Effects")
-	UNiagaraSystem* ThrusterEffect;
-
-	UPROPERTY()
-	UNiagaraComponent* SpawnedEngineEffect;
+	FVector RightTrailOffset = FVector(-400.0f, 200.0f, 0.0f);
 
 	// 사운드
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship|Sound")
@@ -103,6 +107,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship|Sound")
 	class USoundBase* BoardingSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship|Sound")
+	class USoundBase* DepartureSound; // 탈출 시작 사운드
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ship|Sound")
+	class USoundBase* ExtractionCompleteSound; // 탈출 완료 사운드
 
 	UPROPERTY()
 	class UAudioComponent* EngineSoundComponent;

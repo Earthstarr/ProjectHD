@@ -203,14 +203,15 @@ protected:
     
 public:
     void OnSprintStarted();
-    void OnSprintCompleted();    
-    
+    void OnSprintCompleted();
+    void OnSprintToggle(); // 토글 방식 달리기
+
     UPROPERTY(EditAnywhere, Category = "Design")
     TSubclassOf<class APodActor> PodClass;
 
     void Die();
     void RespawnWithPod();
-    void SpawnWithPod(); // 레벨 시작 시 POD 강하 스폰
+    void SpawnWithPod(bool bPlaySound = true); // 레벨 시작 시 POD 강하 스폰
     
     bool bIsDead = false;
     bool bIsOnPod = false;
@@ -299,7 +300,8 @@ protected:
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Combat")
     bool bIsReloading = false;
     
-    bool bSprintButtonDown = false;
+    bool bSprintButtonDown = false;  // 토글 상태
+    bool bIsSprintActive = false;     // 실제 스프린트 어빌리티 활성 상태
     
     
     
@@ -549,7 +551,18 @@ public:
     UPROPERTY(EditAnywhere, Category = "Input")
     class UInputAction* MinimapToggleAction;
 
+    UPROPERTY(EditAnywhere, Category = "Input")
+    class UInputAction* PauseAction;
+
     void ToggleMinimap();
+    void TogglePause();
+
+    // 일시정지 위젯 클래스
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
+    TSubclassOf<class UUserWidget> PauseWidgetClass;
+
+    UPROPERTY()
+    class UUserWidget* PauseWidget;
 
     // HUD 숨기기 (탈출 컷씬용)
     UFUNCTION(BlueprintCallable, Category = "HUD")
