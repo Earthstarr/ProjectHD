@@ -3,9 +3,13 @@
 #include "LevelSequence.h"
 #include "LevelSequencePlayer.h"
 #include "LevelSequenceActor.h"
+#include "MovieScene.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
+#include "Engine/AssetManager.h"
+#include "Blueprint/UserWidget.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
 #include "ProjectHD/HDGameInstance.h"
 
@@ -24,9 +28,137 @@ void AIntroCutsceneManager::BeginPlay()
 		GI->bShouldSpawnWithPod = false;
 	}
 
-	// 약간의 딜레이 후 컷씬 시작 (플레이어 초기화 대기)
+	// 플레이어 입력 비활성화 및 숨기기 (프리로드 중에도)
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		PC->SetInputMode(FInputModeUIOnly());
+
+		if (AFPSCharacter* Player = Cast<AFPSCharacter>(PC->GetPawn()))
+		{
+			Player->HideAllHUD();
+			Player->SetActorHiddenInGame(true);
+		}
+	}
+
+	// 로딩 화면 표시
+	if (LoadingWidgetClass)
+	{
+		LoadingWidget = CreateWidget<UUserWidget>(GetWorld(), LoadingWidgetClass);
+		if (LoadingWidget)
+		{
+			LoadingWidget->AddToViewport(100); // 높은 ZOrder로 맨 앞에 표시
+		}
+	}
+
+	// 워밍업 즉시 시작 (로딩 중에 병렬로 처리)
+	SpawnWarmupActors();
+
+	// 비동기 프리로드 시작
+	StartAsyncPreload();
+
+	// 서브레벨 로드 시작 (완료되면 컷씬 시작)
+	if (!SublevelToLoad.IsNone())
+	{
+		FLatentActionInfo LatentInfo;
+		LatentInfo.CallbackTarget = this;
+		LatentInfo.ExecutionFunction = FName("OnSublevelLoaded");
+		LatentInfo.Linkage = 0;
+		LatentInfo.UUID = 0;
+		UGameplayStatics::LoadStreamLevel(this, SublevelToLoad, true, true, LatentInfo);
+	}
+	else
+	{
+		// 서브레벨 없으면 바로 완료 처리
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, this, &AIntroCutsceneManager::OnSublevelLoaded, 0.1f, false);
+	}
+}
+
+void AIntroCutsceneManager::StartAsyncPreload()
+{
+	TArray<FSoftObjectPath> PathsToLoad;
+
+	// 액터 클래스들
+	for (const TSoftClassPtr<AActor>& SoftClass : PreloadActorClasses)
+	{
+		if (!SoftClass.IsNull())
+		{
+			PathsToLoad.Add(SoftClass.ToSoftObjectPath());
+		}
+	}
+
+	// 나이아가라 시스템들
+	for (const TSoftObjectPtr<UNiagaraSystem>& SoftPtr : PreloadNiagaraSystems)
+	{
+		if (!SoftPtr.IsNull())
+		{
+			PathsToLoad.Add(SoftPtr.ToSoftObjectPath());
+		}
+	}
+
+	// 사운드들
+	for (const TSoftObjectPtr<USoundBase>& SoftPtr : PreloadSounds)
+	{
+		if (!SoftPtr.IsNull())
+		{
+			PathsToLoad.Add(SoftPtr.ToSoftObjectPath());
+		}
+	}
+
+	// 기타 에셋들
+	for (const TSoftObjectPtr<UObject>& SoftPtr : PreloadMiscAssets)
+	{
+		if (!SoftPtr.IsNull())
+		{
+			PathsToLoad.Add(SoftPtr.ToSoftObjectPath());
+		}
+	}
+
+	if (PathsToLoad.Num() > 0)
+	{
+		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+		PreloadHandle = StreamableManager.RequestAsyncLoad(
+			PathsToLoad,
+			FStreamableDelegate::CreateUObject(this, &AIntroCutsceneManager::OnPreloadComplete),
+			FStreamableManager::AsyncLoadHighPriority
+		);
+	}
+	else
+	{
+		// 프리로드할 에셋이 없으면 바로 완료 처리
+		FTimerHandle StartTimerHandle;
+		GetWorldTimerManager().SetTimer(StartTimerHandle, this, &AIntroCutsceneManager::OnPreloadComplete, 0.1f, false);
+	}
+}
+
+void AIntroCutsceneManager::OnPreloadComplete()
+{
+	// 프리로드 핸들 해제
+	if (PreloadHandle.IsValid())
+	{
+		PreloadHandle.Reset();
+	}
+
+	bPreloadComplete = true;
+	// 프리로드 완료, 서브레벨 로드 완료를 기다림
+}
+
+void AIntroCutsceneManager::OnSublevelLoaded()
+{
+	// 서브레벨 로드 완료 후 약간 대기 (텍스처 스트리밍 등)
 	FTimerHandle StartTimerHandle;
-	GetWorldTimerManager().SetTimer(StartTimerHandle, this, &AIntroCutsceneManager::StartCutscene, 0.1f, false);
+	GetWorldTimerManager().SetTimer(StartTimerHandle, [this]()
+	{
+		// 로딩 화면 숨기기
+		if (LoadingWidget)
+		{
+			LoadingWidget->RemoveFromParent();
+			LoadingWidget = nullptr;
+		}
+
+		StartCutscene();
+
+	}, WarmupExtraDelay, false);
 }
 
 void AIntroCutsceneManager::StartCutscene()
@@ -41,11 +173,9 @@ void AIntroCutsceneManager::StartCutscene()
 		OnSoundPlayed.Broadcast(IntroCutsceneSubtitleKey);
 	}
 
-	// 플레이어 입력 비활성화 및 HUD 숨기기
+	// 플레이어 HUD 숨기기 및 POD 강하 (FPSCharacter BeginPlay 이후이므로 여기서 다시 숨김)
 	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
 	{
-		PC->SetInputMode(FInputModeUIOnly());
-
 		if (AFPSCharacter* Player = Cast<AFPSCharacter>(PC->GetPawn()))
 		{
 			Player->HideAllHUD();
@@ -62,15 +192,20 @@ void AIntroCutsceneManager::StartCutscene()
 		FTimerHandle PodTimerHandle;
 		GetWorldTimerManager().SetTimer(PodTimerHandle, this, &AIntroCutsceneManager::SpawnCinematicPod, PodSpawnDelay, false);
 	}
-
-	// 워밍업 액터들 스폰
-	SpawnWarmupActors();
-
+	
 	// 시퀀서 재생
 	if (IntroSequence)
 	{
+		// 오디오 클럭 소스로 설정 (오디오와 영상 동기화)
+		if (UMovieScene* MovieScene = IntroSequence->GetMovieScene())
+		{
+			MovieScene->SetClockSource(EUpdateClockSource::Audio);
+		}
+
 		ALevelSequenceActor* SequenceActor;
 		FMovieSceneSequencePlaybackSettings Settings;
+		Settings.bPauseAtEnd = true;
+
 		SequencePlayer = ULevelSequencePlayer::CreateLevelSequencePlayer(
 			GetWorld(), IntroSequence, Settings, SequenceActor);
 
@@ -164,6 +299,15 @@ void AIntroCutsceneManager::OnSequenceFinished()
 			Player->SetActorHiddenInGame(false);
 			Player->RestorePlayerState();
 			Player->SpawnWithPod();
+		}
+	}
+
+	// BGM 재생
+	if (PostCutsceneBGM)
+	{
+		if (UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(this)))
+		{
+			GI->PlayBGM(PostCutsceneBGM, BGMFadeInDuration);
 		}
 	}
 

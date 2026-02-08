@@ -81,6 +81,40 @@ Core/           # UHDGameInstance (BGM 관리, 레벨 전환 플래그)
 - `IAbilitySystemInterface` - 플레이어 GAS 통합
 - `IInteractableInterface` - 보급 포드 등 상호작용
 
+### 로딩 최적화 (`AIntroCutsceneManager`)
+
+**Preload vs Warmup 차이**
+| 구분 | Preload (TSoftPtr) | Warmup (하드 레퍼런스) |
+|------|-------------------|----------------------|
+| 동작 | 메모리에 비동기 로드 | 실제 스폰/재생 |
+| 효과 | 디스크 I/O 방지 | 셰이더 컴파일, 디코딩 완료 |
+| 에디터 | 이미 로드된 경우 즉시 완료 | 항상 효과 있음 |
+
+**에셋 타입별 권장 방법**
+| 에셋 | 권장 배열 | 비고 |
+|------|----------|------|
+| Actor/BP | `PreloadActorClasses` + `WarmupActorClasses` | 둘 다 사용 |
+| Niagara | `WarmupNiagaraSystems`만 | GPU 셰이더 컴파일 필요 |
+| Sound | `WarmupSounds`만 | 볼륨 0 재생으로 디코딩 |
+| Material | `PreloadMiscAssets` | 안전하게 프리로드 가능 |
+| SkeletalMesh | **직접 프리로드 금지** | MeshBuilder 크래시, BP로 대체 |
+
+**흐름**
+```
+BeginPlay → 플레이어 숨김 → StartAsyncPreload()
+    → OnPreloadComplete() → StartCutscene()
+    → SpawnWarmupActors() (실제 워밍업) → 시퀀서 재생
+```
+
+**Unreal Insights 사용법**
+```bash
+# 콘솔에서
+trace.start default,cpu,gpu,frame,loadtime
+# 렉 구간 플레이 후
+trace.stop
+# UnrealInsights.exe로 Saved/Profiling/*.utrace 파일 분석
+```
+
 ## Branch Strategy
 
 | 브랜치 | 용도 |
@@ -107,6 +141,7 @@ chore:    설정 등 기타
 
 ## 진행 상황
 
+- 2026-02-07: 로딩 최적화 시스템 구현 (`IntroCutsceneManager` 비동기 프리로드, Warmup 배열)
 - 2026-02-05: 컷씬 시스템 아키텍처 정리 (`IntroCutsceneManager`, `CinematicPod`, `ExtractionTerminal`, `ExtractionShip`)
 - 2026-02-03: 레벨 전환 트리거 및 POD 강하 스폰 시스템 (`LevelTransitionTrigger`, `SpawnWithPod`)
 - 2026-02-02: 데이터 링크 미션 구현 (`DataLinkMission`, `DataLinkTerminal`)
