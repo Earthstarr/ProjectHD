@@ -75,7 +75,7 @@ protected:
 
 	// 워밍업 완료 후 추가 대기 시간 (오디오 디코딩 등)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Warmup")
-	float WarmupExtraDelay = 40.0f;
+	float WarmupExtraDelay = 5.0f;
 
 	// ===== 로딩 화면 =====
 
@@ -109,7 +109,7 @@ protected:
 
 	// BGM 페이드인 시간
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
-	float BGMFadeInDuration = 2.0f;
+	float BGMFadeInDuration = 5.0f;
 
 public:
 	// 자막 델리게이트

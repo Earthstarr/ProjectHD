@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Projectile/HDProjectile.h"
+#include "Components/BoxComponent.h"
 #include "Grenade.generated.h"
+
+class UNiagaraComponent;
 
 /**
  * 
@@ -14,45 +17,54 @@ class PROJECTHD_API AGrenade : public AHDProjectile
 {
 	GENERATED_BODY()
 	
-public:	
+public:
 	AGrenade();
-	
+
 	virtual void BeginPlay() override;
-	
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float TimeToExplode = 2.5f;
-	
+	float TimeToExplode = 1.0f;
+
 	void StartExplosionTimer(float Delay);
-	
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void Explode();
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float Damage = 300.0f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float ExplosionRadius = 1200.0f;	
-	
-	// 소음 범위
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-	float NoiseLoud = 1.0f;
-	
-	// 이펙트
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	UNiagaraSystem* ExplosionEffect;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	USoundBase* ExplosionSound;
-	
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
-	
-	FVector ExplosionLocation;
-	void ReportDelayedNoise();	// 소음 이벤트
-	
+
+	// 방어벽 콜리전
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ShieldWall")
+	UBoxComponent* WallCollision;
+
+	// 방어벽 비주얼 메시
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ShieldWall")
+	UStaticMeshComponent* WallMesh;
+
+	// 방어벽 크기 (Half Extent)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ShieldWall")
+	FVector WallExtent = FVector(15.f, 300.f, 150.f);
+
+	// 방어벽 지속 시간
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ShieldWall")
+	float WallLifetime = 10.f;
+
+	// 이펙트
+	UPROPERTY(EditDefaultsOnly, Category = "ShieldWall")
+	UNiagaraSystem* ShieldFX;
+
+	UPROPERTY(EditDefaultsOnly, Category = "ShieldWall")
+	USoundBase* ActivateSound;
+
+	// 수류탄 트레일 이펙트
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UNiagaraSystem* TrailEffect;
+
+	UPROPERTY()
+	UNiagaraComponent* TrailComp;
+
 private:
 	FTimerHandle ExplosionTimerHandle;
-	FTimerHandle NoiseTimerHandle;
 	
 };

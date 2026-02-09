@@ -249,6 +249,7 @@ protected:
     void OnSelectWeapon1() { SwitchWeapon(0); }
     void OnSelectWeapon2() { SwitchWeapon(1); }
     void OnSelectWeapon3() { SwitchWeapon(2); }
+    void OnSelectWeapon4() { SwitchWeapon(3); }
 
     // 스트라타젬 함수
     void OnStratagemMenuAction(const struct FInputActionValue& Value);
@@ -271,6 +272,9 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
     class UWeaponDataAsset* ThirdWeaponData;
 
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+    class UWeaponDataAsset* FourthWeaponData;
+
     // 무기 교체
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
     class UInputAction* WeaponSlot1Action;
@@ -280,6 +284,9 @@ protected:
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
     class UInputAction* WeaponSlot3Action;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+    class UInputAction* WeaponSlot4Action;
 
     // 이동 속도
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")

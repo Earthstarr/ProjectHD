@@ -171,10 +171,11 @@ void AFPSCharacter::BeginPlay()
 
     OnGrenadeChanged.Broadcast(CurrentGrenadeCount, MaxGrenadeCount);
 
-    // 1, 2, 3번 무기 등록
+    // 1, 2, 3, 4번 무기 등록
     if (FirstWeaponData) WeaponInventory.Add(FWeaponInstance(FirstWeaponData));
     if (SecondWeaponData) WeaponInventory.Add(FWeaponInstance(SecondWeaponData));
     if (ThirdWeaponData) WeaponInventory.Add(FWeaponInstance(ThirdWeaponData));
+    if (FourthWeaponData) WeaponInventory.Add(FWeaponInstance(FourthWeaponData));
 
     // 첫 번째 무기 장착
     if (WeaponInventory.Num() > 0)
@@ -544,6 +545,10 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
         EnhancedInputComponent->BindAction(WeaponSlot1Action, ETriggerEvent::Started, this, &AFPSCharacter::OnSelectWeapon1);
         EnhancedInputComponent->BindAction(WeaponSlot2Action, ETriggerEvent::Started, this, &AFPSCharacter::OnSelectWeapon2);
         EnhancedInputComponent->BindAction(WeaponSlot3Action, ETriggerEvent::Started, this, &AFPSCharacter::OnSelectWeapon3);
+        if (WeaponSlot4Action)
+        {
+            EnhancedInputComponent->BindAction(WeaponSlot4Action, ETriggerEvent::Started, this, &AFPSCharacter::OnSelectWeapon4);
+        }
 
         // Q 키 (메뉴 열기/닫기)
         EnhancedInputComponent->BindAction(StratagemMenuAction, ETriggerEvent::Started, this, &AFPSCharacter::OnStratagemMenuAction);
@@ -1346,14 +1351,15 @@ void AFPSCharacter::FireWeapon()
         ActorSpawnParams.Owner = this;
         ActorSpawnParams.Instigator = this;
 
-        // 총구 화염 생성
-        if (MuzzleFlashFX)
+        // 총구 화염 생성 (무기별 FX 우선, 없으면 캐릭터 기본값)
+        UNiagaraSystem* ActiveMuzzleFX = CurrentWeaponData->MuzzleFlashFX ? CurrentWeaponData->MuzzleFlashFX : MuzzleFlashFX;
+        if (ActiveMuzzleFX)
         {
             UNiagaraFunctionLibrary::SpawnSystemAtLocation(
                 GetWorld(),
-                MuzzleFlashFX,
+                ActiveMuzzleFX,
                 MuzzleLocation,
-                MuzzleRotation
+                TargetRotation
             );
         }
 
