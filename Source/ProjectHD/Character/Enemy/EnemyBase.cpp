@@ -13,6 +13,8 @@
 #include "Components/StateTreeAIComponent.h"
 #include "ProjectHD/Character/Player/FPSCharacter.h"
 #include "ProjectHD/HDGameInstance.h"
+#include "Engine/DamageEvents.h"
+#include "ProjectHD/Weapon/HDSilentDamageType.h"
 #include "NavigationInvokerComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISense_Sight.h"
@@ -95,9 +97,9 @@ float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
     // 데미지를 입으면 주변 적에게 소음 알림
     if (ActualDamage > 0.0f && DamageCauser)
     {
-        
+
         AActor* RealAttacker = DamageCauser;  // 기본값은 DamageCauser
-    
+
         // 1순위: Instigator (플레이어 같은 Pawn)
         if (APawn* InstigatorPawn = DamageCauser->GetInstigator())
         {
@@ -108,19 +110,22 @@ float AEnemyBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent
         {
             RealAttacker = OwnerActor;
         }
-    
-        LastAttackerLocation = RealAttacker->GetActorLocation();    
-        
-        //DrawDebugSphere(GetWorld(), GetActorLocation(), 500.0f, 32, FColor::Red, false, 5.0f);
-    
-        UAISense_Hearing::ReportNoiseEvent(
-            GetWorld(),
-            GetActorLocation(),
-            NoiseLoud,
-            this,
-            0.0f,
-            FName(TEXT("HelpNoise")) // 태그
-        );
+
+        LastAttackerLocation = RealAttacker->GetActorLocation();
+
+        // SilentDamageType이면 소음 생략 (레일건 등)
+        bool bIsSilent = DamageEvent.DamageTypeClass && DamageEvent.DamageTypeClass->IsChildOf(UHDSilentDamageType::StaticClass());
+        if (!bIsSilent)
+        {
+            UAISense_Hearing::ReportNoiseEvent(
+                GetWorld(),
+                GetActorLocation(),
+                NoiseLoud,
+                this,
+                0.0f,
+                FName(TEXT("HelpNoise")) // 태그
+            );
+        }
     }   
     
     if (CurrentHealth <= 0.0f)

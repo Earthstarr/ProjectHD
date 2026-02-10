@@ -75,7 +75,7 @@ protected:
 
 	// 워밍업 완료 후 추가 대기 시간 (오디오 디코딩 등)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Warmup")
-	float WarmupExtraDelay = 5.0f;
+	float WarmupExtraDelay = 15.0f;
 
 	// ===== 로딩 화면 =====
 

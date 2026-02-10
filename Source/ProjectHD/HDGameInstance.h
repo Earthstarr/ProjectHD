@@ -105,7 +105,7 @@ public:
 
 	// 시간 보너스 기준 시간 (초)
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mission|Score")
-	float TimeBonusBaseSeconds = 600.0f;
+	float TimeBonusBaseSeconds = 900.0f;
 
 	// 시간 보너스 배율
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mission|Score")

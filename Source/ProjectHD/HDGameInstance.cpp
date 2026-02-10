@@ -157,12 +157,12 @@ FString UHDGameInstance::GetMissionGrade() const
 {
 	int32 Score = MissionResult.FinalScore;
 
-	if (Score >= 5000) return TEXT("SS");
-	if (Score >= 4000) return TEXT("S");
-	if (Score >= 3000) return TEXT("A");
-	if (Score >= 2000) return TEXT("B");
-	if (Score >= 1000) return TEXT("C");
-	if (Score >= 500) return TEXT("D");
+	if (Score >= 8000) return TEXT("SS");
+	if (Score >= 6000) return TEXT("S");
+	if (Score >= 5000) return TEXT("A");
+	if (Score >= 4000) return TEXT("B");
+	if (Score >= 3000) return TEXT("C");
+	if (Score >= 2000) return TEXT("D");
 	return TEXT("F");
 }
 

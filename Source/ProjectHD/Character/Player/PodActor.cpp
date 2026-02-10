@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
 #include "ProjectHD/Character/Enemy/EnemyBase.h"
+#include "GameFramework/SpringArmComponent.h"
 
 APodActor::APodActor()
 {
@@ -145,8 +146,25 @@ void APodActor::Tick(float DeltaTime)
 
 		if (GetWorld()->LineTraceSingleByChannel(GroundHit, Start, End, ECC_Visibility, Params))
 		{
+			// 착지 전 카메라 붐 위치를 월드 좌표로 고정 (포드가 땅속으로 가도 카메라는 지상에 유지)
+			TArray<AActor*> AttachedForCamera;
+			GetAttachedActors(AttachedForCamera);
+			for (AActor* Actor : AttachedForCamera)
+			{
+				AFPSCharacter* Player = Cast<AFPSCharacter>(Actor);
+				if (Player && Player->CameraBoom)
+				{
+					SavedBoomRelativeLocation = Player->CameraBoom->GetRelativeLocation();
+					FVector BoomWorldLoc = Player->CameraBoom->GetComponentLocation();
+					Player->CameraBoom->SetAbsolute(true, false, false);
+					Player->CameraBoom->SetRelativeLocation(BoomWorldLoc);
+					bCameraLocked = true;
+					break;
+				}
+			}
+
 			OnPodLanded();
-			
+
 			// 박힐 때 위치 보정
 			SetActorLocation(GroundHit.ImpactPoint + FVector(0.f, 0.f, -200.f));
 		}
@@ -217,7 +235,7 @@ void APodActor::OnPodLanded()
 void APodActor::HandleRiseProgress(float Value)
 {
 	// 0에서 1로 변하는 Value값을 이용해 내부 메쉬의 Z축 높이 조절
-	float NewZ = FMath::Lerp(-100.f, 100.f, Value);
+	float NewZ = FMath::Lerp(-100.f, 180.f, Value);
 	InternalElevatorMesh->SetRelativeLocation(FVector(0.f, 0.f, NewZ));
 	
 	if (Value >= 1.0f)
@@ -239,8 +257,9 @@ void APodActor::OnRiseFinished()
 			// 부착 해제
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
-			// 캐릭터 외형 다시 보이게 (무기 메시 포함)
-			Player->GetMesh()->SetVisibility(true, true);
+			// 캐릭터 외형 다시 보이게 (RetargetMesh + WeaponMesh)
+			Player->RetargetMesh->SetVisibility(true, true);
+			Player->GetMesh()->SetVisibility(false); // 기존 메시는 항상 숨김
 
 			// 메시 회전 다시 확인
 			Player->GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
@@ -260,10 +279,18 @@ void APodActor::OnRiseFinished()
 			Player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 			Player->GetCharacterMovement()->GravityScale = 1.0f;
             
-			// 입력 활성화
+			// 입력 활성화 및 카메라 붐 고정 해제
 			if (APlayerController* PC = Cast<APlayerController>(Player->GetController()))
 			{
 				Player->EnableInput(PC);
+
+				// 카메라 붐을 다시 상대 좌표로 복구
+				if (bCameraLocked && Player->CameraBoom)
+				{
+					Player->CameraBoom->SetAbsolute(false, false, false);
+					Player->CameraBoom->SetRelativeLocation(SavedBoomRelativeLocation);
+					bCameraLocked = false;
+				}
 			}
             
 			// 회전 모드 복구

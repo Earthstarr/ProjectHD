@@ -20,76 +20,91 @@ class PROJECTHD_API UWeaponDataAsset : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-    // --- ºñÁÖ¾ó ¹× ¿¡¼Â ---
+    // --- ï¿½ï¿½ï¿½Ö¾ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ---
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Visual")
-    USkeletalMesh* WeaponMesh; // ¹«±â ¿ÜÇü ¸Ş½Ã
+    USkeletalMesh* WeaponMesh; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ş½ï¿½
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Visual")
-    UNiagaraSystem* MuzzleFlashFX; // ÃÑ±¸ È­¿°
+    UNiagaraSystem* MuzzleFlashFX; // ï¿½Ñ±ï¿½ È­ï¿½ï¿½
 
-    // --- GAS °ü·Ã ---
+    // --- GAS ï¿½ï¿½ï¿½ï¿½ ---
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
-    TSubclassOf<UGameplayAbility> FireAbility; // »ç°İ ¾îºô¸®Æ¼
-
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
-    TSubclassOf<UGameplayAbility> ReloadAbility; // ¸®·Îµå ¾îºô¸®Æ¼
+    TSubclassOf<UGameplayAbility> FireAbility; // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
-    TSubclassOf<class UGameplayAbility> AimAbility; // ¹«±âº° Á¶ÁØ ¾îºô¸®Æ¼
+    TSubclassOf<UGameplayAbility> ReloadAbility; // ï¿½ï¿½ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
+    TSubclassOf<class UGameplayAbility> AimAbility; // ï¿½ï¿½ï¿½âº° ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Æ¼
     
-    // --- ¹«±â ½ºÆå ---
+    // --- ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ---
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-    float FireRate; // ¿¬»ç ¼Óµµ
+    float FireRate; // ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-    float RecoilPitch; // À§¾Æ·¡ ¹İµ¿ ¼öÄ¡
+    float RecoilPitch; // ï¿½ï¿½ï¿½Æ·ï¿½ ï¿½İµï¿½ ï¿½ï¿½Ä¡
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-    float RecoilYaw; // ÁÂ¿ì ¹İµ¿ ¼öÄ¡
+    float RecoilYaw; // ï¿½Â¿ï¿½ ï¿½İµï¿½ ï¿½ï¿½Ä¡
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-    int32 MaxAmmoInMag; // ÅºÃ¢ ´ç ÃÖ´ë ÃÑ¾Ë ¼ö
+    int32 MaxAmmoInMag; // ÅºÃ¢ ï¿½ï¿½ ï¿½Ö´ï¿½ ï¿½Ñ¾ï¿½ ï¿½ï¿½
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-    int32 MaxMag; // ÃÖ´ë ÅºÃ¢ ¼ö
+    int32 MaxMag; // ï¿½Ö´ï¿½ ÅºÃ¢ ï¿½ï¿½
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-    float AimFOV; // ÀÌ ¹«±â¸¦ Á¶ÁØÇßÀ» ¶§ÀÇ ½Ã¾ß°¢
+    float AimFOV; // ï¿½ï¿½ ï¿½ï¿½ï¿½â¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¾ß°ï¿½
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-    float AimWalkSpeed; // Á¶ÁØ ½Ã ÀÌµ¿ ¼Óµµ
+    float AimWalkSpeed; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½Óµï¿½
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-    TSubclassOf<class AHDProjectile> ProjectileClass; // ÅºÈ¯ Á¾·ù
+    TSubclassOf<class AHDProjectile> ProjectileClass; // ÅºÈ¯ ï¿½ï¿½ï¿½ï¿½
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-	float SoundRadius = 1500.0f; // ¹«±â ¼ÒÀ½ ¹İ°æ
+	float SoundRadius = 1500.0f; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½İ°ï¿½
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stats")
-	float Loudness = 1.0f; // ¹«±â ¼ÒÀ½ Å©±â(AI Hearing)
+	float Loudness = 1.0f; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½(AI Hearing)
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Ammo")
-	int32 AmmoSuppliedPerBox = 2; // º¸±Ş½Ã º¸ÃæµÇ´Â ÅºÃ¢ ¼ö
+	int32 AmmoSuppliedPerBox = 2; // ï¿½ï¿½ï¿½Ş½ï¿½ ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ ÅºÃ¢ ï¿½ï¿½
 	
 	// --- ABP ---
 	UPROPERTY(EditAnywhere, Category = "Animation")
-	TSubclassOf<UAnimInstance> WeaponAnimLayer; // ÇØ´ç ¹«±â Àü¿ë ·¹ÀÌ¾î ABP Å¬·¡½º
+	TSubclassOf<UAnimInstance> WeaponAnimLayer; // ï¿½Ø´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ ABP Å¬ï¿½ï¿½ï¿½ï¿½
 
 	UPROPERTY(EditAnywhere, Category = "Animation")
-	UAnimMontage* ReloadMontage; // ¹«±âº° ÀåÀü ¸ùÅ¸ÁÖ
+	UAnimMontage* ReloadMontage; // ï¿½ï¿½ï¿½âº° ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½
 	
 	UPROPERTY(EditAnywhere, Category = "Animation")
 	UAnimMontage* FireMontage;
 	
-	// ÃÑ±â Æ®·£½ºÆû Á¶Á¤
+	// ï¿½Ñ±ï¿½ Æ®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	UPROPERTY(EditAnywhere, Category = "Grip Correction")
-	FVector GripLocationOffset; // ¼ÕÀâÀÌ À§Ä¡ º¸Á¤°ª
+	FVector GripLocationOffset; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 	UPROPERTY(EditAnywhere, Category = "Grip Correction")
-	FRotator GripRotationOffset; // ÃÑ±¸ ¹æÇâ º¸Á¤°ª
+	FRotator GripRotationOffset; // ï¿½Ñ±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    // --- »ç¿îµå ---
+    // --- ï¿½ï¿½ï¿½ï¿½ ---
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Sound")
-    USoundBase* FireSound; // »ç°İ ¼Ò¸®
-    
+    USoundBase* FireSound; // ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½
+
+	// --- íˆíŠ¸ìŠ¤ìº” ---
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hitscan")
+	bool bIsHitscan = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hitscan", meta = (EditCondition = "bIsHitscan"))
+	float HitscanDamage = 2000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hitscan", meta = (EditCondition = "bIsHitscan"))
+	UNiagaraSystem* BeamFX = nullptr; // ë¹” ë‚˜ì´ì•„ê°€ë¼ (User_BeamStart/User_BeamEnd)
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hitscan", meta = (EditCondition = "bIsHitscan"))
+	UNiagaraSystem* HitscanImpactFX = nullptr; // ì  íˆíŠ¸ ì´í™íŠ¸
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Hitscan", meta = (EditCondition = "bIsHitscan"))
+	USoundBase* HitscanImpactSound = nullptr; // ì  íˆíŠ¸ ì‚¬ìš´ë“œ
 };

@@ -332,6 +332,9 @@ protected:
     UFUNCTION(BlueprintCallable, Category = "Combat")
     void FireWeapon();
 
+    // 히트스캔 발사 (관통 라인트레이스 + 빔 이펙트)
+    void FireHitscan(const FVector& MuzzleLocation, const FVector& AimPoint);
+
     FTimerHandle TimerHandle_AutomaticFire;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
@@ -624,11 +627,15 @@ public:
     // 탈출 터미널 (입력 처리용)
     UPROPERTY()
     class AExtractionTerminal* ActiveExtractionTerminal = nullptr;
+    
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+    class USkeletalMeshComponent* RetargetMesh;
 
 protected:
+
     UPROPERTY(BlueprintReadWrite, Category = "Mesh")
     class USkeletalMeshComponent* WeaponMesh;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
-    float FireRange = 12000.0f;
+    float FireRange = 300000.0f;
 };

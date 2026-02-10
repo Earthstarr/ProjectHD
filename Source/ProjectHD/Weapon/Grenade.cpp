@@ -41,6 +41,12 @@ void AGrenade::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Owner(플레이어) 충돌 무시 (생성자에서는 Owner가 없으므로 여기서 설정)
+	if (GetOwner() && CollisionComp)
+	{
+		CollisionComp->IgnoreActorWhenMoving(GetOwner(), true);
+	}
+
 	// 트레일 이펙트
 	if (TrailEffect)
 	{
@@ -104,5 +110,8 @@ void AGrenade::Explode()
 void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
+	// 던진 플레이어와 충돌 무시
+	if (OtherActor && OtherActor == GetOwner()) return;
+
 	Explode();
 }

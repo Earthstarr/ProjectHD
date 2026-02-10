@@ -67,9 +67,13 @@ protected:
 
 private:
 	bool bLanded = false;
-	
+
 	void OnRiseFinished();
-	
+
 	UPROPERTY()
 	UAudioComponent* FallingSoundComponent;
+
+	// 착지 시 카메라 붐 위치 고정용
+	FVector SavedBoomRelativeLocation;
+	bool bCameraLocked = false;
 };

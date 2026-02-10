@@ -12,6 +12,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ProjectHD/Weapon/Projectile/HDProjectile.h"
 #include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "ProjectHD/Weapon/Stratagem/StratagemBeacon.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "AbilitySystemComponent.h"
@@ -26,6 +27,8 @@
 #include "ProjectHD/Mission/ExtractionTerminal.h"
 #include "ProjectHD/Mission/IntroCutsceneManager.h"
 #include "ProjectHD/HDGameInstance.h"
+#include "ProjectHD/Weapon/HDSilentDamageType.h"
+#include "ProjectHD/Character/Enemy/EnemyBase.h"
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -66,10 +69,12 @@ AFPSCharacter::AFPSCharacter()
     // 메시 및 총구 설정
     GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
     GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
-    WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+    RetargetMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RetargetMesh"));
+    RetargetMesh->SetupAttachment(GetMesh());
+    RetargetMesh->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 
-    // 블루프린트에서 설정한 소켓 이름(예: WeaponSocket)에 부착
-    WeaponMesh->SetupAttachment(GetMesh(), TEXT("WeaponSocket"));
+    WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+    WeaponMesh->SetupAttachment(RetargetMesh, TEXT("WeaponSocket"));
 
     // 체력, 스태미나 관리용 AttributeSet
     AttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("AttributeSet"));
@@ -111,12 +116,20 @@ void AFPSCharacter::BeginPlay()
 {
     Super::BeginPlay();
 
-    // 입력 모드 초기화 (레벨 전환 후 입력 복구)
+    // 기존 캐릭터 메시 숨기기 (RetargetMesh 사용)
+    GetMesh()->SetVisibility(false);
+
+    // 입력 모드 초기화 (레벨 전환 후 입력 복구, 인트로 컷씬 중에는 건너뜀)
     if (APlayerController* PC = Cast<APlayerController>(GetController()))
     {
-        PC->EnableInput(PC);
         PC->bShowMouseCursor = false;
-        PC->SetInputMode(FInputModeGameOnly());
+
+        bool bCutsceneActive = UGameplayStatics::GetActorOfClass(GetWorld(), AIntroCutsceneManager::StaticClass()) != nullptr;
+        if (!bCutsceneActive)
+        {
+            PC->EnableInput(PC);
+            PC->SetInputMode(FInputModeGameOnly());
+        }
     }
 
     // 네비 메시 생성 범위 설정
@@ -457,44 +470,6 @@ void AFPSCharacter::Tick(float DeltaTime)
         }
     }
 
-    // 스프린트 토글: 움직일 때만 스태미나 소모
-    if (bSprintButtonDown && AbilitySystemComponent && AttributeSet)
-    {
-        FVector Velocity = GetVelocity();
-        float Speed = FVector(Velocity.X, Velocity.Y, 0.0f).Size(); // 수평 속도만 체크
-        float CurrentStamina = AttributeSet->GetStamina();
-
-        if (Speed > 10.0f && CurrentStamina > 0.0f) // 움직이고 있고 스태미나 있음
-        {
-            if (!bIsSprintActive && !bIsAiming && !bFireButtonDown)
-            {
-                // 회복 중이었다면 중단
-                GetWorldTimerManager().ClearTimer(TimerHandle_StaminaRegen);
-                AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaRegenEffectClass, AbilitySystemComponent);
-
-                FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
-                AbilitySystemComponent->RemoveLooseGameplayTag(ExhaustedTag);
-
-                // 스프린트 어빌리티 활성화
-                AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Sprint));
-                bIsSprintActive = true;
-            }
-        }
-        else if (bIsSprintActive) // 멈췄거나 스태미나 없음
-        {
-            // 스프린트 어빌리티 일시 정지 (토글은 유지)
-            AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInputID::Sprint));
-            bIsSprintActive = false;
-
-            // 스태미나 회복 시작
-            FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
-            if (!AbilitySystemComponent->HasMatchingGameplayTag(ExhaustedTag))
-            {
-                AbilitySystemComponent->AddLooseGameplayTag(ExhaustedTag);
-            }
-            GetWorldTimerManager().SetTimer(TimerHandle_StaminaRegen, this, &AFPSCharacter::StartStaminaRegen, 2.0f, false);
-        }
-    }
 }
 
 void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -511,8 +486,9 @@ void AFPSCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
         EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
-        // 달리기 (토글)
-        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AFPSCharacter::OnSprintToggle);
+        // 달리기 (홀드)
+        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AFPSCharacter::OnSprintStarted);
+        EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AFPSCharacter::OnSprintCompleted);
 
         // 수류탄 던지기
         EnhancedInputComponent->BindAction(GrenadeAction, ETriggerEvent::Started, this, &AFPSCharacter::OnGrenadeStart);
@@ -726,8 +702,31 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
 // GAS : 달리기
 void AFPSCharacter::OnSprintStarted()
 {
-    // 토글 상태만 설정, 실제 스프린트 활성화는 Tick에서 속도 체크 후 처리
     bSprintButtonDown = true;
+
+    // 조준 중이거나 사격 중이면 입력만 저장하고 리턴
+    if (bIsAiming || bFireButtonDown) return;
+
+    if (AbilitySystemComponent)
+    {
+        float CurrentStamina = AttributeSet->GetStamina();
+
+        // 스태미나가 0보다 크다면, 2초 대기 상태라도 태그 제거
+        if (CurrentStamina > 0.0f)
+        {
+            FGameplayTag ExhaustedTag = FGameplayTag::RequestGameplayTag(FName("State.Exhausted"));
+            AbilitySystemComponent->RemoveLooseGameplayTag(ExhaustedTag);
+
+            // 2초 회복 타이머 중단
+            GetWorldTimerManager().ClearTimer(TimerHandle_StaminaRegen);
+
+            // 기존 회복 효과 제거
+            AbilitySystemComponent->RemoveActiveGameplayEffectBySourceEffect(StaminaRegenEffectClass, AbilitySystemComponent);
+
+            // 달리기 시작
+            AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInputID::Sprint));
+        }
+    }
 }
 
 void AFPSCharacter::OnSprintCompleted()
@@ -832,7 +831,7 @@ void AFPSCharacter::RespawnWithPod()
     }
 
     // 포드 탑승 중 캐릭터 외형 숨기기 (무기 메시 포함)
-    GetMesh()->SetVisibility(false, true);
+    RetargetMesh->SetVisibility(false, true);
 
     // 체력 및 상태 초기화
     if (AttributeSet)
@@ -955,7 +954,7 @@ void AFPSCharacter::SpawnWithPod(bool bPlaySound)
     }
 
     // 포드 탑승 중 캐릭터 외형 숨기기 (무기 메시 포함)
-    GetMesh()->SetVisibility(false, true);
+    RetargetMesh->SetVisibility(false, true);
 
     // 캐릭터 일시적 비활성화
     GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -1085,7 +1084,7 @@ void AFPSCharacter::OnInteract()
     Params.AddIgnoredActor(this);
 
     // 구체 스위프
-    float SweepRadius = 50.0f;
+    float SweepRadius = 100.0f;
 
     bool bHit = GetWorld()->SweepSingleByChannel(
         Hit,
@@ -1146,7 +1145,7 @@ void AFPSCharacter::OnStimCompleted()
 
 void AFPSCharacter::OnFireStarted()
 {
-    if (bIsDead) return;
+    if (bIsDead || bIsOnPod) return;
 
     bFireButtonDown = true;
 
@@ -1318,7 +1317,7 @@ void AFPSCharacter::FireWeapon()
         AddControllerYawInput(RandomYaw);
     }
 
-    if (CurrentWeaponData->ProjectileClass)
+    if (CurrentWeaponData->bIsHitscan || CurrentWeaponData->ProjectileClass)
     {
         FVector MuzzleLocation = WeaponMesh->GetSocketLocation(TEXT("MuzzleSocket"));
         FRotator MuzzleRotation = WeaponMesh->GetSocketRotation(TEXT("MuzzleSocket"));
@@ -1346,11 +1345,6 @@ void AFPSCharacter::FireWeapon()
         // 총구에서 '조준점이 가리키는 위치'를 바라보는 회전값 계산
         FRotator TargetRotation = (LookAtLocation - MuzzleLocation).Rotation();
 
-        FActorSpawnParameters ActorSpawnParams;
-        ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-        ActorSpawnParams.Owner = this;
-        ActorSpawnParams.Instigator = this;
-
         // 총구 화염 생성 (무기별 FX 우선, 없으면 캐릭터 기본값)
         UNiagaraSystem* ActiveMuzzleFX = CurrentWeaponData->MuzzleFlashFX ? CurrentWeaponData->MuzzleFlashFX : MuzzleFlashFX;
         if (ActiveMuzzleFX)
@@ -1377,20 +1371,31 @@ void AFPSCharacter::FireWeapon()
         }
 
         // 소음
-        if (CurrentWeaponData)
-        {
-            UAISense_Hearing::ReportNoiseEvent(
-                GetWorld(),
-                GetActorLocation(),
-                CurrentWeaponData->Loudness,
-                this,
-                0.0f,
-                FName(TEXT("Noise"))
-            );
-        }
+        UAISense_Hearing::ReportNoiseEvent(
+            GetWorld(),
+            GetActorLocation(),
+            CurrentWeaponData->Loudness,
+            this,
+            0.0f,
+            FName(TEXT("Noise"))
+        );
 
-        // 투사체 발사
-        GetWorld()->SpawnActor<AHDProjectile>(CurrentWeaponData->ProjectileClass, MuzzleLocation, TargetRotation, ActorSpawnParams);
+        // 히트스캔, 투사체 분기
+        if (CurrentWeaponData->bIsHitscan)
+        {
+            // 히트스캔은 관통이므로 첫 히트 지점이 아닌 조준 방향 최대 사거리까지 스윕
+            FVector HitscanEnd = MuzzleLocation + (LookAtLocation - MuzzleLocation).GetSafeNormal() * FireRange;
+            FireHitscan(MuzzleLocation, HitscanEnd);
+        }
+        else
+        {
+            FActorSpawnParameters ActorSpawnParams;
+            ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+            ActorSpawnParams.Owner = this;
+            ActorSpawnParams.Instigator = this;
+
+            GetWorld()->SpawnActor<AHDProjectile>(CurrentWeaponData->ProjectileClass, MuzzleLocation, TargetRotation, ActorSpawnParams);
+        }
 
         CurrentAmmo--;
 
@@ -1415,6 +1420,113 @@ void AFPSCharacter::FireWeapon()
             // 계산된 속도로 재생
             AnimInstance->Montage_Play(CurrentWeaponData->FireMontage, CalculatedPlayRate);
         }
+    }
+}
+
+void AFPSCharacter::FireHitscan(const FVector& MuzzleLocation, const FVector& AimPoint)
+{
+    if (!CurrentWeaponData) return;
+
+    const float HitscanDamage = CurrentWeaponData->HitscanDamage;
+    FVector FinalEndPoint = AimPoint;
+
+    // 지형 히트 체크 — 벽/바닥에 막히면 거기까지만 탐색
+    FHitResult WallHit;
+    bool bHitWall = false;
+    {
+        FCollisionQueryParams WallParams;
+        WallParams.AddIgnoredActor(this);
+
+        if (GetWorld()->LineTraceSingleByChannel(WallHit, MuzzleLocation, FinalEndPoint, ECC_Visibility, WallParams))
+        {
+            // 히트 대상이 적이 아닌 지형/벽일 때만 차단
+            if (!Cast<AEnemyBase>(WallHit.GetActor()))
+            {
+                FinalEndPoint = WallHit.ImpactPoint;
+                bHitWall = true;
+            }
+        }
+    }
+
+    // 적 감지 (SweepMulti - Enemy 오브젝트 타입, 지형까지만 관통)
+    TArray<FHitResult> EnemyHits;
+    {
+        FCollisionQueryParams Params;
+        Params.AddIgnoredActor(this);
+
+        FCollisionObjectQueryParams ObjectQuery;
+        ObjectQuery.AddObjectTypesToQuery(ECC_GameTraceChannel1);
+
+        FCollisionShape SweepShape = FCollisionShape::MakeSphere(15.0f);
+
+        GetWorld()->SweepMultiByObjectType(
+            EnemyHits, MuzzleLocation, FinalEndPoint, FQuat::Identity, ObjectQuery, SweepShape, Params);
+    }
+
+    // 적 데미지 적용
+    for (const FHitResult& Hit : EnemyHits)
+    {
+        AEnemyBase* Enemy = Cast<AEnemyBase>(Hit.GetActor());
+        if (!Enemy || Enemy->bIsDead) continue;
+
+        float DamageDealt = UGameplayStatics::ApplyDamage(
+            Enemy,
+            HitscanDamage,
+            GetController(),
+            this,
+            UHDSilentDamageType::StaticClass()
+        );
+
+        if (DamageDealt > 0.f)
+        {
+            OnHitEnemy.Broadcast(false);
+        }
+
+        // 히트 이펙트
+        if (CurrentWeaponData->HitscanImpactFX)
+        {
+            UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+                GetWorld(),
+                CurrentWeaponData->HitscanImpactFX,
+                Hit.ImpactPoint,
+                Hit.ImpactNormal.Rotation()
+            );
+        }
+
+        // 히트 사운드
+        if (CurrentWeaponData->HitscanImpactSound)
+        {
+            UGameplayStatics::PlaySoundAtLocation(this, CurrentWeaponData->HitscanImpactSound, Hit.ImpactPoint);
+        }
+    }
+
+    // 빔 이펙트 스폰
+    if (CurrentWeaponData->BeamFX)
+    {
+        FRotator BeamRotation = (FinalEndPoint - MuzzleLocation).Rotation();
+        UNiagaraComponent* BeamComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(),
+            CurrentWeaponData->BeamFX,
+            MuzzleLocation,
+            BeamRotation
+        );
+
+        if (BeamComp)
+        {
+            BeamComp->SetVectorParameter(FName("User_BeamStart"), MuzzleLocation);
+            BeamComp->SetVectorParameter(FName("User_BeamEnd"), FinalEndPoint);
+        }
+    }
+
+    // 지형 히트 이펙트
+    if (bHitWall && CurrentWeaponData->HitscanImpactFX)
+    {
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+            GetWorld(),
+            CurrentWeaponData->HitscanImpactFX,
+            WallHit.ImpactPoint,
+            WallHit.ImpactNormal.Rotation()
+        );
     }
 }
 
@@ -1771,6 +1883,7 @@ void AFPSCharacter::RestorePlayerState()
 
     // 플레이어 보이기
     SetActorHiddenInGame(false);
+    GetMesh()->SetVisibility(false); // 기존 메시는 항상 숨김 (RetargetMesh 사용)
     SetActorEnableCollision(true);
 
     // 캐릭터 무브먼트 활성화
