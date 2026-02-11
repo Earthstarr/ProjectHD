@@ -132,6 +132,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStratagemUpdate, int32, Stratage
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStratagemStackUpdated, const TArray<EStratagemDirection>&, InputStack);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAttributeChanged, float, CurrentValue, float, MaxValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGrenadeChanged, int32, Current, int32, Max);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponChanged, int32, NewWeaponIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnStimChanged, int32, CurrentCount, int32, MaxCount);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnComboChanged, int32, NewCombo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStratagemMenuOpened, bool, bCanRearm);
@@ -597,6 +598,9 @@ public:
     
     UPROPERTY(BlueprintAssignable, Category = "Stratagem")
     FOnStratagemStackUpdated OnStratagemStackUpdated;
+
+    UPROPERTY(BlueprintAssignable, Category = "Events")
+    FOnWeaponChanged OnWeaponChanged;
     
     UPROPERTY(BlueprintAssignable, Category = "Events")
     FOnGrenadeChanged OnGrenadeChanged;
@@ -619,6 +623,10 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
     float MouseSensitivity = 0.3f;
+
+    // 레일건(4번 무기) 조준 시 감도 배율
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+    float RailgunAimSensitivityMultiplier = 0.4f;
 
     // 데이터 링크 터미널 (입력 처리용)
     UPROPERTY()

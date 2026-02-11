@@ -151,6 +151,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Mission")
 	FString GetMissionGrade() const;
 
+	// 등급별 색상
+	UFUNCTION(BlueprintPure, Category = "Mission")
+	FLinearColor GetMissionGradeColor() const;
+
 	// 미션 시간 포맷팅 (MM:SS)
 	UFUNCTION(BlueprintPure, Category = "Mission")
 	FString GetFormattedMissionTime() const;

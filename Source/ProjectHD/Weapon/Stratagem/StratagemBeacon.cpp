@@ -18,9 +18,7 @@ AStratagemBeacon::AStratagemBeacon()
     CollisionComp->InitSphereRadius(10.0f);
     CollisionComp->SetCollisionProfileName(TEXT("Projectile"));
 
-    CollisionComp->SetCollisionProfileName(TEXT("BlockAll")); // 혹은 "Custom"
-
-    // 2. 물리적 충돌 신호(Simulation Generates Hit Events)를 확실히 켬
+    // 물리적 충돌 신호(Simulation Generates Hit Events)를 확실히 켬
     CollisionComp->SetCanEverAffectNavigation(false);
     CollisionComp->bReturnMaterialOnMove = true;
     CollisionComp->SetNotifyRigidBodyCollision(true);
@@ -206,9 +204,9 @@ void AStratagemBeacon::TriggerStrike()
                     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ClusterExplosionFX, FinalExplosionPos);
                 }                
                 
-                if (ClusterExplosionSound)
+                if (ClusterExplosionSound && FMath::FRand() < 0.33f)
                 {
-                    UGameplayStatics::PlaySoundAtLocation(this, ClusterExplosionSound, FinalExplosionPos, 
+                    UGameplayStatics::PlaySoundAtLocation(this, ClusterExplosionSound, FinalExplosionPos,
                         FMath::FRandRange(0.4f, 0.6f), FMath::FRandRange(0.8f, 1.2f));
                 }
                 

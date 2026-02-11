@@ -574,8 +574,16 @@ void AFPSCharacter::Look(const FInputActionValue& Value)
 
     if (Controller != nullptr)
     {
-        AddControllerYawInput(LookAxisVector.X * MouseSensitivity);
-        AddControllerPitchInput(LookAxisVector.Y * MouseSensitivity);
+        float Sensitivity = MouseSensitivity;
+
+        // 레일건(4번 무기) 조준 시 감도 낮춤
+        if (bIsAiming && CurrentWeaponIndex == 3)
+        {
+            Sensitivity *= RailgunAimSensitivityMultiplier;
+        }
+
+        AddControllerYawInput(LookAxisVector.X * Sensitivity);
+        AddControllerPitchInput(LookAxisVector.Y * Sensitivity);
     }
 }
 
@@ -697,6 +705,7 @@ void AFPSCharacter::EquipWeapon(UWeaponDataAsset* NewWeaponData)
 
     // UI 갱신 델리게이트 호출
     OnAmmoChanged.Broadcast(CurrentAmmo, CurrentMagCount, MaxMagCount);
+    OnWeaponChanged.Broadcast(CurrentWeaponIndex);
 }
 
 // GAS : 달리기

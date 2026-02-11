@@ -27,6 +27,13 @@ ADataLinkTerminal::ADataLinkTerminal()
 	ProgressZone->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 	ProgressZone->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
+	// 홀로그램 메쉬 (업로드 중 표시)
+	HologramMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HologramMesh"));
+	HologramMesh->SetupAttachment(RootComponent);
+	HologramMesh->SetRelativeLocation(FVector(0.0f, 0.0f, 200.0f));
+	HologramMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HologramMesh->SetVisibility(false);
+
 	// 상호작용 위젯 (E - 활성화)
 	InteractionWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("InteractionWidget"));
 	InteractionWidget->SetupAttachment(RootComponent);
@@ -229,6 +236,9 @@ void ADataLinkTerminal::StartUploading()
 	RemoveArrowWidget();
 	CreateProgressWidget();
 
+	// 홀로그램 표시
+	HologramMesh->SetVisibility(true);
+
 	OnDataLinkStateChanged.Broadcast(TerminalState);
 	OnDataLinkProgressChanged.Broadcast(CurrentProgress, UploadDuration);
 }
@@ -271,6 +281,9 @@ void ADataLinkTerminal::InterruptUpload()
 	// 진행도 위젯 제거
 	RemoveProgressWidget();
 
+	// 홀로그램 숨김
+	HologramMesh->SetVisibility(false);
+
 	OnDataLinkStateChanged.Broadcast(TerminalState);
 	OnDataLinkProgressChanged.Broadcast(0.0f, UploadDuration);
 
@@ -287,6 +300,9 @@ void ADataLinkTerminal::CompleteUpload()
 	InteractingPlayer = nullptr;
 
 	RemoveProgressWidget();
+
+	// 홀로그램 숨김
+	HologramMesh->SetVisibility(false);
 
 	// 사운드 및 자막
 	if (UploadCompleteSound)

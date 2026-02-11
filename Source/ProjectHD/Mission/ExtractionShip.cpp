@@ -188,13 +188,25 @@ void AExtractionShip::UpdateLanding(float DeltaTime)
 void AExtractionShip::CompleteLanding()
 {
 	ShipState = EShipState::Waiting;
-	
+
 	// 트레일 비활성화
 	if (LeftTrail) LeftTrail->Deactivate();
 	if (RightTrail) RightTrail->Deactivate();
 
 	OnShipStateChanged.Broadcast(ShipState);
 	OnLandingCompleted();
+
+	// 이미 BoardingZone 안에 있는 플레이어 체크
+	TArray<AActor*> OverlappingActors;
+	BoardingZone->GetOverlappingActors(OverlappingActors, AFPSCharacter::StaticClass());
+	for (AActor* Actor : OverlappingActors)
+	{
+		if (AFPSCharacter* Player = Cast<AFPSCharacter>(Actor))
+		{
+			HandleBoardingBeginOverlap(BoardingZone, Player, nullptr, 0, false, FHitResult());
+			break;
+		}
+	}
 }
 
 void AExtractionShip::HandleBoardingBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

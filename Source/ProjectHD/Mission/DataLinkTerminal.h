@@ -49,6 +49,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class UWidgetComponent* InteractionWidget;
 
+	// 홀로그램 메쉬
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UStaticMeshComponent* HologramMesh;
+
 	// 상태
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DataLink")
 	EDataLinkTerminalState TerminalState = EDataLinkTerminalState::Idle;
@@ -63,13 +67,13 @@ protected:
 
 	// 업로드 설정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataLink|Upload")
-	float UploadDuration = 90.0f;
+	float UploadDuration = 60.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DataLink|Upload")
 	float CurrentProgress = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataLink|Upload")
-	float ProgressZoneRadius = 1500.0f;
+	float ProgressZoneRadius = 5000.0f;
 
 	// 플레이어 참조
 	UPROPERTY()

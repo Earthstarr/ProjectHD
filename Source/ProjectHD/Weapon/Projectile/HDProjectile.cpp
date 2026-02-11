@@ -37,8 +37,8 @@ AHDProjectile::AHDProjectile()
 
 	CollisionComp->IgnoreActorWhenMoving(GetOwner(), true);
 
-	// 5초 뒤에 자동으로 삭제
-	InitialLifeSpan = 5.0f;
+	// 8초 뒤에 자동으로 삭제
+	InitialLifeSpan = 8.0f;
 }
 
 void AHDProjectile::BeginPlay()

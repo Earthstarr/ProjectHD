@@ -166,6 +166,19 @@ FString UHDGameInstance::GetMissionGrade() const
 	return TEXT("F");
 }
 
+FLinearColor UHDGameInstance::GetMissionGradeColor() const
+{
+	FString Grade = GetMissionGrade();
+
+	if (Grade == TEXT("SS")) return FLinearColor(1.0f, 0.85f, 0.0f);   // 금색
+	if (Grade == TEXT("S"))  return FLinearColor(1.0f, 0.5f, 0.0f);    // 주황
+	if (Grade == TEXT("A"))  return FLinearColor(0.0f, 1.0f, 0.2f);    // 초록
+	if (Grade == TEXT("B"))  return FLinearColor(0.3f, 0.7f, 1.0f);    // 하늘
+	if (Grade == TEXT("C"))  return FLinearColor(0.7f, 0.7f, 0.7f);    // 회색
+	if (Grade == TEXT("D"))  return FLinearColor(0.8f, 0.4f, 0.2f);    // 갈색
+	return FLinearColor(1.0f, 0.1f, 0.1f);                             // 빨강 (F)
+}
+
 FString UHDGameInstance::GetFormattedMissionTime() const
 {
 	int32 TotalSeconds = FMath::RoundToInt(MissionResult.MissionTime);

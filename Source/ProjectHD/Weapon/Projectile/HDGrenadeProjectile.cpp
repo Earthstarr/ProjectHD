@@ -5,8 +5,8 @@
 
 AHDGrenadeProjectile::AHDGrenadeProjectile()
 {
-    ProjectileMovement->InitialSpeed = 3000.f;
-    ProjectileMovement->MaxSpeed = 3000.f;
+    ProjectileMovement->InitialSpeed = 8000.f;
+    ProjectileMovement->MaxSpeed = 8000.f;
     ProjectileMovement->ProjectileGravityScale = 1.0f;
 
     DamageAmount = 200.f;
