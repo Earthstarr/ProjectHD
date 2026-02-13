@@ -39,7 +39,7 @@ void AHDGrenadeProjectile::Explode(FVector Location, FVector ImpactNormal)
     // 범위 데미지
     UGameplayStatics::ApplyRadialDamageWithFalloff(
         this, DamageAmount, 10.f, ExplosionOrigin,
-        ExplosionRadius * 0.5f, ExplosionRadius, 1.f,
+        ExplosionRadius * 0.7f, ExplosionRadius, 2.f,
         UDamageType::StaticClass(), TArray<AActor*>(),
         this, GetInstigatorController(), ECC_Visibility
     );

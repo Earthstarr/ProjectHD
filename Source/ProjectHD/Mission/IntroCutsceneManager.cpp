@@ -302,13 +302,15 @@ void AIntroCutsceneManager::OnSequenceFinished()
 		}
 	}
 
-	// BGM 재생
-	if (PostCutsceneBGM)
+	// BGM 재생 및 미션 타이머 시작
+	if (UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(this)))
 	{
-		if (UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(this)))
+		if (PostCutsceneBGM)
 		{
 			GI->PlayBGM(PostCutsceneBGM, BGMFadeInDuration);
 		}
+		GI->ResetMissionResult();
+		GI->StartMissionTimer(this);
 	}
 
 	OnIntroCutsceneFinished.Broadcast();

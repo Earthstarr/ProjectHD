@@ -15,6 +15,7 @@ class AHDProjectile;
 class UNiagaraSystem;
 class UGameplayEffect;
 class ADataLinkTerminal;
+class ACameraActor;
 
 // 스트라타젬 입력 화살표 방향
 UENUM(BlueprintType)
@@ -516,6 +517,10 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
     class UCameraComponent* ThirdPersonCamera;
 
+    // 카메라가 벽에 밀려 캐릭터에 가까워지면 true
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+    bool bCameraTooClose = false;
+
     // 입력 시스템
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
     class UInputMappingContext* DefaultMappingContext;
@@ -582,6 +587,45 @@ public:
     // 플레이어 상태 복구 (결과 화면 후)
     UFUNCTION(BlueprintCallable, Category = "HUD")
     void RestorePlayerState();
+
+    // === 메인 메뉴 시스템 ===
+    UPROPERTY(BlueprintReadOnly, Category = "MainMenu")
+    bool bIsInMainMenu = false;
+
+    bool bMenuCameraTransitioning = false;
+    float MenuCameraOrbitAlpha = 0.0f;
+
+    UPROPERTY(EditAnywhere, Category = "MainMenu")
+    float MenuCameraDistance = 250.0f;
+
+    UPROPERTY(EditAnywhere, Category = "MainMenu")
+    float MenuCameraHeightOffset = 30.0f;
+
+    UPROPERTY(EditAnywhere, Category = "MainMenu")
+    float MenuCameraOrbitDuration = 2.0f;
+
+    // 시작 카메라 각도 오프셋 (0=정면, 양수=오른쪽 사선, 음수=왼쪽 사선)
+    UPROPERTY(EditAnywhere, Category = "MainMenu")
+    float MenuCameraStartAngle = 20.0f;
+
+    // TPS 카메라 수렴 시작 시점 (0.0~1.0, 낮을수록 빨리 다가감)
+    UPROPERTY(EditAnywhere, Category = "MainMenu", meta = (ClampMin = "0.0", ClampMax = "0.9"))
+    float MenuCameraBlendStart = 0.5f;
+
+    UPROPERTY()
+    ACameraActor* MenuCamera = nullptr;
+
+    UPROPERTY(EditAnywhere, Category = "MainMenu")
+    TSubclassOf<UUserWidget> MainMenuWidgetClass;
+
+    UPROPERTY(BlueprintReadOnly, Category = "MainMenu")
+    UUserWidget* MainMenuWidget = nullptr;
+
+    UFUNCTION(BlueprintCallable, Category = "MainMenu")
+    void StartGameFromMenu();
+
+    UFUNCTION(BlueprintCallable, Category = "MainMenu")
+    void QuitGameFromMenu();
 
     // 이벤트 델리게이트
     UPROPERTY(BlueprintAssignable, Category = "Stratagem")

@@ -15,19 +15,19 @@ APodActor::APodActor()
 
 	PodMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PodMesh"));
 	RootComponent = PodMesh;
-    
+
 	// 물리 설정
 	PodMesh->SetSimulatePhysics(false); // 초기엔 꺼둠
 	PodMesh->SetEnableGravity(true);
 	PodMesh->SetNotifyRigidBodyCollision(true);
-    
+
 	// 질량 먼저 설정
 	PodMesh->SetMassOverrideInKg(NAME_None, 1000.0f, true);
-    
+
 	// 감쇠 설정
 	PodMesh->SetLinearDamping(0.0f);
 	PodMesh->SetAngularDamping(0.0f);
-    
+
 	// 콜리전 설정
 	PodMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	PodMesh->SetCollisionObjectType(ECC_WorldDynamic);
@@ -146,7 +146,7 @@ void APodActor::Tick(float DeltaTime)
 
 		if (GetWorld()->LineTraceSingleByChannel(GroundHit, Start, End, ECC_Visibility, Params))
 		{
-			// 착지 전 카메라 붐 위치를 월드 좌표로 고정 (포드가 땅속으로 가도 카메라는 지상에 유지)
+			// 착지 전 카메라 붐을 현재 공중 위치에서 월드 좌표로 고정
 			TArray<AActor*> AttachedForCamera;
 			GetAttachedActors(AttachedForCamera);
 			for (AActor* Actor : AttachedForCamera)
@@ -155,10 +155,19 @@ void APodActor::Tick(float DeltaTime)
 				if (Player && Player->CameraBoom)
 				{
 					SavedBoomRelativeLocation = Player->CameraBoom->GetRelativeLocation();
-					FVector BoomWorldLoc = Player->CameraBoom->GetComponentLocation();
+					CameraLockedWorldPos = Player->CameraBoom->GetComponentLocation();
 					Player->CameraBoom->SetAbsolute(true, false, false);
-					Player->CameraBoom->SetRelativeLocation(BoomWorldLoc);
+					Player->CameraBoom->SetRelativeLocation(CameraLockedWorldPos);
 					bCameraLocked = true;
+
+					// 보간 시작값 저장
+					BlendStartArmLength = Player->CameraBoom->TargetArmLength;
+					BlendStartSocketOffset = Player->CameraBoom->SocketOffset;
+					if (APlayerController* PC = Cast<APlayerController>(Player->GetController()))
+					{
+						BlendStartPitch = PC->GetControlRotation().Pitch;
+						if (BlendStartPitch > 180.f) BlendStartPitch -= 360.f;
+					}
 					break;
 				}
 			}
@@ -176,7 +185,7 @@ void APodActor::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitive
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
 	// 지면에 닿았고 아직 착지 처리가 안 되었다면
-	if (!bLanded && Hit.ImpactNormal.Z > 0.5f) 
+	if (!bLanded && Hit.ImpactNormal.Z > 0.5f)
 	{
 		OnPodLanded();
 	}
@@ -208,11 +217,11 @@ void APodActor::OnPodLanded()
 			1.0f
 		);
 	}
-	
-	// 부착된 플레이어의 bIsOnPod false
+
+	// 부착된 플레이어 처리
 	TArray<AActor*> AttachedActors;
 	GetAttachedActors(AttachedActors);
-    
+
 	for (AActor* Actor : AttachedActors)
 	{
 		AFPSCharacter* Player = Cast<AFPSCharacter>(Actor);
@@ -220,12 +229,10 @@ void APodActor::OnPodLanded()
 		{
 			Player->bIsOnPod = false;
 
-			// 착지 시 시야를 위로 강제 이동
-			if (APlayerController* PC = Cast<APlayerController>(Player->GetController()))
-			{
-				FRotator CurrentRot = PC->GetControlRotation();
-				PC->SetControlRotation(FRotator(-30.f, CurrentRot.Yaw, 0.f));  // Pitch를 -30도 (위쪽)
-			}
+			// 착지 후 캐릭터 보이게 (올라오는 연출에 필요)
+			Player->SetActorHiddenInGame(false);
+			Player->RetargetMesh->SetVisibility(true, true);
+			Player->GetMesh()->SetVisibility(false);
 		}
 	}
 
@@ -234,10 +241,44 @@ void APodActor::OnPodLanded()
 
 void APodActor::HandleRiseProgress(float Value)
 {
-	// 0에서 1로 변하는 Value값을 이용해 내부 메쉬의 Z축 높이 조절
-	float NewZ = FMath::Lerp(-100.f, 180.f, Value);
+	// 엘리베이터 Z축 높이 조절
+	float NewZ = FMath::Lerp(-100.f, 160.f, Value);
 	InternalElevatorMesh->SetRelativeLocation(FVector(0.f, 0.f, NewZ));
-	
+
+	// EaseInOutCubic
+	float T = Value;
+	float EasedT = (T < 0.5f) ? 4.f * T * T * T : 1.f - FMath::Pow(-2.f * T + 2.f, 3.f) / 2.f;
+
+	// 카메라 보간: 공중 고정 위치 → 플레이 카메라 위치 (RiseTimeline과 동기화)
+	TArray<AActor*> Attached;
+	GetAttachedActors(Attached);
+	for (AActor* Actor : Attached)
+	{
+		AFPSCharacter* Player = Cast<AFPSCharacter>(Actor);
+		if (Player && Player->CameraBoom)
+		{
+			// ArmLength, SocketOffset 보간
+			Player->CameraBoom->TargetArmLength = FMath::Lerp(BlendStartArmLength, 500.f, EasedT);
+			Player->CameraBoom->SocketOffset = FMath::Lerp(BlendStartSocketOffset, FVector(0.f, 120.f, 80.f), EasedT);
+
+			// Pitch 보간
+			if (APlayerController* PC = Cast<APlayerController>(Player->GetController()))
+			{
+				float NewPitch = FMath::Lerp(BlendStartPitch, -15.f, EasedT);
+				FRotator Rot = PC->GetControlRotation();
+				PC->SetControlRotation(FRotator(NewPitch, Rot.Yaw, 0.f));
+			}
+
+			// 카메라 붐 월드 위치 보간: 공중 → 캐릭터 기준 위치
+			if (bCameraLocked)
+			{
+				FVector TargetWorldPos = Player->GetActorLocation() + SavedBoomRelativeLocation;
+				FVector BlendedPos = FMath::Lerp(CameraLockedWorldPos, TargetWorldPos, EasedT);
+				Player->CameraBoom->SetRelativeLocation(BlendedPos);
+			}
+		}
+	}
+
 	if (Value >= 1.0f)
 	{
 		OnRiseFinished();
@@ -257,42 +298,40 @@ void APodActor::OnRiseFinished()
 			// 부착 해제
 			Player->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
-			// 캐릭터 외형 다시 보이게 (RetargetMesh + WeaponMesh)
-			Player->RetargetMesh->SetVisibility(true, true);
-			Player->GetMesh()->SetVisibility(false); // 기존 메시는 항상 숨김
-
 			// 메시 회전 다시 확인
 			Player->GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 			Player->GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -96.f));
-            
+
 			// 캐릭터를 지면 위로 약간 띄워서 안착
 			FVector CurrentLoc = Player->GetActorLocation();
 			Player->SetActorLocation(CurrentLoc + FVector(0, 0, 10.f));
-            
+
 			// 리전 및 중력 원복
 			Player->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			Player->GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Block);
 			Player->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 			Player->GetCapsuleComponent()->SetEnableGravity(true);
-            
+
 			// 이동 모드 복구
 			Player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 			Player->GetCharacterMovement()->GravityScale = 1.0f;
-            
-			// 입력 활성화 및 카메라 붐 고정 해제
+
+			// 입력 활성화 및 카메라 최종 복구
 			if (APlayerController* PC = Cast<APlayerController>(Player->GetController()))
 			{
 				Player->EnableInput(PC);
 
-				// 카메라 붐을 다시 상대 좌표로 복구
-				if (bCameraLocked && Player->CameraBoom)
+				// 카메라 붐을 relative로 복구 + 최종값 설정
+				if (Player->CameraBoom)
 				{
 					Player->CameraBoom->SetAbsolute(false, false, false);
 					Player->CameraBoom->SetRelativeLocation(SavedBoomRelativeLocation);
-					bCameraLocked = false;
+					Player->CameraBoom->TargetArmLength = 500.f;
+					Player->CameraBoom->SocketOffset = FVector(0.f, 120.f, 80.f);
 				}
+				bCameraLocked = false;
 			}
-            
+
 			// 회전 모드 복구
 			Player->bUseControllerRotationPitch = false;
 			Player->bUseControllerRotationYaw = false;
@@ -300,7 +339,7 @@ void APodActor::OnRiseFinished()
 			Player->GetCharacterMovement()->bOrientRotationToMovement = true;
 		}
 	}
-    
+
 	// 포드 제거
 	SetLifeSpan(10.0f);
 }

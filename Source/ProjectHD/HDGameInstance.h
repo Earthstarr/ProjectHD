@@ -6,6 +6,11 @@
 
 // 전방 선언
 enum class EStratagemType : uint8;
+class USoundMix;
+class USoundClass;
+class UHDSaveSettings;
+class UInputMappingContext;
+class UInputAction;
 
 // 미션 결과 데이터
 USTRUCT(BlueprintType)
@@ -58,6 +63,111 @@ class PROJECTHD_API UHDGameInstance : public UGameInstance
 
 public:
 	UHDGameInstance();
+
+	virtual void Init() override;
+
+	// ===== 설정 시스템 =====
+
+	// --- Audio 설정 ---
+	UFUNCTION(BlueprintCallable, Category = "Settings|Audio")
+	void SetMasterVolume(float Volume);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Audio")
+	float GetMasterVolume() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Audio")
+	void SetMusicVolume(float Volume);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Audio")
+	float GetMusicVolume() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Audio")
+	void SetSFXVolume(float Volume);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Audio")
+	float GetSFXVolume() const;
+
+	// --- Video 설정 ---
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetWindowMode(int32 Mode);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	int32 GetWindowMode() const;
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	TArray<FIntPoint> GetSupportedResolutions() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetResolution(FIntPoint Resolution);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	FIntPoint GetCurrentResolution() const;
+
+	// "1920 x 1080" 형식으로 반환
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	static FString FormatResolution(FIntPoint Resolution);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetBrightness(float Value);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	float GetBrightness() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetOverallQuality(int32 Level);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	int32 GetOverallQuality() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetShadowQuality(int32 Level);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	int32 GetShadowQuality() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetAntiAliasingQuality(int32 Level);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	int32 GetAntiAliasingQuality() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetTextureQuality(int32 Level);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	int32 GetTextureQuality() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetViewDistanceQuality(int32 Level);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	int32 GetViewDistanceQuality() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void SetEffectsQuality(int32 Level);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Video")
+	int32 GetEffectsQuality() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Settings|Video")
+	void ApplyVideoSettings();
+
+	// --- Key Binding ---
+	UFUNCTION(BlueprintCallable, Category = "Settings|Input")
+	void RemapKey(UInputMappingContext* Context, UInputAction* Action, FKey NewKey);
+
+	UFUNCTION(BlueprintPure, Category = "Settings|Input")
+	FKey GetKeyForAction(UInputMappingContext* Context, UInputAction* Action) const;
+
+	// --- 저장/로드 ---
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void SaveSettings();
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	void LoadAndApplySettings();
+
+	UPROPERTY(BlueprintReadOnly, Category = "Settings")
+	UHDSaveSettings* CachedSettings;
 
 	// ===== BGM 시스템 =====
 
@@ -155,11 +265,31 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Mission")
 	FLinearColor GetMissionGradeColor() const;
 
-	// 미션 시간 포맷팅 (MM:SS)
+	// 미션 시간 포맷팅 (MM:SS) - 결과용 (타이머 정지 후)
 	UFUNCTION(BlueprintPure, Category = "Mission")
 	FString GetFormattedMissionTime() const;
 
+	// 실시간 경과 시간 (MM:SS) - 플레이 중 위젯 표시용
+	UFUNCTION(BlueprintPure, Category = "Mission", meta = (WorldContext = "WorldContextObject"))
+	FString GetElapsedTimeFormatted(UObject* WorldContextObject) const;
+
 protected:
+	// === 설정용 에셋 (에디터에서 할당) ===
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Audio")
+	USoundMix* MasterSoundMix;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Audio")
+	USoundClass* MasterSoundClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Audio")
+	USoundClass* MusicSoundClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Settings|Audio")
+	USoundClass* SFXSoundClass;
+
+	void ApplyAudioVolume(USoundClass* SoundClass, float Volume);
+
+	// === BGM ===
 	UPROPERTY()
 	class UAudioComponent* BGMComponent;
 
