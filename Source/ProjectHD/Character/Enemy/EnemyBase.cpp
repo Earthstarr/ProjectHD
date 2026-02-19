@@ -32,6 +32,10 @@ AEnemyBase::AEnemyBase()
     
     GetCharacterMovement()->bEnablePhysicsInteraction = false;
     GetCharacterMovement()->AvoidanceConsiderationRadius = 0.0f;
+
+    // 애니메이션 URO (Update Rate Optimization)
+    GetMesh()->bEnableUpdateRateOptimizations = true;
+    GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::OnlyTickPoseWhenRendered;
 }
 
 void AEnemyBase::BeginPlay()

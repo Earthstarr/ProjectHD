@@ -141,6 +141,8 @@ chore:    설정 등 기타
 
 ## 진행 상황
 
+- 2026-02-12: 옵션 메뉴 시스템 (`HDSaveSettings`, `HDGameInstance` 확장 - Audio/Video/KeyBinding/Save)
+- 2026-02-12: 메인 메뉴 시스템 (SpaceShip 레벨 카메라 오빗, `StartGameFromMenu`)
 - 2026-02-07: 로딩 최적화 시스템 구현 (`IntroCutsceneManager` 비동기 프리로드, Warmup 배열)
 - 2026-02-05: 컷씬 시스템 아키텍처 정리 (`IntroCutsceneManager`, `CinematicPod`, `ExtractionTerminal`, `ExtractionShip`)
 - 2026-02-03: 레벨 전환 트리거 및 POD 강하 스폰 시스템 (`LevelTransitionTrigger`, `SpawnWithPod`)

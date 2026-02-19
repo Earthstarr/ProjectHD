@@ -24,6 +24,7 @@ public class ProjectHD : ModuleRules
             "NavigationSystem",
             "LevelSequence",
             "MovieScene",
+            "RHI",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] { "EngineCameras", "EngineCameras", "GameplayStateTreeModule" });

@@ -13,7 +13,7 @@ class PROJECTHD_API APodActor : public AActor
 
 public:
 	APodActor();
-	
+
 	// 포드 몸체 메쉬
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* PodMesh;
@@ -21,7 +21,7 @@ public:
 	// 캐릭터가 서 있을 내부 발판 혹은 캐릭터가 올라올 메쉬
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* InternalElevatorMesh;
-	
+
 	// 캐릭터가 실제로 붙을 위치
 	UPROPERTY(VisibleAnywhere, Category = "Pod")
 	class USceneComponent* CharacterAnchor;
@@ -31,17 +31,17 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	class UCurveFloat* RiseCurve;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* FallingSound; // 낙하 사운드
-    
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ImpactSound; // 착지 사운드
 
 	// 낙하 중 조종 힘 (방향키로 이동)
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float PodSteerForce = 500000.f;
-	
+
 	FORCEINLINE class UStaticMeshComponent* GetInternalElevatorMesh() const { return InternalElevatorMesh; }
 	FORCEINLINE USceneComponent* GetCharacterAnchor() const { return CharacterAnchor; }
 
@@ -73,7 +73,13 @@ private:
 	UPROPERTY()
 	UAudioComponent* FallingSoundComponent;
 
-	// 착지 시 카메라 붐 위치 고정용
+	// 착지 시 카메라 붐 고정용
 	FVector SavedBoomRelativeLocation;
 	bool bCameraLocked = false;
+	FVector CameraLockedWorldPos;  // 착지 순간 카메라 붐 월드 위치 (공중)
+
+	// 카메라 보간용 (RiseTimeline 동기화)
+	float BlendStartArmLength = 0.f;
+	FVector BlendStartSocketOffset = FVector::ZeroVector;
+	float BlendStartPitch = 0.f;
 };

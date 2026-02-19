@@ -27,8 +27,11 @@
 #include "ProjectHD/Mission/ExtractionTerminal.h"
 #include "ProjectHD/Mission/IntroCutsceneManager.h"
 #include "ProjectHD/HDGameInstance.h"
+#include "ProjectHD/HDSaveSettings.h"
 #include "ProjectHD/Weapon/HDSilentDamageType.h"
 #include "ProjectHD/Character/Enemy/EnemyBase.h"
+#include "Camera/CameraActor.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AFPSCharacter::AFPSCharacter()
 {
@@ -210,6 +213,46 @@ void AFPSCharacter::BeginPlay()
         }
     }
 
+    // 저장된 키 바인딩 및 감도 적용
+    if (UHDGameInstance* SettingsGI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(this)))
+    {
+        if (UHDSaveSettings* Settings = SettingsGI->CachedSettings)
+        {
+            // 키 바인딩 적용 (저장된 바인딩이 있을 때만)
+            if (DefaultMappingContext)
+            {
+                TArray<FName> SavedKeys;
+                Settings->KeyBindings.GetKeys(SavedKeys);
+
+                if (SavedKeys.Num() > 0)
+                {
+                    TMap<FName, UInputAction*> ActionMap;
+                    if (FireAction) ActionMap.Add(FireAction->GetFName(), FireAction);
+                    if (AimAction) ActionMap.Add(AimAction->GetFName(), AimAction);
+                    if (InteractAction) ActionMap.Add(InteractAction->GetFName(), InteractAction);
+                    if (JumpAction) ActionMap.Add(JumpAction->GetFName(), JumpAction);
+                    if (StratagemMenuAction) ActionMap.Add(StratagemMenuAction->GetFName(), StratagemMenuAction);
+                    if (SprintAction) ActionMap.Add(SprintAction->GetFName(), SprintAction);
+                    if (GrenadeAction) ActionMap.Add(GrenadeAction->GetFName(), GrenadeAction);
+                    if (StimAction) ActionMap.Add(StimAction->GetFName(), StimAction);
+
+                    for (const FName& KeyName : SavedKeys)
+                    {
+                        FKey* FoundKey = Settings->KeyBindings.Find(KeyName);
+                        UInputAction** FoundAction = ActionMap.Find(KeyName);
+                        if (FoundKey && FoundAction)
+                        {
+                            SettingsGI->RemapKey(DefaultMappingContext, *FoundAction, *FoundKey);
+                        }
+                    }
+                }
+            }
+
+            // 마우스 감도 적용
+            MouseSensitivity = Settings->MouseSensitivity;
+        }
+    }
+
     // 500kg 폭탄
     FStratagemData Bomb;
     Bomb.Name = TEXT("500kg Bomb");
@@ -318,6 +361,7 @@ void AFPSCharacter::BeginPlay()
 
     // 레벨 전환으로 들어왔으면 POD 강하로 스폰
     UHDGameInstance* GI = Cast<UHDGameInstance>(UGameplayStatics::GetGameInstance(this));
+    bool bWasPodSpawn = GI && GI->bShouldSpawnWithPod;
     if (GI)
     {
         // 현재 레벨이 미션 맵인지 확인
@@ -326,17 +370,17 @@ void AFPSCharacter::BeginPlay()
 
         UE_LOG(LogTemp, Warning, TEXT("[MissionTimer] CurrentLevel: %s, MissionLevel: %s"), *CurrentLevelName, *GI->MissionLevelName.ToString());
 
-        if (CurrentLevelName == GI->MissionLevelName.ToString())
-        {
-            // 미션 맵이면 타이머 리셋 및 시작
-            GI->ResetMissionResult();
-            GI->StartMissionTimer(this);
-            UE_LOG(LogTemp, Warning, TEXT("[MissionTimer] Timer Started!"));
-        }
-
         // IntroCutsceneManager가 없을 때만 자동 POD 스폰
         TArray<AActor*> FoundManagers;
         UGameplayStatics::GetAllActorsOfClass(GetWorld(), AIntroCutsceneManager::StaticClass(), FoundManagers);
+
+        if (CurrentLevelName == GI->MissionLevelName.ToString() && FoundManagers.Num() == 0)
+        {
+            // 컷씬 없는 미션 맵이면 바로 타이머 시작 (컷씬 있으면 IntroCutsceneManager에서 시작)
+            GI->ResetMissionResult();
+            GI->StartMissionTimer(this);
+            UE_LOG(LogTemp, Warning, TEXT("[MissionTimer] Timer Started! (no cutscene)"));
+        }
 
         if (GI->bShouldSpawnWithPod && FoundManagers.Num() == 0)
         {
@@ -345,6 +389,57 @@ void AFPSCharacter::BeginPlay()
             // 약간의 딜레이 후 POD 강하 시작 (레벨 로드 완료 대기)
             FTimerHandle SpawnPodHandle;
             GetWorldTimerManager().SetTimer(SpawnPodHandle, [this]() { SpawnWithPod(); }, 0.5f, false);
+        }
+    }
+
+    // === 메인 메뉴 모드 ===
+    {
+        FString LevelName = GetWorld()->GetMapName();
+        LevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+
+        if (LevelName.Contains(TEXT("SpaceShip")) && !bWasPodSpawn)
+        {
+            bIsInMainMenu = true;
+
+            if (APlayerController* PC = Cast<APlayerController>(GetController()))
+            {
+                PC->DisableInput(PC);
+                PC->bShowMouseCursor = true;
+                PC->SetInputMode(FInputModeUIOnly());
+            }
+
+            if (MainHUDWidget)
+            {
+                MainHUDWidget->SetVisibility(ESlateVisibility::Hidden);
+            }
+
+            // 캐릭터 정면(사선)에 카메라 배치
+            FVector CharForward = GetActorForwardVector();
+            FVector CharRight = GetActorRightVector();
+            FVector CharCenter = GetActorLocation() + FVector(0, 0, MenuCameraHeightOffset);
+            float StartAngleRad = FMath::DegreesToRadians(MenuCameraStartAngle);
+            FVector CameraPos = CharCenter
+                + CharForward * FMath::Cos(StartAngleRad) * MenuCameraDistance
+                + CharRight * FMath::Sin(StartAngleRad) * MenuCameraDistance;
+            FRotator CameraRot = (CharCenter - CameraPos).Rotation();
+
+            MenuCamera = GetWorld()->SpawnActor<ACameraActor>(ACameraActor::StaticClass(), CameraPos, CameraRot);
+            if (MenuCamera)
+            {
+                if (APlayerController* PC = Cast<APlayerController>(GetController()))
+                {
+                    PC->SetViewTargetWithBlend(MenuCamera, 0.0f);
+                }
+            }
+
+            if (MainMenuWidgetClass)
+            {
+                MainMenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuWidgetClass);
+                if (MainMenuWidget)
+                {
+                    MainMenuWidget->AddToViewport();
+                }
+            }
         }
     }
 }
@@ -440,6 +535,74 @@ void AFPSCharacter::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
     UpdateAimOffset(DeltaTime);
+
+    // 메인 메뉴 카메라 오빗
+    if (bMenuCameraTransitioning && MenuCamera)
+    {
+        MenuCameraOrbitAlpha += DeltaTime / MenuCameraOrbitDuration;
+
+        float t = FMath::Clamp(MenuCameraOrbitAlpha, 0.0f, 1.0f);
+        // EaseInOutCubic
+        float EasedAlpha = t < 0.5f ? 4.0f * t * t * t : 1.0f - FMath::Pow(-2.0f * t + 2.0f, 3) / 2.0f;
+
+        FVector CharForward = GetActorForwardVector();
+        FVector CharRight = GetActorRightVector();
+        FVector CharCenter = GetActorLocation() + FVector(0, 0, MenuCameraHeightOffset);
+
+        float StartAngleRad = FMath::DegreesToRadians(MenuCameraStartAngle);
+        float Angle = FMath::Lerp(StartAngleRad, UE_PI, EasedAlpha);
+        FVector CamPos = CharCenter
+            + CharForward * FMath::Cos(Angle) * MenuCameraDistance
+            + CharRight * FMath::Sin(Angle) * MenuCameraDistance;
+
+        FRotator CamRot = (CharCenter - CamPos).Rotation();
+
+        // 오빗 후반에서 실제 TPS 카메라 위치로 수렴
+        if (EasedAlpha > MenuCameraBlendStart)
+        {
+            float BlendFactor = (EasedAlpha - MenuCameraBlendStart) / (1.0f - MenuCameraBlendStart);
+            FVector TPSLoc = ThirdPersonCamera->GetComponentLocation();
+            FRotator TPSRot = ThirdPersonCamera->GetComponentRotation();
+
+            CamPos = FMath::Lerp(CamPos, TPSLoc, BlendFactor);
+            CamRot = FQuat::Slerp(CamRot.Quaternion(), TPSRot.Quaternion(), BlendFactor).Rotator();
+        }
+
+        MenuCamera->SetActorLocationAndRotation(CamPos, CamRot);
+
+        if (MenuCameraOrbitAlpha >= 1.0f)
+        {
+            bMenuCameraTransitioning = false;
+            bIsInMainMenu = false;
+
+            // 위치가 이미 일치하므로 즉시 전환
+            if (APlayerController* PC = Cast<APlayerController>(GetController()))
+            {
+                PC->SetViewTarget(this);
+                PC->EnableInput(PC);
+                PC->bShowMouseCursor = false;
+                PC->SetInputMode(FInputModeGameOnly());
+            }
+
+            if (MainHUDWidget)
+            {
+                MainHUDWidget->SetVisibility(ESlateVisibility::Visible);
+            }
+
+            MenuCamera->Destroy();
+            MenuCamera = nullptr;
+        }
+    }
+
+    // 카메라가 벽에 의해 캐릭터 가까이 당겨지면 메시 숨김 (Pod 탑승 중에는 스킵)
+    if (!bIsOnPod)
+    {
+        float CameraDist = FVector::Dist(ThirdPersonCamera->GetComponentLocation(), GetActorLocation());
+        bCameraTooClose = CameraDist < 250.f;
+
+        RetargetMesh->SetVisibility(!bCameraTooClose);
+        WeaponMesh->SetVisibility(!bCameraTooClose);
+    }
 
     // 포드 안에 있을 때 시야를 맵 아래로 고정
     if (bIsOnPod && Controller)
@@ -962,7 +1125,8 @@ void AFPSCharacter::SpawnWithPod(bool bPlaySound)
         OnSoundPlayed.Broadcast(FName("SpawnVoiceSound")); // 자막
     }
 
-    // 포드 탑승 중 캐릭터 외형 숨기기 (무기 메시 포함)
+    // 낙하 중 캐릭터 완전히 숨기기 (카메라에서 안 보이게)
+    SetActorHiddenInGame(true);
     RetargetMesh->SetVisibility(false, true);
 
     // 캐릭터 일시적 비활성화
@@ -971,11 +1135,18 @@ void AFPSCharacter::SpawnWithPod(bool bPlaySound)
     GetCharacterMovement()->SetMovementMode(MOVE_None);
     GetCharacterMovement()->GravityScale = 0.0f;
 
-    // 시야를 맵 아래로 고정 (-90도)
+    // 시야를 위에서 아래로 내려다보는 앵글로 설정
     if (APlayerController* PC = Cast<APlayerController>(GetController()))
     {
         FRotator CurrentRot = PC->GetControlRotation();
-        PC->SetControlRotation(FRotator(-90.f, CurrentRot.Yaw, 0.f));
+        PC->SetControlRotation(FRotator(-60.f, CurrentRot.Yaw, 0.f));
+    }
+
+    // 카메라 붐을 하이앵글로 설정 (낙하 연출)
+    if (CameraBoom)
+    {
+        CameraBoom->TargetArmLength = 800.f;
+        CameraBoom->SocketOffset = FVector(0.f, 0.f, 200.f);
     }
 
     // 현재 위치(PlayerStart 위치) 기준으로 상공에서 스폰
@@ -1908,4 +2079,29 @@ void AFPSCharacter::RestorePlayerState()
         PC->bShowMouseCursor = false;
         PC->SetInputMode(FInputModeGameOnly());
     }
+}
+
+void AFPSCharacter::StartGameFromMenu()
+{
+    if (MainMenuWidget)
+    {
+        MainMenuWidget->RemoveFromParent();
+        MainMenuWidget = nullptr;
+    }
+
+    if (APlayerController* PC = Cast<APlayerController>(GetController()))
+    {
+        PC->bShowMouseCursor = false;
+
+        // TPS 카메라가 캐릭터 뒤에 위치하도록 컨트롤 로테이션 설정
+        PC->SetControlRotation(GetActorRotation());
+    }
+
+    bMenuCameraTransitioning = true;
+    MenuCameraOrbitAlpha = 0.0f;
+}
+
+void AFPSCharacter::QuitGameFromMenu()
+{
+    UKismetSystemLibrary::QuitGame(GetWorld(), Cast<APlayerController>(GetController()), EQuitPreference::Quit, false);
 }

@@ -150,7 +150,7 @@ void AExtractionTerminal::ActivateTerminal()
 	// 활성화 사운드
 	if (ActivationSound)
 	{
-		UGameplayStatics::PlaySound2D(this, ActivationSound);
+		UGameplayStatics::PlaySound2D(this, ActivationSound);		
 	}
 
 	OnExtractionStateChanged.Broadcast(ExtractionState);
@@ -227,6 +227,7 @@ void AExtractionTerminal::ProcessDirectionInput(EStratagemDirection Direction)
 			if (InputCompleteSound)
 			{
 				UGameplayStatics::PlaySound2D(this, InputCompleteSound);
+				OnSoundPlayed.Broadcast(FName("Extraction_Start")); // 자막
 			}
 
 			// 플레이어에서 터미널 연결 해제
@@ -296,6 +297,7 @@ void AExtractionTerminal::CompleteExtraction()
 	if (ExtractionCompleteSound)
 	{
 		UGameplayStatics::PlaySound2D(this, ExtractionCompleteSound);
+		OnSoundPlayed.Broadcast(FName("Extraction_Complete")); // 자막
 	}
 
 	// 수송선 스폰

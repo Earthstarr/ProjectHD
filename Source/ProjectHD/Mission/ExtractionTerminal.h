@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ProjectHD/InteractableInterface.h"
+#include "ProjectHD/SubtitleTypes.h" // 자막
+
 #include "ExtractionTerminal.generated.h"
 
 class AFPSCharacter;
@@ -213,4 +215,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Extraction")
 	int32 GetTotalSteps() const { return RequiredCommand.Num(); }
+	
+	UPROPERTY(BlueprintAssignable, Category = "Audio")
+	FOnSoundPlayedSignature OnSoundPlayed;  // 자막
 };

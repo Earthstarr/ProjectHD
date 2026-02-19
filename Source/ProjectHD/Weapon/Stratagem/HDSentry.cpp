@@ -20,11 +20,11 @@ AHDSentry::AHDSentry()
     RootComponent = BodyMesh;
     BodyMesh->SetSimulatePhysics(true);
     BodyMesh->SetNotifyRigidBodyCollision(true);
-
+    
     // 기둥
     PillarMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PillarMesh"));
     PillarMesh->SetupAttachment(BodyMesh);
-
+    
     // 터렛
     TurretMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("TurretMesh"));
     TurretMesh->SetupAttachment(PillarMesh);
@@ -62,7 +62,7 @@ void AHDSentry::Tick(float DeltaTime)
             BodyMesh->SetSimulatePhysics(false);
             BodyMesh->PutRigidBodyToSleep();
             BodyMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-                        
+            
             // 땅에 고정
             SetActorLocation(GroundHit.ImpactPoint + FVector(0.f, 0.f, -100.f));
             

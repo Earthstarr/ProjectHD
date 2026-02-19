@@ -199,18 +199,18 @@ void AStratagemBeacon::TriggerStrike()
                 }
                 
                 // 이펙트 및 데미지
-                if (ClusterExplosionFX)
+                if (ClusterExplosionFX && FMath::FRand() < 0.5f) // 이펙트 절반만
                 {
                     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ClusterExplosionFX, FinalExplosionPos);
                 }                
                 
-                if (ClusterExplosionSound && FMath::FRand() < 0.33f)
+                if (ClusterExplosionSound && FMath::FRand() < 0.2f) // 사운드 20퍼만
                 {
                     UGameplayStatics::PlaySoundAtLocation(this, ClusterExplosionSound, FinalExplosionPos,
                         FMath::FRandRange(0.4f, 0.6f), FMath::FRandRange(0.8f, 1.2f));
                 }
                 
-                //이펙트 터진곳 데미지
+                //터진 위치 데미지
                 TArray<FHitResult> PointHits;
                 FCollisionShape SphereShape = FCollisionShape::MakeSphere(500.f);
                 if (GetWorld()->SweepMultiByChannel(PointHits, FinalExplosionPos, FinalExplosionPos, FQuat::Identity, ECC_Pawn, SphereShape))
